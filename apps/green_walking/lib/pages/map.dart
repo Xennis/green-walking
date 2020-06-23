@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:latlong/latlong.dart';
 
+import '../widgets/map_attribution.dart';
+
 class MapPage extends StatefulWidget {
   MapPage({Key key}) : super(key: key);
 
@@ -15,6 +17,9 @@ class _MapPageState extends State<MapPage> {
   MapOptions mapOptions = MapOptions(
     center: LatLng(53.5519, 9.8682),
     zoom: 15.0,
+    plugins: [
+      AttributionPlugin(),
+    ],
     minZoom: 6,
     maxZoom: 18,
     swPanBoundary: LatLng(46.1037, 5.2381),
@@ -33,7 +38,7 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Green walking'),
+          title: Text('Green Walking'),
         ),
         body: FutureBuilder<String>(
             future: accessToken,
@@ -57,6 +62,7 @@ class _MapPageState extends State<MapPage> {
                             // NetworkTileProvider or CachedNetworkTileProvider
                             tileProvider: NetworkTileProvider(),
                           ),
+                          AttributionOptions(),
                         ]),
                   )
                 ]));
