@@ -5,11 +5,17 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
+import 'package:green_walking/services/parks.dart';
+import 'package:green_walking/widgets/place_list_tile.dart';
 import 'package:latlong/latlong.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:geolocator/geolocator.dart';
 
+import '../routes.dart';
 import '../widgets/map_attribution.dart';
+import '../types/place.dart';
+import 'detail.dart';
 
 class MapPage extends StatefulWidget {
   MapPage({Key key}) : super(key: key);
@@ -19,20 +25,13 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+  final PopupController _popupController = PopupController();
   MapController mapController;
-  MapOptions mapOptions = MapOptions(
-    center: LatLng(53.5519, 9.8682),
-    zoom: 15.0,
-    plugins: [
-      AttributionPlugin(),
-    ],
-    minZoom: 6,
-    maxZoom: 18,
-    swPanBoundary: LatLng(46.1037, 5.2381),
-    nePanBoundary: LatLng(55.5286, 16.6275),
-  );
   Future<String> accessToken;
 
+  ParkService parkService = ParkService();
+
+  List<Marker> markers = [];
   List<CircleMarker> circles = [];
 
   Position _lastKnownPosition;
@@ -44,6 +43,27 @@ class _MapPageState extends State<MapPage> {
     accessToken = DefaultAssetBundle.of(context)
         .loadString("assets/mapbox-access-token.txt");
     super.initState();
+
+    parkService.load(context).then((value) {
+      List<Marker> l = [];
+      for (final p in value) {
+        l.add(Marker(
+          anchorPos: AnchorPos.align(AnchorAlign.center),
+          height: 50,
+          width: 50,
+          point: p.location,
+          builder: (_) => Icon(
+            Icons.nature_people,
+            color: Colors.blueGrey,
+            size: 50,
+          ),
+        ));
+      }
+      setState(() {
+        markers = l;
+      });
+    });
+
     _initLastKnownLocation();
     _initCurrentLocation();
   }
@@ -115,7 +135,19 @@ class _MapPageState extends State<MapPage> {
                 Flexible(
                   child: FlutterMap(
                       mapController: mapController,
-                      options: mapOptions,
+                      options: MapOptions(
+                        center: LatLng(53.5519, 9.8682),
+                        zoom: 15.0,
+                        plugins: [
+                          MarkerClusterPlugin(),
+                          AttributionPlugin(),
+                        ],
+                        minZoom: 6,
+                        maxZoom: 18,
+                        swPanBoundary: LatLng(46.1037, 5.2381),
+                        nePanBoundary: LatLng(55.5286, 16.6275),
+                        onTap: (_) => _popupController.hidePopup(),
+                      ),
                       layers: [
                         TileLayerOptions(
                           urlTemplate:
@@ -128,8 +160,51 @@ class _MapPageState extends State<MapPage> {
                           // NetworkTileProvider or CachedNetworkTileProvider
                           tileProvider: NetworkTileProvider(),
                         ),
-                        CircleLayerOptions(
+                                                CircleLayerOptions(
                           circles: circles,
+                        ),
+
+                        MarkerClusterLayerOptions(
+                          size: Size(40, 40),
+                          markers: markers,
+                          builder: (context, markers) {
+                            return FloatingActionButton(
+                              child: Text(markers.length.toString()),
+                              onPressed: null,
+                            );
+                          },
+                          popupOptions: PopupOptions(
+                              popupSnap: PopupSnap.top,
+                              popupController: _popupController,
+                              popupBuilder: (_, marker) {
+                                final Place p = parkService.get(marker.point);
+                                return Container(
+                                    width: 300,
+                                    //alignment: Alignment.bottomLeft,
+                                    child: Card(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          PlaceListTile(place: p,),
+                                          ButtonBar(
+                                            children: <Widget>[
+                                              FlatButton(
+                                                child: const Text('OK'),
+                                                onPressed: () => _popupController.hidePopup(),
+                                              ),
+                                              FlatButton(
+                                                child: const Text('DETAILS'),
+                                                onPressed: () {
+                                                      Navigator.of(context).pushNamed(Routes.detail, arguments: DetailPageArguments(p.name));
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                              }),
                         ),
                         AttributionOptions(),
                       ]),
@@ -187,12 +262,13 @@ class _MapPageState extends State<MapPage> {
                   log("current post");
                   LatLng newPos = LatLng(
                       _currentPosition.latitude, _currentPosition.longitude);
-                  if (mapOptions.isOutOfBounds(newPos)) {
-                    Scaffold.of(context).showSnackBar(SnackBar(
-                      content: Text("Location outside of Germany"),
-                    ));
-                    return;
-                  }
+                  // FIXME: Check the location is inside the bounds.
+                  //if (!mapController.bounds.contains(newPos)) {
+                  //  Scaffold.of(context).showSnackBar(SnackBar(
+                  //    content: Text("Location outside of Germany"),
+                  //  ));
+                  //  return;
+                  //}
 
                   mapController.move(newPos, 15.0);
                   setState(() {
