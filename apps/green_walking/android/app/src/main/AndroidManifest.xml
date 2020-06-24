@@ -46,4 +46,7 @@
     </application>
     <!-- Required by flutter_map -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Required by geolocator -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 </manifest>
