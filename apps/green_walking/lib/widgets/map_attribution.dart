@@ -6,7 +6,13 @@ import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AttributionOptions extends LayerOptions {
-  Color color = Colors.blueGrey;
+  final Color color;
+  final String logoAssetName;
+
+  AttributionOptions({
+    @required this.logoAssetName,
+    this.color = Colors.blueGrey,
+  }) : assert(logoAssetName != null);
 }
 
 class AttributionLayer extends StatefulWidget {
@@ -29,7 +35,7 @@ class _AttributionLayerState extends State<AttributionLayer> {
         children: [
           Text("   "),  // FIXME: Use proper spacing
           SvgPicture.asset(
-            "assets/mapbox-logo.svg",
+            widget.options.logoAssetName,
             semanticsLabel: 'Mapbox',
             width: 80,
             color: widget.options.color,
