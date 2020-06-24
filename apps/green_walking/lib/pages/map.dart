@@ -206,7 +206,7 @@ class _MapPageState extends State<MapPage> {
                                   );
                               }),
                         ),
-                        AttributionOptions(),
+                        AttributionOptions(logoAssetName: "assets/mapbox-logo.svg"),
                       ]),
                 )
               ]));
