@@ -29,8 +29,6 @@ class _MapPageState extends State<MapPage> {
   MapController mapController;
   Future<String> accessToken;
 
-  ParkService parkService = ParkService();
-
   List<Marker> markers = [];
   List<CircleMarker> circles = [];
 
@@ -44,14 +42,14 @@ class _MapPageState extends State<MapPage> {
         .loadString("assets/mapbox-access-token.txt");
     super.initState();
 
-    parkService.load(context).then((value) {
+    ParkService.load(context).then((value) {
       List<Marker> l = [];
       for (final p in value) {
         l.add(Marker(
           anchorPos: AnchorPos.align(AnchorAlign.center),
           height: 50,
           width: 50,
-          point: p.location,
+          point: p.coordinates,
           builder: (_) => Icon(
             Icons.nature_people,
             color: Colors.blueGrey,
@@ -177,7 +175,7 @@ class _MapPageState extends State<MapPage> {
                               popupSnap: PopupSnap.top,
                               popupController: _popupController,
                               popupBuilder: (_, marker) {
-                                final Place p = parkService.get(marker.point);
+                                final Place p = ParkService.get(marker.point);
                                 return Container(
                                     width: 300,
                                     //alignment: Alignment.bottomLeft,
@@ -195,7 +193,7 @@ class _MapPageState extends State<MapPage> {
                                               FlatButton(
                                                 child: const Text('DETAILS'),
                                                 onPressed: () {
-                                                      Navigator.of(context).pushNamed(Routes.detail, arguments: DetailPageArguments(p.name));
+                                                      Navigator.of(context).pushNamed(Routes.detail, arguments: DetailPageArguments(p.coordinates));
                                                 },
                                               ),
                                             ],
