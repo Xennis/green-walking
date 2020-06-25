@@ -1,7 +1,7 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 
 
-def get_results(endpoint_url, query):
+def get_results(endpoint_url: str, query: str):
     # User-Agent policy: https://w.wiki/CX6
     user_agent = "green-walking/0.1 (https://github.com/Xennis/green-walking)"
     sparql = SPARQLWrapper(endpoint_url, agent=user_agent)

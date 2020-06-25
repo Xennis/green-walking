@@ -3,3 +3,4 @@ venv/
 
 # Local files
 all-parks.txt
+park-details.json
