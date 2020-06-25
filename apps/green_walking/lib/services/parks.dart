@@ -5,26 +5,28 @@ import 'dart:convert';
 
 import '../types/place.dart';
 
+
+Map<LatLng, Place> places = Map();
+
+
 class ParkService {
 
-  Map<LatLng, Place> places = Map();
-
-  Future<Iterable<Place>> load(BuildContext context) async {
+  static Future<Iterable<Place>> load(BuildContext context) async {
     String rawBlob =
         await DefaultAssetBundle.of(context).loadString("assets/parks.json");
     List<String> rawLines = LineSplitter().convert(rawBlob);
 
     for (var i = 0; i < rawLines.length; i++) {
       Place p = Place.fromJson(json.decode(rawLines[i]));
-      if (p.location == Null) {
+      if (p.coordinates == Null) {
         continue;
       }
-      places[p.location] = p;
+      places[p.coordinates] = p;
     }
     return places.values;
   }
 
-  Place get(LatLng location) {
+  static Place get(LatLng location) {
     return places[location];
   }
 

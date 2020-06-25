@@ -8,6 +8,8 @@ def extract_item_data(entry: Dict[str, Any]) -> Dict[str, Any]:
     res["name"] = entry.get("labels", {}).get("de")
     res["aliases"] = entry.get("aliases")["de"]
     res["description"] = entry.get("descriptions", {}).get("de")
+    res["wiki_url"] = entry.get("wiki_url", {}).get("de")
+
     claims = entry.get("claims", {})
     location = claims.get("location")
     administrative = claims.get("located in the administrative territorial entity", [])
@@ -21,7 +23,6 @@ def extract_item_data(entry: Dict[str, Any]) -> Dict[str, Any]:
         "longitude": coordinate_location[0].get("longitude") if coordinate_location else None
     }
     res["categories"] = [v.get("de") for v in claims.get("instance of")] + [v.get("de") for v in claims.get("heritage designation", {})]
-    res["wiki_url"] = claims.get("wiki_url", {}).get("de")
     return res
 
 
