@@ -18,7 +18,7 @@ class ParkService {
 
     for (var i = 0; i < rawLines.length; i++) {
       Place p = Place.fromJson(json.decode(rawLines[i]));
-      if (p.coordinates == Null) {
+      if (p.coordinates == null) {
         continue;
       }
       places[p.coordinates] = p;
