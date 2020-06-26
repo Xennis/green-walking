@@ -38,17 +38,48 @@ class PlaceListTile extends StatelessWidget {
         ],
       ));
     }
-    children.add(Wrap(
-      alignment: WrapAlignment.start,
-      spacing: 5,
-      children: createCategoryCips(),
-    ));
+    children.add(CategoryChips(place.categories));
     return ListTile(
       //leading: Icon(Icons.nature_people),
       title: Text(place.name),
       subtitle: Column(
         children: children,
       ),
+    );
+  }
+}
+
+class CategoryChips extends StatelessWidget {
+  final List<String> categories;
+
+  CategoryChips(this.categories);
+
+  String truncateString(String myString, int cutoff) {
+    return (myString.length <= cutoff)
+        ? myString
+        : '${myString.substring(0, cutoff)}...';
+  }
+
+  List<Widget> createCategoryCips() {
+    List<Widget> res = [];
+    categories.forEach((c) {
+      res.add(Chip(
+        avatar: CircleAvatar(
+          backgroundColor: Colors.grey.shade800,
+          child: Icon(Icons.nature_people),
+        ),
+        label: Text(truncateString(c, 15)),
+      ));
+    });
+    return res;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      alignment: WrapAlignment.start,
+      spacing: 5,
+      children: createCategoryCips(),
     );
   }
 }

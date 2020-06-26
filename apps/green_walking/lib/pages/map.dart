@@ -50,7 +50,7 @@ class _MapPageState extends State<MapPage> {
           anchorPos: AnchorPos.align(AnchorAlign.center),
           height: 50,
           width: 50,
-          point: p.coordinates,
+          point: p.coordinateLocation,
           builder: (_) => Icon(
             Icons.nature_people,
             color: Colors.blueGrey,
@@ -210,8 +210,8 @@ class _MapPageState extends State<MapPage> {
                                                 Navigator.of(context).pushNamed(
                                                     Routes.detail,
                                                     arguments:
-                                                        DetailPageArguments(
-                                                            p.coordinates));
+                                                        DetailPageArguments(p
+                                                            .coordinateLocation));
                                               },
                                             ),
                                           ],
