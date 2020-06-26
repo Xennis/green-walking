@@ -1,4 +1,4 @@
-package com.example.green_walking
+package org.xennis.apps.green_walking
 
 import io.flutter.embedding.android.FlutterActivity
 
