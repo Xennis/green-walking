@@ -116,7 +116,7 @@ class _MapPageState extends State<MapPage> {
           setState(() => _currentPosition = position);
         }
       }).catchError((e) {
-        log(e);
+        log(e.toString());
       });
   }
 

@@ -15,18 +15,13 @@ class AttributionOptions extends LayerOptions {
   }) : assert(logoAssetName != null);
 }
 
-class AttributionLayer extends StatefulWidget {
+class AttributionLayer extends StatelessWidget {
   final AttributionOptions options;
   final MapState map;
   final Stream<void> stream;
 
   AttributionLayer(this.options, this.map, this.stream);
 
-  @override
-  _AttributionLayerState createState() => _AttributionLayerState();
-}
-
-class _AttributionLayerState extends State<AttributionLayer> {
   @override
   Widget build(BuildContext context) {
     return Align(
@@ -35,15 +30,15 @@ class _AttributionLayerState extends State<AttributionLayer> {
         children: [
           Text("   "),  // FIXME: Use proper spacing
           SvgPicture.asset(
-            widget.options.logoAssetName,
+            options.logoAssetName,
             semanticsLabel: 'Mapbox',
             width: 80,
-            color: widget.options.color,
+            color: options.color,
           ),
           IconButton(
               icon: Icon(
                 Icons.info,
-                color: widget.options.color,
+                color: options.color,
               ),
               onPressed: () {
                 showDialog(
