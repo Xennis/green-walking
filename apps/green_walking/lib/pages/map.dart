@@ -1,18 +1,17 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:green_walking/services/parks.dart';
+import 'package:green_walking/widgets/drawer.dart';
 import 'package:green_walking/widgets/place_list_tile.dart';
 import 'package:latlong/latlong.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../routes.dart';
 import '../widgets/map_attribution.dart';
@@ -122,82 +121,11 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle textStyle = Theme.of(context).textTheme.bodyText2;
-    final List<Widget> aboutBoxChildren = <Widget>[
-      SizedBox(height: 24),
-      RichText(
-        text: TextSpan(
-          children: <TextSpan>[
-            TextSpan(
-                style: textStyle,
-                text: 'To see the source code of this app, please visit the '),
-            TextSpan(
-              text: 'GitHub repository',
-              style: TextStyle(color: Theme.of(context).accentColor),
-              recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  launch('https://github.com/Xennis/green-walking');
-                },
-            ),
-            TextSpan(style: textStyle, text: '.'),
-          ],
-        ),
-      ),
-    ];
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Green Walking'),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Theme.of(context).accentColor,
-              ),
-              child: Column(children: <Widget>[
-                Row(children: [
-                  Text(
-                    'Green Walking',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                    ),
-                  ),
-                ]),
-                Row(
-                  children: [
-                    Text("Entdecke deine grüne Stadt!", style: TextStyle(color: Colors.white70,)),
-                  ],
-                )
-              ]),
-            ),
-            ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Einstellungen'),
-            ),
-            ListTile(
-              leading: Icon(Icons.help),
-              title: Text('Hilfe'),
-            ),
-            Divider(),
-            ListTile(
-              leading: Icon(Icons.feedback),
-              title: Text('Feedback senden'),
-            ),
-            AboutListTile(
-              icon: Icon(Icons.info),
-              applicationIcon: FlutterLogo(),
-              applicationName: 'Green Walking',
-              applicationVersion: 'Version 0.1.0',
-              applicationLegalese: 'Developed by Xennis',
-              aboutBoxChildren: aboutBoxChildren,
-            ),
-          ],
-        ),
-      ),
+      drawer: MainDrawer(),
       body: FutureBuilder<String>(
           future: accessToken,
           builder: (context, snapshot) {
