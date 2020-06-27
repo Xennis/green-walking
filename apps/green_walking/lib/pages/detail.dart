@@ -12,12 +12,7 @@ class DetailPageArguments {
   DetailPageArguments(this.coordinates);
 }
 
-class DetailPage extends StatefulWidget {
-  @override
-  _DetailPageState createState() => _DetailPageState();
-}
-
-class _DetailPageState extends State<DetailPage> {
+class DetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DetailPageArguments args = ModalRoute.of(context).settings.arguments;
