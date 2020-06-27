@@ -232,17 +232,26 @@ class _MapPageState extends State<MapPage> {
                           // NetworkTileProvider or CachedNetworkTileProvider
                           tileProvider: NetworkTileProvider(),
                         ),
-                                                CircleLayerOptions(
+                        CircleLayerOptions(
                           circles: circles,
                         ),
-
                         MarkerClusterLayerOptions(
                           size: Size(40, 40),
                           markers: markers,
                           builder: (context, markers) {
-                            return FloatingActionButton(
-                              child: Text(markers.length.toString()),
-                              onPressed: null,
+                            // Avoid using a FloatingActionButton here.
+                            // See https://github.com/lpongetti/flutter_map_marker_cluster/issues/18
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).accentColor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  markers.length.toString(),
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
                             );
                           },
                           popupOptions: PopupOptions(
@@ -296,6 +305,7 @@ class _MapPageState extends State<MapPage> {
       // A Builder is used because the Scaffold context is needed for the SnakBars.
       floatingActionButton: Builder(
         builder: (context) => FloatingActionButton(
+          heroTag: "location-searching",
           child: Icon(Icons.location_searching),
           onPressed: () {
             Geolocator().checkGeolocationPermissionStatus().then((status) {
