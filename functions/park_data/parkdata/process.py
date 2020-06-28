@@ -5,24 +5,22 @@ from bs4 import BeautifulSoup
 
 class ProcessWikidata:
 
-    # @staticmethod
-    # def _resolve_commons_media(image_info: Dict[str, Any]) -> Dict[str, Any]:
-    #     res = {}
-    #     res["url"] = image_info.get("url")
-    #     res["description_url"] = image_info.get("descriptionurl")
-    #
-    #     ext_meta_data = image_info.get("extmetadata", {})
-    #     res["license_short_name"] = ext_meta_data.get("LicenseShortName", {}).get("value")
-    #     res["license_url"] = ext_meta_data.get("LicenseUrl", {}).get("value")
-    #     res["copyrighted"] = bool(
-    #         ext_meta_data.get("Copyrighted", {}).get("value") != "False")  # Safer to parse for False than True
-    #     artist = ext_meta_data.get("Artist").get("value")
-    #     if artist is not None:
-    #         # Remove the HTML link is there is one
-    #         res["artist"] = BeautifulSoup(artist, features="html.parser").text
-    #     else:
-    #         res["artist"] = None
-    #     return res
+    @staticmethod
+    def _resolve_commons_media(image_info: Dict[str, Any]) -> Dict[str, Any]:
+        ext_meta_data = image_info.get("extmetadata", {})
+        # It's safer to parse for False: It's better to wrongly assume a media has a copyright than the other way round.
+        copyrighted = bool(ext_meta_data.get("Copyrighted", {}).get("value") != "False")
+        artist = ext_meta_data.get("Artist", {}).get("value")
+        # The artist attribute can contain a HTML link
+        artist = None if artist is None else BeautifulSoup(artist, features="html.parser").text
+        return {
+            "artist": artist,
+            "copyrighted": copyrighted,
+            "descriptionUrl": image_info.get("descriptionurl"),
+            "licenseShortName": ext_meta_data.get("LicenseShortName", {}).get("value"),
+            "licenseUrl": ext_meta_data.get("LicenseUrl", {}).get("value"),
+            "url": image_info.get("url"),
+        }
 
     @staticmethod
     def _resolve_claims_by_type(claims: Dict[str, Iterable[Dict[str, Any]]]) -> Dict[str, Any]:
@@ -43,8 +41,7 @@ class ProcessWikidata:
                     res[prop].append(data_val.get("gw", {}).get("labels", {}))
                 elif data_type == "commonsMedia" and data_val_type == "string":
                     image_infos = data_val.get("gw", {}).get("imageinfo", [])
-                    # TODO: Resolve media
-                    res[prop].append(image_infos)
+                    res[prop].append([ProcessWikidata._resolve_commons_media(info) for info in image_infos])
                 elif data_type == "url" and data_val_type == "string":
                     res[prop].append(data_val.get("value"))
                 else:
@@ -63,6 +60,7 @@ class ProcessWikidata:
         heritage_designation: List[Dict[str, Any]] = claims.get("heritage designation", {})
         instance_of: List[Dict[str, Any]] = claims.get("instance of", {})
         location = claims.get("location")
+        officialWebsite = claims.get("official website")
         image = claims.get("image")
 
         return {
@@ -70,19 +68,20 @@ class ProcessWikidata:
                 "de": [e.get("value") for e in aliases.get("de", [])],
                 "en": [e.get("value") for e in aliases.get("en", [])],
             },
-            "coordinate location": {
-                "latitude": coordinate_location[0].get("latitude") if coordinate_location else None,
-                "longitude": coordinate_location[0].get("longitude") if coordinate_location else None
-            },
             "categories": {
                 "de": [v.get("de", {}).get("value") for v in instance_of] + [v.get("de", {}).get("value") for v in heritage_designation],
                 "en": [v.get("en", {}).get("value") for v in instance_of] + [v.get("en", {}).get("value") for v in heritage_designation],
             },
+            "coordinateLocation": {
+                "latitude": coordinate_location[0].get("latitude") if coordinate_location else None,
+                "longitude": coordinate_location[0].get("longitude") if coordinate_location else None
+            },
+            "commonsUrl": sitelinks.get("commonswiki", {}).get("url"),
             "descriptions": {
                 "de": descriptions.get("de", {}).get("value"),
                 "en": descriptions.get("en", {}).get("value")
             },
-            "image": image,
+            "image": image[0][0] if image else None,
             "location": {
                 "de": {
                     "location": location[0].get("de", {}).get("value") if location else None,
@@ -97,10 +96,10 @@ class ProcessWikidata:
                 "de": labels.get("de", {}).get("value"),
                 "en": labels.get("en", {}).get("value"),
             },
-            "wikipedia_url": {
+            "officialWebsite": officialWebsite[0] if officialWebsite else None,
+            "wikidataId": entry.get("title"),
+            "wikipediaUrl": {
                 "de": sitelinks.get("dewiki", {}).get("url"),
                 "en": sitelinks.get("enwiki", {}).get("url")
             },
-            "commons_url": sitelinks.get("commonswiki", {}).get("url"),
-            "wikidata_id": entry.get("title"),
         }
