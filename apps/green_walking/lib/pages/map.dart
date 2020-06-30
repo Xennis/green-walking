@@ -1,17 +1,14 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:green_walking/services/parks.dart';
 import 'package:green_walking/widgets/drawer.dart';
 import 'package:green_walking/widgets/place_list_tile.dart';
 import 'package:latlong/latlong.dart';
-import 'package:app_settings/app_settings.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:user_location/user_location.dart';
 
 import '../routes.dart';
 import '../widgets/map_attribution.dart';
@@ -27,18 +24,15 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   final PopupController _popupController = PopupController();
-  MapController mapController;
+  final MapController mapController = MapController();
+  UserLocationOptions userLocationOptions;
   Future<String> accessToken;
 
   List<Marker> markers = [];
-  List<CircleMarker> circles = [];
-
-  Position _lastKnownPosition;
-  Position _currentPosition;
+  List<Marker> userLocationMarkers = [];
 
   @override
   void initState() {
-    mapController = MapController();
     accessToken = DefaultAssetBundle.of(context)
         .loadString("assets/mapbox-access-token.txt");
     super.initState();
@@ -62,65 +56,38 @@ class _MapPageState extends State<MapPage> {
         markers = l;
       });
     });
-
-    _initLastKnownLocation();
-    _initCurrentLocation();
   }
 
-  @override
-  void didUpdateWidget(Widget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    setState(() {
-      _lastKnownPosition = null;
-      _currentPosition = null;
-    });
-
-    _initLastKnownLocation().then((_) => _initCurrentLocation());
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> _initLastKnownLocation() async {
-    Position position;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      final Geolocator geolocator = Geolocator()
-        ..forceAndroidLocationManager = true;
-      position = await geolocator.getLastKnownPosition(
-          desiredAccuracy: LocationAccuracy.best);
-    } on PlatformException {
-      position = null;
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      _lastKnownPosition = position;
-    });
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  _initCurrentLocation() {
-    Geolocator()
-      ..forceAndroidLocationManager = true
-      ..getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.medium,
-      ).then((position) {
-        if (mounted) {
-          setState(() => _currentPosition = position);
-        }
-      }).catchError((e) {
-        log(e.toString());
-      });
+  UserLocationOptions _createUserLocationOptions(BuildContext context) {
+    return UserLocationOptions(
+        context: context,
+        mapController: mapController,
+        markers: userLocationMarkers,
+        showHeading: true,
+        zoomToCurrentLocationOnLoad: false,
+        updateMapLocationOnPositionChange: false,
+        showMoveToCurrentLocationFloatingActionButton: true,
+        fabBottom: 16,
+        fabRight: 16,
+        fabWidth: 55,
+        fabHeight: 55,
+        moveToCurrentLocationFloatingActionButton: Container(
+          decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor,
+              borderRadius: BorderRadius.circular(40.0),
+              boxShadow: [BoxShadow(color: Colors.grey, blurRadius: 10.0)]),
+          child: Icon(
+            Icons.location_searching,
+            color: Colors.white,
+          ),
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
+    // You can use the userLocationOptions object to change the properties
+    // of UserLocationOptions in runtime
+    userLocationOptions = _createUserLocationOptions(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Green Walking'),
@@ -139,8 +106,9 @@ class _MapPageState extends State<MapPage> {
                         center: LatLng(53.5519, 9.8682),
                         zoom: 15.0,
                         plugins: [
-                          MarkerClusterPlugin(),
                           AttributionPlugin(),
+                          MarkerClusterPlugin(),
+                          UserLocationPlugin(),
                         ],
                         minZoom: 8, // zoom out
                         maxZoom: 18, // zoom in
@@ -160,9 +128,7 @@ class _MapPageState extends State<MapPage> {
                           // NetworkTileProvider or CachedNetworkTileProvider
                           tileProvider: NetworkTileProvider(),
                         ),
-                        CircleLayerOptions(
-                          circles: circles,
-                        ),
+                        MarkerLayerOptions(markers: userLocationMarkers),
                         MarkerClusterLayerOptions(
                           size: Size(40, 40),
                           markers: markers,
@@ -189,7 +155,6 @@ class _MapPageState extends State<MapPage> {
                                 final Place p = ParkService.get(marker.point);
                                 return Container(
                                   width: 300,
-                                  //alignment: Alignment.bottomLeft,
                                   child: Card(
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
@@ -222,6 +187,7 @@ class _MapPageState extends State<MapPage> {
                                 );
                               }),
                         ),
+                        userLocationOptions,
                         AttributionOptions(
                             logoAssetName: "assets/mapbox-logo.svg"),
                       ]),
@@ -230,106 +196,6 @@ class _MapPageState extends State<MapPage> {
             }
             return Center(child: CircularProgressIndicator());
           }),
-      // A Builder is used because the Scaffold context is needed for the SnakBars.
-      floatingActionButton: Builder(
-        builder: (context) => FloatingActionButton(
-          heroTag: "location-searching",
-          child: Icon(Icons.location_searching),
-          onPressed: () {
-            Geolocator().checkGeolocationPermissionStatus().then((status) {
-              if (status != GeolocationStatus.granted) {
-                Scaffold.of(context).showSnackBar(SnackBar(
-                  content: Text("Permission denied"),
-                ));
-                log("no access granted");
-                log(status.toString());
-                return;
-              }
-              Geolocator().isLocationServiceEnabled().then((enabled) {
-                if (enabled != true) {
-                  showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                            content:
-                                Text("To continue, turn on device location"),
-                            actions: [
-                              FlatButton(
-                                child: Text("NO THANKS"),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              FlatButton(
-                                  child: Text("OK"),
-                                  onPressed: () {
-                                    AppSettings.openLocationSettings();
-                                    Navigator.of(context).pop();
-                                  }),
-                            ],
-                          ));
-
-                  log("location disabled");
-                  log(_lastKnownPosition.toString());
-                  log(_currentPosition.toString());
-                  return;
-                }
-
-                log(_lastKnownPosition.toString());
-                log(_currentPosition.toString());
-                if (_currentPosition != null) {
-                  log("current post");
-                  LatLng newPos = LatLng(
-                      _currentPosition.latitude, _currentPosition.longitude);
-                  // FIXME: Check the location is inside the bounds.
-                  //if (!mapController.bounds.contains(newPos)) {
-                  //  Scaffold.of(context).showSnackBar(SnackBar(
-                  //    content: Text("Location outside of Germany"),
-                  //  ));
-                  //  return;
-                  //}
-
-                  mapController.move(newPos, 15.0);
-                  setState(() {
-                    circles = [
-                      CircleMarker(
-                        point: LatLng(_currentPosition.latitude,
-                            _currentPosition.longitude),
-                        color: Colors.blueAccent,
-                        radius: 10.0,
-                      )
-                    ];
-                  });
-                } else if (_initLastKnownLocation() != null) {
-                  mapController.move(
-                      LatLng(_lastKnownPosition.latitude,
-                          _lastKnownPosition.longitude),
-                      15.0);
-                  Scaffold.of(context).showSnackBar(SnackBar(
-                    content: Text("Use last location"),
-                  ));
-                } else {
-                  log("current and last location are null");
-                  Scaffold.of(context).showSnackBar(SnackBar(
-                    content: Text("No location yet"),
-                  ));
-                }
-              }).catchError((onError) {
-                log("isLocationServiceEnabled onError");
-                log(onError.toString());
-                Scaffold.of(context).showSnackBar(SnackBar(
-                  content: Text("isLocationServiceEnabled failed"),
-                ));
-              });
-            }).catchError((onError) {
-              log("checkGeolocationPermissionStatus onError");
-              log(onError.toString());
-              Scaffold.of(context).showSnackBar(SnackBar(
-                content: Text("checkGeolocationPermissionStatus failed"),
-              ));
-            });
-          },
-        ),
-      ),
     );
   }
 }
