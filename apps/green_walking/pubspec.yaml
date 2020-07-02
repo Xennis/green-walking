@@ -31,7 +31,7 @@ dependencies:
   flutter_map: ^0.9.0
   flutter_map_marker_cluster: ^0.2.8
   flutter_speed_dial: ^1.2.5
-  flutter_svg: ^0.18.0
+  flutter_svg: ^0.17.4 # Can't use new version because of dep conflicts with flutter_launcher_icons.
   url_launcher: ^5.4.11
   user_location:
     git:
@@ -39,6 +39,7 @@ dependencies:
       url: https://github.com/igaurab/user_location_plugin.git
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.7.5
   flutter_test:
     sdk: flutter
 
@@ -84,3 +85,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_icons:
+  android: true
+  image_path: "assets/app-icon.png"
