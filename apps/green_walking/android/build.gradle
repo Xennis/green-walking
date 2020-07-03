@@ -3,12 +3,17 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven {
+            url 'https://maven.fabric.io/public'  // fabric resources required by firebase_crashlytics
+        }
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:4.0.0'
         classpath 'com.google.gms:google-services:4.3.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        // versions can be found here https://s3.amazonaws.com/fabric-artifacts/public/io/fabric/tools/gradle/maven-metadata.xml
+        classpath 'io.fabric.tools:gradle:1.31.1' // required by firebase_crashlytics
     }
 }
 

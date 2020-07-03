@@ -73,3 +73,7 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
+
+// Plugins required by firebase_crashlytics
+apply plugin: 'io.fabric'
+apply plugin: 'com.google.gms.google-services'
