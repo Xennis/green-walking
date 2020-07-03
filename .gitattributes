@@ -1,4 +1,5 @@
 # Credentials
+google-services.json filter=git-crypt diff=git-crypt
 key.jks filter=git-crypt diff=git-crypt
 key.properties filter=git-crypt diff=git-crypt
 mapbox-access-token.txt filter=git-crypt diff=git-crypt
