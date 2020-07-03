@@ -30,6 +30,8 @@ if (flutterVersionName == null) {
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+apply plugin: 'io.fabric' // required by firebase_crashlytics
+apply plugin: 'com.google.gms.google-services' // required by firebase, firebase_crashlytics
 
 android {
     compileSdkVersion 28
@@ -72,8 +74,6 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-}
 
-// Plugins required by firebase_crashlytics
-apply plugin: 'io.fabric'
-apply plugin: 'com.google.gms.google-services'
+    implementation 'com.google.firebase:firebase-analytics:17.2.2'
+}
