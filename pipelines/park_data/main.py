@@ -41,18 +41,17 @@ def main():
                         continue
                     f_out.write(json.dumps(entity_data, sort_keys=True) + "\n")
 
-    if not os.path.exists(file_parks) or True:
-        process = ProcessWikidata()
-        with open(file_park_details) as f_in:
-            with open(file_parks, "w") as f_out:
-                for line in f_in:
-                    raw = json.loads(line.rstrip("\n"))
-                    try:
-                        entity_data = process.process(raw)
-                    except Exception as e:
-                        logging.warning(f"failed to parse line '{e}' of {type(e).__name__}:\n{line}")
-                        continue
-                    f_out.write(json.dumps(entity_data, sort_keys=True) + "\n")
+    process = ProcessWikidata()
+    with open(file_park_details) as f_in:
+        with open(file_parks, "w") as f_out:
+            for line in f_in:
+                raw = json.loads(line.rstrip("\n"))
+                try:
+                    entity_data = process.process(raw)
+                except Exception as e:
+                    logging.warning(f"failed to parse line '{e}' of {type(e).__name__}:\n{line}")
+                    continue
+                f_out.write(json.dumps(entity_data, sort_keys=True) + "\n")
 
 
 if __name__ == "__main__":
