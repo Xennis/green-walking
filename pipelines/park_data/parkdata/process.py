@@ -79,11 +79,11 @@ class ProcessWikidata:
         return {
             "aliases": {
                 "de": [e.get("value") for e in aliases.get("de", [])],
-                "en": [e.get("value") for e in aliases.get("en", [])],
+                #"en": [e.get("value") for e in aliases.get("en", [])],
             },
             "categories": {
                 "de": self._create_categories("de", instance_of, heritage_designation=heritage_designation),
-                "en": self._create_categories("de", instance_of, heritage_designation=heritage_designation),
+                #"en": self._create_categories("de", instance_of, heritage_designation=heritage_designation),
             },
             "coordinateLocation": {
                 "latitude": coordinate_location[0].get("latitude") if coordinate_location else None,
@@ -92,7 +92,7 @@ class ProcessWikidata:
             "commonsUrl": sitelinks.get("commonswiki", {}).get("url"),
             "descriptions": {
                 "de": descriptions.get("de", {}).get("value"),
-                "en": descriptions.get("en", {}).get("value")
+                #"en": descriptions.get("en", {}).get("value")
             },
             "image": image[0][0] if image else None,
             "location": {
@@ -100,19 +100,19 @@ class ProcessWikidata:
                     "location": location[0].get("de", {}).get("value") if location else None,
                     "administrative": administrative[0].get("de", {}).get("value") if administrative else None
                 },
-                "en": {
-                    "location": location[0].get("en", {}).get("value") if location else None,
-                    "administrative": administrative[0].get("en", {}).get("value") if administrative else None
-                },
+                #"en": {
+                #    "location": location[0].get("en", {}).get("value") if location else None,
+                #    "administrative": administrative[0].get("en", {}).get("value") if administrative else None
+                #},
             },
             "name": {
                 "de": labels.get("de", {}).get("value"),
-                "en": labels.get("en", {}).get("value"),
+                #"en": labels.get("en", {}).get("value"),
             },
             "officialWebsite": officialWebsite[0] if officialWebsite else None,
             "wikidataId": entry.get("title"),
             "wikipediaUrl": {
                 "de": sitelinks.get("dewiki", {}).get("url"),
-                "en": sitelinks.get("enwiki", {}).get("url")
+                #"en": sitelinks.get("enwiki", {}).get("url")
             },
         }
