@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Any, Iterable, List
+from typing import Dict, Any, Iterable, List, Optional
 from bs4 import BeautifulSoup
 
 
@@ -48,6 +48,19 @@ class ProcessWikidata:
                     logging.info("data_type %s and data_val_type %s not handled", data_type, data_val_type)
         return res
 
+    @staticmethod
+    def _create_categories(lang: str, instance_of: List[Dict[str, Any]], heritage_designation: List[Dict[str, Any]]) -> List[str]:
+        res = []
+        for category in instance_of + heritage_designation:
+            label: Optional[str] = category.get(lang, {}).get("value")
+            if not label:
+                continue
+            # Deduplicate labels. For example Q174782 (square) and Q22698 (park) have the same label in German.
+            if label in res:
+                continue
+            res.append(label)
+        return res
+
     def process(self, entry: Dict[str, Any]) -> Dict[str, Any]:
         aliases = entry.get("aliases", {})
         descriptions = entry.get("descriptions", {})
@@ -56,9 +69,9 @@ class ProcessWikidata:
 
         claims = self._resolve_claims_by_type(entry.get("claims", {}))
         administrative = claims.get("located in the administrative territorial entity", [])
-        coordinate_location: List[Dict[str, Any]] = claims.get("coordinate location", {})
-        heritage_designation: List[Dict[str, Any]] = claims.get("heritage designation", {})
-        instance_of: List[Dict[str, Any]] = claims.get("instance of", {})
+        coordinate_location: List[Dict[str, Any]] = claims.get("coordinate location", [])
+        heritage_designation: List[Dict[str, Any]] = claims.get("heritage designation", [])
+        instance_of: List[Dict[str, Any]] = claims.get("instance of", [])
         location = claims.get("location")
         officialWebsite = claims.get("official website")
         image = claims.get("image")
@@ -69,8 +82,8 @@ class ProcessWikidata:
                 "en": [e.get("value") for e in aliases.get("en", [])],
             },
             "categories": {
-                "de": [v.get("de", {}).get("value") for v in instance_of] + [v.get("de", {}).get("value") for v in heritage_designation],
-                "en": [v.get("en", {}).get("value") for v in instance_of] + [v.get("en", {}).get("value") for v in heritage_designation],
+                "de": self._create_categories("de", instance_of, heritage_designation=heritage_designation),
+                "en": self._create_categories("de", instance_of, heritage_designation=heritage_designation),
             },
             "coordinateLocation": {
                 "latitude": coordinate_location[0].get("latitude") if coordinate_location else None,
