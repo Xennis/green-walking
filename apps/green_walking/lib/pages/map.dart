@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,6 @@ import 'package:green_walking/widgets/place_list_tile.dart';
 import 'package:latlong/latlong.dart';
 import 'package:user_location/user_location.dart';
 
-import '../routes.dart';
 import '../widgets/map_attribution.dart';
 import '../types/place.dart';
 import 'detail.dart';
@@ -174,11 +174,17 @@ class _MapPageState extends State<MapPage> {
                                             FlatButton(
                                               child: const Text('DETAILS'),
                                               onPressed: () {
-                                                Navigator.of(context).pushNamed(
-                                                    Routes.detail,
-                                                    arguments:
-                                                        DetailPageArguments(p
-                                                            .coordinateLocation));
+                                                if (p == null) {
+                                                  log("no park found");
+                                                  return;
+                                                }
+                                                Navigator.of(context)
+                                                    .push(MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      DetailPage(
+                                                    park: p,
+                                                  ),
+                                                ));
                                               },
                                             ),
                                           ],

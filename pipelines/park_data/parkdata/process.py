@@ -55,9 +55,8 @@ class ProcessWikidata:
             label: Optional[str] = category.get(lang, {}).get("value")
             if not label:
                 continue
-            # Deduplicate labels. For example Q174782 (square) and Q22698 (park) have the same label in German.
             if label in res:
-                continue
+                continue  # Deduplicate labels
             res.append(label)
         return res
 
