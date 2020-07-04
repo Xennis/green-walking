@@ -33,27 +33,29 @@ class _MapPageState extends State<MapPage> {
 
   @override
   void initState() {
+    super.initState();
     accessToken = DefaultAssetBundle.of(context)
         .loadString("assets/mapbox-access-token.txt");
-    super.initState();
 
-    ParkService.load(context).then((value) {
-      List<Marker> l = [];
-      for (final p in value) {
-        l.add(Marker(
-          anchorPos: AnchorPos.align(AnchorAlign.center),
-          height: 50,
-          width: 50,
-          point: p.coordinateLocation,
-          builder: (_) => Icon(
-            Icons.nature_people,
-            color: Colors.blueGrey,
-            size: 50,
-          ),
-        ));
-      }
-      setState(() {
-        markers = l;
+    mapController.onReady.then((value) {
+      ParkService.load(context).then((value) {
+        List<Marker> l = [];
+        value.forEach((p) {
+          l.add(Marker(
+            anchorPos: AnchorPos.align(AnchorAlign.center),
+            height: 50,
+            width: 50,
+            point: p.coordinateLocation,
+            builder: (_) => Icon(
+              Icons.nature_people,
+              color: Colors.blueGrey,
+              size: 50,
+            ),
+          ));
+        });
+        setState(() {
+          markers = l;
+        });
       });
     });
   }
