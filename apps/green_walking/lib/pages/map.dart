@@ -128,7 +128,7 @@ class _MapPageState extends State<MapPage> {
                           },
                           // It is recommended to use TileProvider with a caching and retry strategy, like
                           // NetworkTileProvider or CachedNetworkTileProvider
-                          tileProvider: NetworkTileProvider(),
+                          tileProvider: CachedNetworkTileProvider(),
                         ),
                         MarkerLayerOptions(markers: userLocationMarkers),
                         MarkerClusterLayerOptions(
