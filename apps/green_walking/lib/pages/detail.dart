@@ -303,7 +303,7 @@ class _DetailSpeedDial extends StatelessWidget {
     }
     return SpeedDial(
         animatedIcon: AnimatedIcons.menu_close,
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Theme.of(context).accentColor,
         children: children);
   }
 }

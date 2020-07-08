@@ -15,20 +15,6 @@ class PlaceListTile extends StatelessWidget {
         : '${myString.substring(0, cutoff)}...';
   }
 
-  List<Widget> createCategoryCips() {
-    List<Widget> res = [];
-    place.categories.forEach((c) {
-      res.add(Chip(
-        avatar: CircleAvatar(
-          backgroundColor: Colors.grey.shade800,
-          child: Icon(Icons.nature_people),
-        ),
-        label: Text(truncateString(c, 15)),
-      ));
-    });
-    return res;
-  }
-
   Widget build(BuildContext context) {
     List<Widget> children = [];
     if (place.location != null) {
@@ -40,9 +26,9 @@ class PlaceListTile extends StatelessWidget {
     }
     children.add(CategoryChips(place.categories));
     return ListTile(
-      //leading: Icon(Icons.nature_people),
       title: Text(place.name),
       subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: children,
       ),
     );
@@ -60,13 +46,16 @@ class CategoryChips extends StatelessWidget {
         : '${myString.substring(0, cutoff)}...';
   }
 
-  List<Widget> createCategoryCips() {
+  List<Widget> createCategoryCips(BuildContext context) {
     List<Widget> res = [];
     categories.forEach((c) {
       res.add(Chip(
         avatar: CircleAvatar(
-          backgroundColor: Colors.grey.shade800,
-          child: Icon(Icons.nature_people),
+          backgroundColor: Colors.grey.shade100,
+          child: Icon(
+            Icons.nature,
+            color: Theme.of(context).primaryColor,
+          ),
         ),
         label: Text(truncateString(c, 15)),
       ));
@@ -77,9 +66,8 @@ class CategoryChips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Wrap(
-      alignment: WrapAlignment.start,
       spacing: 5,
-      children: createCategoryCips(),
+      children: createCategoryCips(context),
     );
   }
 }
