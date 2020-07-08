@@ -23,11 +23,21 @@ class DetailPage extends StatelessWidget {
         super(key: key);
 
   // FIXME: Rework this and the functions below.
-  Widget _description(String description) {
-    if (description == null) {
-      return Row();
+  Widget _description(PlaceExtract extract, String description) {
+    if (extract == null) {
+      if (description == null) {
+        return Row();
+      }
+      // Use Wikidata description as fallback.
+      return Text(
+        description,
+        style: TextStyle(color: Colors.black),
+      );
     }
-    return Text(description);
+    return RichText(
+        textScaleFactor: 1.2,
+        text: TextSpan(
+            text: extract.text, style: TextStyle(color: Colors.black)));
   }
 
   Widget _location(String location) {
@@ -79,7 +89,7 @@ class DetailPage extends StatelessWidget {
             onPressed: () => Navigator.pop(context, false),
           )),
       floatingActionButton: _DetailSpeedDial(park),
-      body: Column(
+      body: ListView(
         children: [
           _image(park.image),
           Padding(
@@ -93,9 +103,14 @@ class DetailPage extends StatelessWidget {
                     truncateCutoff: 25,
                   ),
                   // TODO: Add Wikipedia quote instead
-                  _description(park.description),
+                  _description(park.extract, park.description),
                   Divider(),
-                  _DetailAttribution(park.wikidataId, park.image),
+                  _DetailAttribution(
+                    wikidataId: park.wikidataId,
+                    image: park.image,
+                    extract: park.extract,
+                    wikipediaUrl: park.wikipediaUrl,
+                  ),
                 ],
               )),
         ],
@@ -107,15 +122,22 @@ class DetailPage extends StatelessWidget {
 class _DetailAttribution extends StatelessWidget {
   final String wikidataId;
   final PlaceImage image;
+  final PlaceExtract extract;
+  final String wikipediaUrl;
   final Color textColor = Colors.grey;
 
-  _DetailAttribution(this.wikidataId, this.image);
+  _DetailAttribution(
+      {@required this.wikidataId, this.image, this.extract, this.wikipediaUrl})
+      : assert(wikidataId != null);
 
   @override
   Widget build(BuildContext context) {
     List<Widget> children = [_wikidata(context)];
     if (image != null) {
       children.add(_imageAttribution(context, image));
+    }
+    if (extract != null) {
+      children.add(_extractAttribution(context));
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,6 +268,79 @@ class _DetailAttribution extends StatelessWidget {
             text: TextSpan(style: TextStyle(color: textColor), children: [
               TextSpan(
                 text: "Foto: ${image.artist} / ${image.licenseShortName}",
+              ),
+              TextSpan(text: " "),
+              WidgetSpan(
+                  child: Icon(
+                Icons.info,
+                size: 15,
+                color: textColor,
+              ))
+            ]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _extractAttribution(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                  title: Text('Text'),
+                  content: SingleChildScrollView(
+                    child: ListBody(
+                      children: <Widget>[
+                        RichText(
+                          text: TextSpan(
+                            text: 'Wikipedia\n',
+                            style: TextStyle(color: Colors.blue),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                launch(wikipediaUrl);
+                              },
+                          ),
+                        ),
+                        RichText(
+                          text: TextSpan(
+                            text: '${extract.licenseShortName}\n',
+                            style: TextStyle(color: Colors.blue),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                launch(extract.licenseUrl);
+                              },
+                          ),
+                        ),
+                        RichText(
+                          text: TextSpan(
+                            text: 'Improve this data',
+                            style: TextStyle(color: Colors.blue),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                launch(wikipediaUrl);
+                              },
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  actions: [
+                    FlatButton(
+                        child: Text("OK"),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        }),
+                  ],
+                ));
+      },
+      child: Wrap(
+        children: [
+          RichText(
+            text: TextSpan(style: TextStyle(color: textColor), children: [
+              TextSpan(
+                text: "Text: Wikipedia / ${extract.licenseShortName}",
               ),
               TextSpan(text: " "),
               WidgetSpan(
