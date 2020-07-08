@@ -47,8 +47,8 @@ class _MapPageState extends State<MapPage> {
             width: 50,
             point: p.coordinateLocation,
             builder: (_) => Icon(
-              Icons.nature_people,
-              color: Colors.blueGrey,
+              Icons.location_on,
+              color: Colors.pink,
               size: 50,
             ),
           ));
@@ -155,6 +155,8 @@ class _MapPageState extends State<MapPage> {
                               popupController: _popupController,
                               popupBuilder: (_, marker) {
                                 final Place p = ParkService.get(marker.point);
+                                final TextStyle tx = TextStyle(
+                                    color: Theme.of(context).accentColor);
                                 return Container(
                                   width: 300,
                                   child: Card(
@@ -167,12 +169,12 @@ class _MapPageState extends State<MapPage> {
                                         ButtonBar(
                                           children: <Widget>[
                                             FlatButton(
-                                              child: const Text('OK'),
+                                              child: Text('OK', style: tx),
                                               onPressed: () =>
                                                   _popupController.hidePopup(),
                                             ),
                                             FlatButton(
-                                              child: const Text('DETAILS'),
+                                              child: Text('DETAILS', style: tx),
                                               onPressed: () {
                                                 if (p == null) {
                                                   log("no park found");
