@@ -24,7 +24,7 @@ class PlaceListTile extends StatelessWidget {
         ],
       ));
     }
-    children.add(CategoryChips(place.categories));
+    children.add(CategoryChips(categories: place.categories));
     return ListTile(
       title: Text(place.name),
       subtitle: Column(
@@ -37,8 +37,10 @@ class PlaceListTile extends StatelessWidget {
 
 class CategoryChips extends StatelessWidget {
   final List<String> categories;
+  final int truncateCutoff;
 
-  CategoryChips(this.categories);
+  CategoryChips({@required this.categories, this.truncateCutoff = 15})
+      : assert(categories != null);
 
   String truncateString(String myString, int cutoff) {
     return (myString.length <= cutoff)
@@ -57,7 +59,7 @@ class CategoryChips extends StatelessWidget {
             color: Theme.of(context).primaryColor,
           ),
         ),
-        label: Text(truncateString(c, 15)),
+        label: Text(truncateString(c, truncateCutoff)),
       ));
     });
     return res;
