@@ -135,7 +135,7 @@ class _DetailAttribution extends StatelessWidget {
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
                                 launch(
-                                    'https://www.wikidata.org/wiki/${wikidataId}');
+                                    'https://www.wikidata.org/wiki/$wikidataId');
                               },
                           ),
                         ),
