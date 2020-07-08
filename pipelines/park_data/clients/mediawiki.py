@@ -1,7 +1,8 @@
+import copy
 import json
 import urllib.request
 import urllib.parse
-from typing import Dict, Any, Iterable
+from typing import Dict, Any, Iterable, Optional
 
 
 class CommonsImageInfoClient:
@@ -44,7 +45,7 @@ class CommonsImageInfoClient:
             return page
 
 
-class WikipediaExtractsClient:
+class WikipediaExtractClient:
 
     _API_ENDPOINT_TEMPLATE = "https://{lang}.wikipedia.org/w/api.php"
 
@@ -67,6 +68,10 @@ class WikipediaExtractsClient:
             "prop": "extracts",
             "redirects": 1,  # Follow redirects
             "titles": "|".join(titles),
+
+            # API documentation: https://www.mediawiki.org/wiki/API:Siteinfo
+            "meta": "siteinfo",
+            "siprop": "|".join(["rightsinfo"]),
         })
         req = urllib.request.Request(f"{endpoint}?{params}")
         req.add_header("User-Agent", self._user_agent)
@@ -80,6 +85,8 @@ class WikipediaExtractsClient:
         Example: https://de.wikipedia.org/w/api.php?action=query&format=json&titles=Jenischpark&prop=extracts&exintro&explaintext&redirects=1
         """
         resp = self._do_request(lang=lang, titles=[title])
-        pages: Dict[str, Any] = resp["query"]["pages"]
+        query: Dict[str, Dict[str, Any]] = resp["query"]
+        pages: Dict[str, Any] = query["pages"]
         for page in pages.values():
+            page["rightsinfo"] = query["rightsinfo"]
             return page

@@ -1,2 +1,2 @@
-from .mediawiki import CommonsImageInfoClient, WikipediaExtractsClient
+from .mediawiki import CommonsImageInfoClient, WikipediaExtractClient
 from .wikidata import WikidataEntityClient, WikidataQueryClient
