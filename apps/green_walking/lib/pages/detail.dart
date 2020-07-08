@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
@@ -46,7 +47,18 @@ class DetailPage extends StatelessWidget {
     if (image.url == null) {
       return Row();
     }
-    return Image.network(image.url);
+    return Container(
+      height: 300,
+      width: double.infinity,
+      color: Colors.grey.shade200,
+      child: Center(
+        child: CachedNetworkImage(
+          imageUrl: image.url,
+          placeholder: (context, url) => CircularProgressIndicator(),
+          fit: BoxFit.fitHeight,
+        ),
+      ),
+    );
   }
 
   Widget _title(String name) {
