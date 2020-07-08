@@ -88,7 +88,10 @@ class DetailPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _location(park.location),
-                  CategoryChips(park.categories),
+                  CategoryChips(
+                    categories: park.categories,
+                    truncateCutoff: 25,
+                  ),
                   // TODO: Add Wikipedia quote instead
                   _description(park.description),
                   Divider(),
