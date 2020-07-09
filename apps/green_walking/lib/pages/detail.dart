@@ -3,11 +3,11 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import '../types/place.dart';
 import '../widgets/place_list_tile.dart';
+import 'detail_footer.dart';
 
 class DetailPageArguments {
   final Place place;
@@ -35,9 +35,10 @@ class DetailPage extends StatelessWidget {
       );
     }
     return RichText(
-        textScaleFactor: 1.2,
+        textScaleFactor: 1.1,
         text: TextSpan(
-            text: extract.text, style: TextStyle(color: Colors.black)));
+            text: extract.text,
+            style: TextStyle(color: Colors.black, height: 1.5)));
   }
 
   Widget _location(String location) {
@@ -50,308 +51,90 @@ class DetailPage extends StatelessWidget {
     );
   }
 
-  Widget _image(PlaceImage image) {
-    if (image == null) {
-      return Row();
-    }
-    if (image.url == null) {
-      return Row();
-    }
-    return Container(
-      height: 300,
-      width: double.infinity,
-      color: Colors.grey.shade200,
-      child: Center(
-        child: CachedNetworkImage(
-          imageUrl: image.url,
-          placeholder: (context, url) => CircularProgressIndicator(),
-          fit: BoxFit.fitHeight,
-        ),
-      ),
-    );
-  }
-
-  Widget _title(String name) {
+  Widget _title(BuildContext context, String name) {
     if (name == null) {
       return Text("Unbekannt");
     }
-    return Text(name);
+    return Text(
+      name,
+      style: Theme.of(context).textTheme.headline4,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          automaticallyImplyLeading: true,
-          title: _title(park.name),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context, false),
-          )),
       floatingActionButton: _DetailSpeedDial(park),
-      body: ListView(
-        children: [
-          _image(park.image),
-          Padding(
-              padding: EdgeInsets.all(10.0),
+      body: NestedScrollView(
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          Widget fs;
+          String imageUrl = park.image?.url;
+          if (imageUrl != null) {
+            fs = FlexibleSpaceBar(
+              background: CachedNetworkImage(
+                imageUrl: park.image?.url,
+                fit: BoxFit.cover,
+              ),
+            );
+          }
+          return <Widget>[
+            SliverAppBar(
+              expandedHeight: imageUrl != null ? 200.0 : null,
+              floating: false,
+              pinned: false,
+              automaticallyImplyLeading: true,
+              leading: IconButton(
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                ),
+                onPressed: () => Navigator.pop(context, false),
+              ),
+              flexibleSpace: fs,
+            )
+          ];
+        },
+        body: ListView(
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(15, 0, 15, 25),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _title(context, park.name),
                   _location(park.location),
                   CategoryChips(
                     categories: park.categories,
                     truncateCutoff: 25,
                   ),
-                  // TODO: Add Wikipedia quote instead
                   _description(park.extract, park.description),
-                  Divider(),
-                  _DetailAttribution(
-                    wikidataId: park.wikidataId,
-                    image: park.image,
-                    extract: park.extract,
-                    wikipediaUrl: park.wikipediaUrl,
-                  ),
                 ],
-              )),
-        ],
-      ),
-    );
-  }
-}
-
-class _DetailAttribution extends StatelessWidget {
-  final String wikidataId;
-  final PlaceImage image;
-  final PlaceExtract extract;
-  final String wikipediaUrl;
-  final Color textColor = Colors.grey;
-
-  _DetailAttribution(
-      {@required this.wikidataId, this.image, this.extract, this.wikipediaUrl})
-      : assert(wikidataId != null);
-
-  @override
-  Widget build(BuildContext context) {
-    List<Widget> children = [_wikidata(context)];
-    if (image != null) {
-      children.add(_imageAttribution(context, image));
-    }
-    if (extract != null) {
-      children.add(_extractAttribution(context));
-    }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: children,
-    );
-  }
-
-  Widget _wikidata(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-                  title: Text('Data'),
-                  content: SingleChildScrollView(
-                    child: ListBody(
-                      children: <Widget>[
-                        RichText(
-                          text: TextSpan(
-                            text: 'Powered by Wikidata\n',
-                            style: TextStyle(color: Colors.blue),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                launch('https://www.wikidata.org');
-                              },
-                          ),
-                        ),
-                        RichText(
-                          text: TextSpan(
-                            text: 'Improve this data',
-                            style: TextStyle(color: Colors.blue),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                launch(
-                                    'https://www.wikidata.org/wiki/$wikidataId');
-                              },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  actions: [
-                    FlatButton(
-                        child: Text("OK"),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        }),
-                  ],
-                ));
-      },
-      child: Wrap(
-        children: [
-          RichText(
-            text: TextSpan(style: TextStyle(color: textColor), children: [
-              TextSpan(
-                text: "Powered by Wikidata",
               ),
-              TextSpan(text: " "),
-              WidgetSpan(
-                child: Icon(
-                  Icons.info,
-                  size: 15,
-                  color: textColor,
+            ),
+            Expanded(
+                child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  border: Border(
+                      top: BorderSide(color: Colors.grey.shade300, width: 1))),
+              child: Padding(
+                // Wide right padding because of floating action button.
+                padding: EdgeInsets.fromLTRB(15, 25, 85, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DetailFooter(
+                      wikidataId: park.wikidataId,
+                      image: park.image,
+                      extract: park.extract,
+                      wikipediaUrl: park.wikipediaUrl,
+                    ),
+                  ],
                 ),
               ),
-            ]),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _imageAttribution(BuildContext context, PlaceImage image) {
-    return GestureDetector(
-      onTap: () {
-        showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-                  title: Text('Foto'),
-                  content: SingleChildScrollView(
-                    child: ListBody(
-                      children: <Widget>[
-                        RichText(
-                          text: TextSpan(
-                            text: '${image.artist}\n',
-                            style: TextStyle(color: Colors.blue),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                launch(image.descriptionUrl);
-                              },
-                          ),
-                        ),
-                        RichText(
-                          text: TextSpan(
-                            text: '${image.licenseShortName}\n',
-                            style: TextStyle(color: Colors.blue),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                launch(image.licenseUrl);
-                              },
-                          ),
-                        ),
-                        RichText(
-                          text: TextSpan(
-                            text: 'Improve this data',
-                            style: TextStyle(color: Colors.blue),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                launch(image.descriptionUrl);
-                              },
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  actions: [
-                    FlatButton(
-                        child: Text("OK"),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        }),
-                  ],
-                ));
-      },
-      child: Wrap(
-        children: [
-          RichText(
-            text: TextSpan(style: TextStyle(color: textColor), children: [
-              TextSpan(
-                text: "Foto: ${image.artist} / ${image.licenseShortName}",
-              ),
-              TextSpan(text: " "),
-              WidgetSpan(
-                  child: Icon(
-                Icons.info,
-                size: 15,
-                color: textColor,
-              ))
-            ]),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _extractAttribution(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-                  title: Text('Text'),
-                  content: SingleChildScrollView(
-                    child: ListBody(
-                      children: <Widget>[
-                        RichText(
-                          text: TextSpan(
-                            text: 'Wikipedia\n',
-                            style: TextStyle(color: Colors.blue),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                launch(wikipediaUrl);
-                              },
-                          ),
-                        ),
-                        RichText(
-                          text: TextSpan(
-                            text: '${extract.licenseShortName}\n',
-                            style: TextStyle(color: Colors.blue),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                launch(extract.licenseUrl);
-                              },
-                          ),
-                        ),
-                        RichText(
-                          text: TextSpan(
-                            text: 'Improve this data',
-                            style: TextStyle(color: Colors.blue),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                launch(wikipediaUrl);
-                              },
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  actions: [
-                    FlatButton(
-                        child: Text("OK"),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        }),
-                  ],
-                ));
-      },
-      child: Wrap(
-        children: [
-          RichText(
-            text: TextSpan(style: TextStyle(color: textColor), children: [
-              TextSpan(
-                text: "Text: Wikipedia / ${extract.licenseShortName}",
-              ),
-              TextSpan(text: " "),
-              WidgetSpan(
-                  child: Icon(
-                Icons.info,
-                size: 15,
-                color: textColor,
-              ))
-            ]),
-          ),
-        ],
+            ))
+          ],
+        ),
       ),
     );
   }

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import '../types/place.dart';
 
 class PlaceListTile extends StatelessWidget {
+  final Place place;
+
   const PlaceListTile({Key key, @required this.place})
       : assert(place != null),
         super(key: key);
-
-  final Place place;
 
   String truncateString(String myString, int cutoff) {
     return (myString.length <= cutoff)
