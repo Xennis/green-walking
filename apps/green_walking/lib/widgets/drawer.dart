@@ -50,7 +50,11 @@ class MainDrawer extends StatelessWidget {
           ),
           AboutListTile(
             icon: Icon(Icons.info),
-            applicationIcon: FlutterLogo(),
+            applicationIcon: Image.asset(
+              'assets/app-icon.png',
+              width: 65,
+              height: 65,
+            ),
             applicationName: 'Green Walking',
             applicationVersion: 'Version 0.1.0',
             applicationLegalese: 'Developed by Xennis',
