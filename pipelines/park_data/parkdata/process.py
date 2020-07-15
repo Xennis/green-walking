@@ -8,20 +8,30 @@ from parkdata import fields
 class ProcessWikidata:
 
     @staticmethod
+    def _extract_artist(raw: Optional[Dict[str, Any]]) -> Optional[str]:
+        if not raw:
+            return None
+        value = raw.get("value")
+        if not value:
+            return None
+        # The artist attribute can contain a HTML link
+        text = BeautifulSoup(value, features="html.parser").text
+        if not text:
+            return None
+        return text.strip()
+
+    @staticmethod
     def _resolve_commons_media(image_info: Dict[str, Any]) -> Dict[str, Any]:
         ext_meta_data = image_info.get("extmetadata", {})
         # It's safer to parse for False: It's better to wrongly assume a media has a copyright than the other way round.
         copyrighted = bool(ext_meta_data.get("Copyrighted", {}).get("value") != "False")
-        artist = ext_meta_data.get("Artist", {}).get("value")
-        # The artist attribute can contain a HTML link
-        artist = None if artist is None else BeautifulSoup(artist, features="html.parser").text
         return {
-            "artist": artist,
-            "copyrighted": copyrighted,
-            "descriptionUrl": image_info.get("descriptionurl"),
-            "licenseShortName": ext_meta_data.get("LicenseShortName", {}).get("value"),
-            "licenseUrl": ext_meta_data.get("LicenseUrl", {}).get("value"),
-            "url": image_info.get("url"),
+            fields.ARTIST: ProcessWikidata._extract_artist(ext_meta_data.get("Artist")),
+            fields.COPYRIGHTED: copyrighted,
+            fields.DESCRIPTION_URL: image_info.get("descriptionurl"),
+            fields.LICENSE_SHORT_NAME: ext_meta_data.get("LicenseShortName", {}).get("value"),
+            fields.LICENSE_URL: ext_meta_data.get("LicenseUrl", {}).get("value"),
+            fields.URL: image_info.get("url"),
         }
 
     @staticmethod
@@ -62,6 +72,26 @@ class ProcessWikidata:
             res.append(label)
         return res
 
+    @staticmethod
+    def _filter_images(images: Optional[Iterable[List[Dict[str, Any]]]]) -> Optional[Dict[str, Any]]:
+        if not images:
+            return None
+        for image_infos in images:
+            image_info = image_infos[0]
+            # The artist name is required to show a proper attribution. There are images like
+            # https://commons.wikimedia.org/wiki/File:Lustgarten_3.JPG that have an author but it's not machine-readable
+            # (see categories).
+            if not image_info.get(fields.ARTIST):
+                continue
+            if not image_info.get(fields.LICENSE_SHORT_NAME):
+                continue
+            if not image_info.get(fields.DESCRIPTION_URL):
+                continue
+            # fields.LICENSE_URL can be None, e.g. for public domain
+            return image_info
+
+        return None
+
     def process(self, entry: Dict[str, Any]) -> Dict[str, Any]:
         aliases = entry.get("aliases", {})
         descriptions = entry.get("descriptions", {})
@@ -75,7 +105,7 @@ class ProcessWikidata:
         instance_of: List[Dict[str, Any]] = claims.get("instance of", [])
         location = claims.get("location")
         officialWebsite = claims.get("official website")
-        image = claims.get("image")
+        image: List[List[Dict[str, Any]]] = claims.get("image", [])
 
         return {
             "aliases": {
@@ -95,7 +125,7 @@ class ProcessWikidata:
                 "de": descriptions.get("de", {}).get("value"),
                 #"en": descriptions.get("en", {}).get("value")
             },
-            "image": image[0][0] if image else None,
+            "image": self._filter_images(image),
             "location": {
                 "de": {
                     "location": location[0].get("de", {}).get("value") if location else None,
