@@ -46,7 +46,7 @@ class AttributionLayer extends StatelessWidget {
                 showDialog<dynamic>(
                     context: context,
                     builder: (BuildContext context) => AlertDialog(
-                          title: const Text('Mapbox Map'),
+                          title: const Text('Mapbox Karte'),
                           content: SingleChildScrollView(
                             child: ListBody(
                               children: <Widget>[
@@ -74,7 +74,7 @@ class AttributionLayer extends StatelessWidget {
                                 ),
                                 RichText(
                                   text: TextSpan(
-                                    text: 'Improve this map',
+                                    text: 'Verbessere diese Daten',
                                     style: const TextStyle(color: Colors.blue),
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {

@@ -47,7 +47,7 @@ class DetailPage extends StatelessWidget {
 
   Widget _title(BuildContext context, String name) {
     if (name == null) {
-      return const Text('Unbekannt');
+      return const Text('Namenlos');
     }
     return Text(
       name,
@@ -143,8 +143,12 @@ class _DetailSpeedDial extends StatelessWidget {
     final List<SpeedDialChild> children = <SpeedDialChild>[
       SpeedDialChild(
         onTap: () {
-          launch(
-              'geo:${park.coordinateLocation.latitude},${park.coordinateLocation.longitude}?q=${park.name}');
+          String uri =
+              'geo:${park.coordinateLocation.latitude},${park.coordinateLocation.longitude}';
+          if (park.name != null) {
+            uri += '?q=${park.name}';
+          }
+          launch(uri);
         },
         label: 'Maps',
         child: const Icon(Icons.map),
@@ -182,7 +186,7 @@ class _DetailSpeedDial extends StatelessWidget {
             launch(park.officialWebsite);
           }
         },
-        label: 'Website',
+        label: 'Webseite',
         child: const Icon(Icons.web),
         backgroundColor: Colors.blueAccent,
       ));
