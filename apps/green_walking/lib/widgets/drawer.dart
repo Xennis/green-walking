@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:green_walking/pages/imprint.dart';
+import 'package:green_walking/routes.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MainDrawer extends StatelessWidget {
@@ -36,19 +36,25 @@ class MainDrawer extends StatelessWidget {
               )
             ]),
           ),
-          const ListTile(
-            leading: Icon(Icons.settings),
-            title: Text('Einstellungen'),
-          ),
-          const ListTile(
-            leading: Icon(Icons.help),
-            title: Text('Hilfe'),
+          //const ListTile(
+          //  leading: Icon(Icons.settings),
+          //  title: Text('Einstellungen'),
+          //),
+          //const ListTile(
+          //  leading: Icon(Icons.help),
+          //  title: Text('Hilfe'),
+          //),
+          //),
+          //const ListTile(
+          //  leading: Icon(Icons.help),
+          //  title: Text('Support'),
+          //),
+          ListTile(
+            leading: const Icon(Icons.feedback),
+            title: const Text('Feedback senden'),
+            onTap: () => Navigator.of(context).pushNamed(Routes.feedback),
           ),
           const Divider(),
-          const ListTile(
-            leading: Icon(Icons.feedback),
-            title: Text('Feedback senden'),
-          ),
           AboutListTile(
             child: const Text('Über die App'),
             icon: const Icon(Icons.explore),
@@ -84,13 +90,14 @@ class MainDrawer extends StatelessWidget {
             ],
           ),
           ListTile(
+            leading: const Icon(Icons.lock),
+            title: const Text('Datenschutz'),
+            onTap: () => Navigator.of(context).pushNamed(Routes.privacy),
+          ),
+          ListTile(
             leading: const Icon(Icons.info),
             title: const Text('Impressum'),
-            onTap: () {
-              Navigator.of(context).push<dynamic>(MaterialPageRoute<dynamic>(
-                builder: (BuildContext context) => ImprintPage(),
-              ));
-            },
+            onTap: () => Navigator.of(context).pushNamed(Routes.imprint),
           ),
         ],
       ),
