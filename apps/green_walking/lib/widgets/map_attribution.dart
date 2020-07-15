@@ -16,29 +16,31 @@ class AttributionOptions extends LayerOptions {
 }
 
 class AttributionLayer extends StatelessWidget {
-  final AttributionOptions options;
+  final LayerOptions options;
   final MapState map;
   final Stream<void> stream;
 
-  AttributionLayer(this.options, this.map, this.stream);
+  AttributionLayer(this.options, this.map, this.stream)
+      : assert(options is AttributionOptions);
 
   @override
   Widget build(BuildContext context) {
+    final AttributionOptions attrOptions = options as AttributionOptions;
     return Align(
       alignment: Alignment.bottomLeft,
       child: Row(
         children: [
           Text("   "), // FIXME: Use proper spacing
           SvgPicture.asset(
-            options.logoAssetName,
+            attrOptions.logoAssetName,
             semanticsLabel: 'Mapbox',
             width: 80,
-            color: options.color,
+            color: attrOptions.color,
           ),
           IconButton(
               icon: Icon(
                 Icons.info,
-                color: options.color,
+                color: attrOptions.color,
               ),
               onPressed: () {
                 showDialog<dynamic>(

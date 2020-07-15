@@ -13,7 +13,7 @@ class ParkService {
         await DefaultAssetBundle.of(context).loadString("assets/parks.json");
     LineSplitter()
         .convert(rawBlob)
-        .map((line) => Place.fromJson(json.decode(line)))
+        .map((line) => Place.fromJson(json.decode(line) as Map))
         .forEach((p) {
       if (p.coordinateLocation == null) {
         return;
