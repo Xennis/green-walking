@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:green_walking/pages/imprint.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MainDrawer extends StatelessWidget {
@@ -49,7 +50,8 @@ class MainDrawer extends StatelessWidget {
             title: Text('Feedback senden'),
           ),
           AboutListTile(
-            icon: const Icon(Icons.info),
+            child: const Text('Über die App'),
+            icon: const Icon(Icons.explore),
             applicationIcon: Image.asset(
               'assets/app-icon.png',
               width: 65,
@@ -80,6 +82,15 @@ class MainDrawer extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+          ListTile(
+            leading: const Icon(Icons.info),
+            title: const Text('Impressum'),
+            onTap: () {
+              Navigator.of(context).push<dynamic>(MaterialPageRoute<dynamic>(
+                builder: (BuildContext context) => ImprintPage(),
+              ));
+            },
           ),
         ],
       ),

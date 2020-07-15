@@ -9,12 +9,6 @@ import '../types/place.dart';
 import '../widgets/place_list_tile.dart';
 import 'detail_footer.dart';
 
-class DetailPageArguments {
-  DetailPageArguments(this.place);
-
-  final Place place;
-}
-
 class DetailPage extends StatelessWidget {
   const DetailPage({Key key, @required this.park})
       : assert(park != null),
