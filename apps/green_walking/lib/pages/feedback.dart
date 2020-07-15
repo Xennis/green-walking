@@ -24,7 +24,7 @@ class FeedbackPage extends StatelessWidget {
                   ),
                   const TextSpan(
                     text:
-                        'Du hast Feedback für die App? Zögere nicht und sende es uns zu, um damit die App zu verbessern.\n\nDu kannst zum Beispiel Feedback geben zu dem Design und der Bedienbarkeit der App, nicht angezeigte Grünanlagen, wünschenswerte Funktionen, Fehler oder Funktionen, die dir besonders gut gefallen.\n',
+                        'Du hast Feedback für die App? Zögere nicht und sende es uns zu, um damit die App zu verbessern.\n\nDu kannst zum Beispiel Feedback geben zu dem Design und der Bedienbarkeit der App, nicht angezeigten Grünanlagen, wünschenswerten Funktionen, Fehlern oder Funktionen, die dir besonders gut gefallen.\n',
                   ),
                 ],
               ),
@@ -33,11 +33,20 @@ class FeedbackPage extends StatelessWidget {
               alignment: MainAxisAlignment.center,
               children: <Widget>[
                 FlatButton(
-                  onPressed: () => launch(
-                      'mailto:code@xennis.org?subject=Green%20Walking%20Feedback'),
+                  onPressed: () {
+                    final Uri mailTo = Uri(
+                      scheme: 'mailto',
+                      path: 'code@xennis.org',
+                      queryParameters: <String, String>{
+                        'subject': 'Green Walking Feedback',
+                        //'body': 'App Version xx',
+                      },
+                    );
+                    launch(mailTo.toString());
+                  },
                   color: Theme.of(context).accentColor,
                   textColor: Colors.white,
-                  child: const Text('Feedback per Mail senden'),
+                  child: const Text('Mail an code@xennis.org senden'),
                 ),
               ],
             ),
