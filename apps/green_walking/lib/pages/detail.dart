@@ -16,28 +16,27 @@ class DetailPage extends StatelessWidget {
 
   final Place park;
 
-  // FIXME: Rework this and the functions below.
   Widget _description(PlaceExtract extract, String description) {
-    if (extract == null) {
-      if (description == null) {
-        return Row();
-      }
+    String text;
+    if (extract?.text != null) {
+      text = extract.text;
+    } else if (description != null) {
       // Use Wikidata description as fallback.
-      return Text(
-        description,
-        style: const TextStyle(color: Colors.black),
-      );
+      text = description;
+    } else {
+      text = 'Der Park hat bisher keine Beschreibung.';
     }
     return RichText(
         textScaleFactor: 1.1,
         text: TextSpan(
-            text: extract.text,
+            text: text,
             style: const TextStyle(color: Colors.black, height: 1.5)));
   }
 
+  // FIXME: Rework this and the functions below.
   Widget _location(String location) {
     if (location == null) {
-      return Row();
+      return Container();
     }
     return Text(
       location,
@@ -46,11 +45,12 @@ class DetailPage extends StatelessWidget {
   }
 
   Widget _title(BuildContext context, String name) {
-    if (name == null) {
-      return const Text('Namenlos');
+    String text = 'Namenlos';
+    if (name != null) {
+      text = name;
     }
     return Text(
-      name,
+      text,
       style: Theme.of(context).textTheme.headline4,
     );
   }
@@ -58,7 +58,7 @@ class DetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: _DetailSpeedDial(park),
+      floatingActionButton: _DetailSpeedDial(park: park),
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           Widget fs;
@@ -134,7 +134,9 @@ class DetailPage extends StatelessWidget {
 }
 
 class _DetailSpeedDial extends StatelessWidget {
-  const _DetailSpeedDial(this.park);
+  const _DetailSpeedDial({Key key, @required this.park})
+      : assert(park != null),
+        super(key: key);
 
   final Place park;
 
@@ -157,11 +159,7 @@ class _DetailSpeedDial extends StatelessWidget {
     ];
     if (park.wikipediaUrl != null) {
       children.add(SpeedDialChild(
-        onTap: () {
-          if (park.wikipediaUrl != null) {
-            launch(park.wikipediaUrl);
-          }
-        },
+        onTap: () => launch(park.wikipediaUrl),
         label: 'Wikipedia',
         child: const Icon(Icons.book),
         backgroundColor: Colors.greenAccent,
@@ -169,11 +167,7 @@ class _DetailSpeedDial extends StatelessWidget {
     }
     if (park.commonsUrl != null) {
       children.add(SpeedDialChild(
-        onTap: () {
-          if (park.commonsUrl != null) {
-            launch(park.commonsUrl);
-          }
-        },
+        onTap: () => launch(park.commonsUrl),
         label: 'Commons',
         child: const Icon(Icons.photo),
         backgroundColor: Colors.orangeAccent,
@@ -181,11 +175,7 @@ class _DetailSpeedDial extends StatelessWidget {
     }
     if (park.officialWebsite != null) {
       children.add(SpeedDialChild(
-        onTap: () {
-          if (park.officialWebsite != null) {
-            launch(park.officialWebsite);
-          }
-        },
+        onTap: () => launch(park.officialWebsite),
         label: 'Webseite',
         child: const Icon(Icons.web),
         backgroundColor: Colors.blueAccent,

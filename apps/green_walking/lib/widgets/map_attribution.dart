@@ -9,15 +9,17 @@ class AttributionOptions extends LayerOptions {
   AttributionOptions({
     @required this.logoAssetName,
     this.color = Colors.blueGrey,
-  }) : assert(logoAssetName != null);
+  })  : assert(logoAssetName != null),
+        super();
 
   final Color color;
   final String logoAssetName;
 }
 
 class AttributionLayer extends StatelessWidget {
-  const AttributionLayer(this.options, this.map, this.stream)
-      : assert(options is AttributionOptions);
+  const AttributionLayer({Key key, this.options, this.map, this.stream})
+      : assert(options is AttributionOptions),
+        super(key: key);
 
   final LayerOptions options;
   final MapState map;
@@ -105,7 +107,7 @@ class AttributionPlugin extends MapPlugin {
   @override
   Widget createLayer(
       LayerOptions options, MapState mapState, Stream<void> stream) {
-    return AttributionLayer(options, mapState, stream);
+    return AttributionLayer(options: options, map: mapState, stream: stream);
   }
 
   @override

@@ -8,8 +8,13 @@ import '../types/place.dart';
 
 class DetailFooter extends StatelessWidget {
   const DetailFooter(
-      {@required this.wikidataId, this.image, this.extract, this.wikipediaUrl})
-      : assert(wikidataId != null);
+      {Key key,
+      @required this.wikidataId,
+      this.image,
+      this.extract,
+      this.wikipediaUrl})
+      : assert(wikidataId != null),
+        super(key: key);
 
   final String wikidataId;
   final PlaceImage image;
@@ -28,7 +33,7 @@ class DetailFooter extends StatelessWidget {
         },
       )
     ];
-    if (image != null) {
+    if (image?.descriptionUrl != null) {
       children.add(_Attribution(
         headline: 'Foto',
         text: 'Foto: ${image.artist} / ${image.licenseShortName}',
@@ -39,7 +44,7 @@ class DetailFooter extends StatelessWidget {
         },
       ));
     }
-    if (extract != null && extract.text != null) {
+    if (extract?.text != null) {
       children.add(_Attribution(
         headline: 'Text',
         text: 'Text: Wikipedia / ${extract.licenseShortName}',
@@ -75,6 +80,9 @@ class _Attribution extends StatelessWidget {
   static List<Widget> _createLinkList(Map<String, String> links) {
     final List<Widget> res = <Widget>[];
     links.forEach((String text, String link) {
+      if (text == null) {
+        return;
+      }
       if (link == null) {
         res.add(RichText(
             text: TextSpan(
@@ -85,10 +93,7 @@ class _Attribution extends StatelessWidget {
         text: TextSpan(
           text: text,
           style: const TextStyle(color: Colors.blue),
-          recognizer: TapGestureRecognizer()
-            ..onTap = () {
-              launch(link);
-            },
+          recognizer: TapGestureRecognizer()..onTap = () => launch(link),
         ),
       ));
     });
@@ -111,9 +116,7 @@ class _Attribution extends StatelessWidget {
                   actions: <Widget>[
                     FlatButton(
                         child: const Text('OK'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        }),
+                        onPressed: () => Navigator.of(context).pop()),
                   ],
                 ));
       },
