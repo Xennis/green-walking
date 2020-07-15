@@ -5,8 +5,8 @@ class Routes {
   static const String map = 'map';
 
   static Map<String, WidgetBuilder> get(BuildContext context) {
-    return {
-      map: (context) => MapPage(),
+    return <String, WidgetBuilder>{
+      map: (BuildContext context) => const MapPage(),
     };
   }
 }

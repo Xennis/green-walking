@@ -7,22 +7,22 @@ import 'package:url_launcher/url_launcher.dart';
 import '../types/place.dart';
 
 class DetailFooter extends StatelessWidget {
+  const DetailFooter(
+      {@required this.wikidataId, this.image, this.extract, this.wikipediaUrl})
+      : assert(wikidataId != null);
+
   final String wikidataId;
   final PlaceImage image;
   final PlaceExtract extract;
   final String wikipediaUrl;
 
-  DetailFooter(
-      {@required this.wikidataId, this.image, this.extract, this.wikipediaUrl})
-      : assert(wikidataId != null);
-
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = [
+    final List<Widget> children = <Widget>[
       _Attribution(
         headline: 'Data',
         text: 'Powered by Wikidata',
-        links: {
+        links: <String, String>{
           'Powered by Wikidata\n': 'https://www.wikidata.org',
           'Improve this data': 'https://www.wikidata.org/wiki/$wikidataId',
         },
@@ -32,7 +32,7 @@ class DetailFooter extends StatelessWidget {
       children.add(_Attribution(
         headline: 'Foto',
         text: 'Foto: ${image.artist} / ${image.licenseShortName}',
-        links: {
+        links: <String, String>{
           '${image.artist}\n': image.descriptionUrl,
           '${image.licenseShortName}\n': image.licenseUrl,
           'Improve this data': image.descriptionUrl
@@ -43,7 +43,7 @@ class DetailFooter extends StatelessWidget {
       children.add(_Attribution(
         headline: 'Text',
         text: 'Text: Wikipedia / ${extract.licenseShortName}',
-        links: {
+        links: <String, String>{
           'Wikipedia\n': wikipediaUrl,
           '${extract.licenseShortName}\n': extract.licenseUrl,
           'Improve this data': wikipediaUrl
@@ -58,32 +58,33 @@ class DetailFooter extends StatelessWidget {
 }
 
 class _Attribution extends StatelessWidget {
-  final Color textColor = Colors.grey;
-
-  final String text;
-  final String headline;
-  final Map<String, String> links;
-
   const _Attribution(
       {Key key,
       @required this.text,
       @required this.headline,
-      @required this.links})
+      @required this.links,
+      this.textColor = Colors.grey})
       : assert(text != null && headline != null && links != null),
         super(key: key);
 
+  final String text;
+  final String headline;
+  final Map<String, String> links;
+  final Color textColor;
+
   static List<Widget> _createLinkList(Map<String, String> links) {
-    List<Widget> res = [];
-    links.forEach((text, link) {
+    final List<Widget> res = <Widget>[];
+    links.forEach((String text, String link) {
       if (link == null) {
         res.add(RichText(
-            text: TextSpan(text: text, style: TextStyle(color: Colors.black))));
+            text: TextSpan(
+                text: text, style: const TextStyle(color: Colors.black))));
         return;
       }
       res.add(RichText(
         text: TextSpan(
           text: text,
-          style: TextStyle(color: Colors.blue),
+          style: const TextStyle(color: Colors.blue),
           recognizer: TapGestureRecognizer()
             ..onTap = () {
               launch(link);
@@ -100,16 +101,16 @@ class _Attribution extends StatelessWidget {
       onTap: () {
         showDialog<dynamic>(
             context: context,
-            builder: (context) => AlertDialog(
-                  title: Text(this.headline),
+            builder: (BuildContext context) => AlertDialog(
+                  title: Text(headline),
                   content: SingleChildScrollView(
                     child: ListBody(
                       children: _createLinkList(links),
                     ),
                   ),
-                  actions: [
+                  actions: <Widget>[
                     FlatButton(
-                        child: Text("OK"),
+                        child: const Text('OK'),
                         onPressed: () {
                           Navigator.of(context).pop();
                         }),
@@ -117,18 +118,20 @@ class _Attribution extends StatelessWidget {
                 ));
       },
       child: Wrap(
-        children: [
+        children: <Widget>[
           RichText(
             textScaleFactor: 0.9,
-            text: TextSpan(style: TextStyle(color: textColor), children: [
-              TextSpan(text: "$text ", style: TextStyle(height: 1.5)),
-              WidgetSpan(
-                  child: Icon(
-                Icons.info,
-                size: 15,
-                color: textColor,
-              ))
-            ]),
+            text: TextSpan(
+                style: TextStyle(color: textColor),
+                children: <InlineSpan>[
+                  TextSpan(text: '$text ', style: const TextStyle(height: 1.5)),
+                  WidgetSpan(
+                      child: Icon(
+                    Icons.info,
+                    size: 15,
+                    color: textColor,
+                  ))
+                ]),
           ),
         ],
       ),

@@ -1,6 +1,6 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'routes.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 void main() {
   // Pass all uncaught errors from the framework to Crashlytics.
@@ -24,7 +24,7 @@ class GreenWalkingApp extends StatelessWidget {
       ),
       initialRoute: Routes.map,
       routes: () {
-        Map<String, WidgetBuilder> routes = Routes.get(context);
+        final Map<String, WidgetBuilder> routes = Routes.get(context);
         return routes;
       }(),
     );

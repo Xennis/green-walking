@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import '../types/place.dart';
 
 class PlaceListTile extends StatelessWidget {
-  final Place place;
-
   const PlaceListTile({Key key, @required this.place})
       : assert(place != null),
         super(key: key);
+
+  final Place place;
 
   String truncateString(String myString, int cutoff) {
     return (myString.length <= cutoff)
@@ -15,16 +15,19 @@ class PlaceListTile extends StatelessWidget {
         : '${myString.substring(0, cutoff)}...';
   }
 
+  @override
   Widget build(BuildContext context) {
-    List<Widget> children = [];
+    final List<Widget> children = <Widget>[];
     if (place.location != null) {
       children.add(Row(
-        children: [
+        children: <Widget>[
           Text(truncateString(place.location, 35)),
         ],
       ));
     }
-    children.add(CategoryChips(categories: place.categories));
+    if (place.categories != null) {
+      children.add(CategoryChips(categories: place.categories));
+    }
     return ListTile(
       title: Text(place.name),
       subtitle: Column(
@@ -36,11 +39,11 @@ class PlaceListTile extends StatelessWidget {
 }
 
 class CategoryChips extends StatelessWidget {
+  const CategoryChips({@required this.categories, this.truncateCutoff = 15})
+      : assert(categories != null);
+
   final List<String> categories;
   final int truncateCutoff;
-
-  CategoryChips({@required this.categories, this.truncateCutoff = 15})
-      : assert(categories != null);
 
   String truncateString(String myString, int cutoff) {
     return (myString.length <= cutoff)
@@ -49,8 +52,8 @@ class CategoryChips extends StatelessWidget {
   }
 
   List<Widget> createCategoryCips(BuildContext context) {
-    List<Widget> res = [];
-    categories.forEach((c) {
+    final List<Widget> res = <Widget>[];
+    for (final String c in categories) {
       res.add(Chip(
         avatar: CircleAvatar(
           backgroundColor: Colors.grey.shade100,
@@ -61,7 +64,7 @@ class CategoryChips extends StatelessWidget {
         ),
         label: Text(truncateString(c, truncateCutoff)),
       ));
-    });
+    }
     return res;
   }
 

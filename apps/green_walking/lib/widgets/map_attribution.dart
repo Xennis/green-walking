@@ -6,22 +6,22 @@ import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AttributionOptions extends LayerOptions {
-  final Color color;
-  final String logoAssetName;
-
   AttributionOptions({
     @required this.logoAssetName,
     this.color = Colors.blueGrey,
   }) : assert(logoAssetName != null);
+
+  final Color color;
+  final String logoAssetName;
 }
 
 class AttributionLayer extends StatelessWidget {
+  const AttributionLayer(this.options, this.map, this.stream)
+      : assert(options is AttributionOptions);
+
   final LayerOptions options;
   final MapState map;
   final Stream<void> stream;
-
-  AttributionLayer(this.options, this.map, this.stream)
-      : assert(options is AttributionOptions);
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +29,8 @@ class AttributionLayer extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomLeft,
       child: Row(
-        children: [
-          Text("   "), // FIXME: Use proper spacing
+        children: <Widget>[
+          const Text('   '), // FIXME: Use proper spacing
           SvgPicture.asset(
             attrOptions.logoAssetName,
             semanticsLabel: 'Mapbox',
@@ -45,15 +45,15 @@ class AttributionLayer extends StatelessWidget {
               onPressed: () {
                 showDialog<dynamic>(
                     context: context,
-                    builder: (context) => AlertDialog(
-                          title: Text('Mapbox Map'),
+                    builder: (BuildContext context) => AlertDialog(
+                          title: const Text('Mapbox Map'),
                           content: SingleChildScrollView(
                             child: ListBody(
                               children: <Widget>[
                                 RichText(
                                   text: TextSpan(
                                     text: '© Mapbox\n',
-                                    style: TextStyle(color: Colors.blue),
+                                    style: const TextStyle(color: Colors.blue),
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
                                         launch(
@@ -64,7 +64,7 @@ class AttributionLayer extends StatelessWidget {
                                 RichText(
                                   text: TextSpan(
                                     text: '© OpenStreetMap\n',
-                                    style: TextStyle(color: Colors.blue),
+                                    style: const TextStyle(color: Colors.blue),
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
                                         launch(
@@ -75,7 +75,7 @@ class AttributionLayer extends StatelessWidget {
                                 RichText(
                                   text: TextSpan(
                                     text: 'Improve this map',
-                                    style: TextStyle(color: Colors.blue),
+                                    style: const TextStyle(color: Colors.blue),
                                     recognizer: TapGestureRecognizer()
                                       ..onTap = () {
                                         launch(
@@ -86,9 +86,9 @@ class AttributionLayer extends StatelessWidget {
                               ],
                             ),
                           ),
-                          actions: [
+                          actions: <Widget>[
                             FlatButton(
-                                child: Text("OK"),
+                                child: const Text('OK'),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 }),
