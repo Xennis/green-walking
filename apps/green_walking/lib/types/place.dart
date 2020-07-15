@@ -10,9 +10,9 @@ class PlaceExtract {
 
   factory PlaceExtract.fromJson(Map<dynamic, dynamic> j) {
     return PlaceExtract(
-      text: j['text'],
-      licenseShortName: j['licenseShortName'],
-      licenseUrl: j['licenseUrl'],
+      text: j['text'] as String,
+      licenseShortName: j['licenseShortName'] as String,
+      licenseUrl: j['licenseUrl'] as String,
     );
   }
 }
@@ -33,11 +33,11 @@ class PlaceImage {
 
   factory PlaceImage.fromJson(Map<dynamic, dynamic> j) {
     return PlaceImage(
-      artist: j['artist'],
-      descriptionUrl: j['descriptionUrl'],
-      licenseShortName: j['licenseShortName'],
-      licenseUrl: j['licenseUrl'],
-      url: j['url'],
+      artist: j['artist'] as String,
+      descriptionUrl: j['descriptionUrl'] as String,
+      licenseShortName: j['licenseShortName'] as String,
+      licenseUrl: j['licenseUrl'] as String,
+      url: j['url'] as String,
     );
   }
 }
@@ -73,8 +73,9 @@ class Place {
 
   factory Place.fromJson(Map<dynamic, dynamic> j) {
     const String lang = 'de';
-    String location = j['location'][lang]['location'];
-    final String locAdministrative = j['location'][lang]['administrative'];
+    String location = j['location'][lang]['location'] as String;
+    final String locAdministrative =
+        j['location'][lang]['administrative'] as String;
     if (locAdministrative != null) {
       if (location == null) {
         location = locAdministrative;
@@ -83,36 +84,36 @@ class Place {
       }
     }
     LatLng coordinateLocation;
-    double lat = j['coordinateLocation']['latitude'];
-    double lng = j['coordinateLocation']['longitude'];
+    double lat = j['coordinateLocation']['latitude'] as double;
+    double lng = j['coordinateLocation']['longitude'] as double;
     if (lat != null && lng != null) {
       coordinateLocation = LatLng(lat.toDouble(), lng.toDouble());
     }
 
     PlaceImage image;
     if (j['image'] != null) {
-      image = PlaceImage.fromJson(j['image']);
+      image = PlaceImage.fromJson(j['image'] as Map);
     }
     PlaceExtract extract;
     if (j['extract'] != null) {
-      Map<dynamic, dynamic> rawExtractLang = j['extract'][lang];
+      Map rawExtractLang = j['extract'][lang] as Map;
       if (rawExtractLang != null) {
         extract = PlaceExtract.fromJson(rawExtractLang);
       }
     }
 
     return Place(
-        aliases: List<String>.from(j['aliases'][lang]),
-        categories: List<String>.from(j['categories'][lang]),
+        aliases: List<String>.from(j['aliases'][lang] as Iterable),
+        categories: List<String>.from(j['categories'][lang] as Iterable),
         coordinateLocation: coordinateLocation,
-        commonsUrl: j['commonsUrl'],
-        description: j['description'],
+        commonsUrl: j['commonsUrl'] as String,
+        description: j['description'] as String,
         extract: extract,
         image: image,
         location: location,
-        name: j['name'][lang],
-        officialWebsite: j['officialWebsite'],
-        wikidataId: j['wikidataId'],
-        wikipediaUrl: j['wikipediaUrl'][lang]);
+        name: j['name'][lang] as String,
+        officialWebsite: j['officialWebsite'] as String,
+        wikidataId: j['wikidataId'] as String,
+        wikipediaUrl: j['wikipediaUrl'][lang] as String);
   }
 }
