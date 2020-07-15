@@ -3,7 +3,7 @@ import logging
 import os.path
 
 from clients import WikidataQueryClient, WikidataEntityClient, CommonsImageInfoClient, WikipediaExtractClient
-from parkdata import FetchWikidata, ProcessWikidata, ProcessWikipedia
+from parkdata import FetchWikidata, ProcessWikidata, ProcessWikipedia, fields
 
 
 def main():
@@ -55,17 +55,28 @@ def main():
                     continue
                 f_out.write(json.dumps(entity_data, sort_keys=True) + "\n")
 
-    if os.path.exists(file_wikipedia):
+    if not os.path.exists(file_wikipedia):
         extract = ProcessWikipedia(WikipediaExtractClient(user_agent))
         with open(file_parks) as f_in:
             with open(file_wikipedia, "w") as f_out:
                 for line in f_in:
                     raw = json.loads(line.rstrip("\n"))
+                    titles_per_lang = {}
+                    urls_per_lang = {}
+                    for lang, entry in raw.get(fields.WIKIPEDIA, {}).items():
+                        titles_per_lang[lang] = entry.get(fields.TITLE)
+                        urls_per_lang[lang] = entry.get(fields.URL)
+
+                    del raw[fields.WIKIPEDIA]
+                    raw["wikipediaUrl"] = urls_per_lang
                     try:
-                        raw["extract"] = extract.process(raw.get("wikipediaUrl", {}))
+                        raw["extract"] = extract.process(titles_per_lang)
                     except Exception as e:
                         logging.warning(f"failed to parse line '{e}' of {type(e).__name__}:\n{line}")
                         continue
+
+                    for lang, entry in raw.get(fields.WIKIPEDIA, {}).items():
+                        titles_per_lang[lang] = entry.get(fields.TITLE)
                     f_out.write(json.dumps(raw, sort_keys=True) + "\n")
 
 

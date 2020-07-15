@@ -2,6 +2,8 @@ import logging
 from typing import Dict, Any, Iterable, List, Optional
 from bs4 import BeautifulSoup
 
+from parkdata import fields
+
 
 class ProcessWikidata:
 
@@ -110,8 +112,11 @@ class ProcessWikidata:
             },
             "officialWebsite": officialWebsite[0] if officialWebsite else None,
             "wikidataId": entry.get("title"),
-            "wikipediaUrl": {
-                "de": sitelinks.get("dewiki", {}).get("url"),
+            fields.WIKIPEDIA: {
+                "de": {
+                    fields.TITLE: sitelinks.get("dewiki", {}).get("title"),
+                    fields.URL: sitelinks.get("dewiki", {}).get("url"),
+                }
                 #"en": sitelinks.get("enwiki", {}).get("url")
             },
         }

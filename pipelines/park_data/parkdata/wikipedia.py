@@ -36,11 +36,10 @@ class ProcessWikipedia:
             "licenseShortName": self._shorten_licence_name(rightinfo.get("text")),
         }
 
-    def process(self, urls: Dict[str, Optional[str]]) -> Dict[str, Any]:
+    def process(self, title_per_lang: Dict[str, Optional[str]]) -> Dict[str, Any]:
         res = {}
-        for lang, url in urls.items():
-            if not url:
+        for lang, title in title_per_lang.items():
+            if not title:
                 continue
-            title = url.rsplit("/wiki/", 1)[1]
             res[lang] = self._fetch(lang, title=title)
         return res
