@@ -8,7 +8,9 @@ void main() {
   testWidgets('long artist does not overflow', (WidgetTester tester) async {
     final PlaceImage i = PlaceImage(
         artist: 'Unknown author, not menioned anywhere',
-        licenseShortName: 'Public domain');
+        licenseShortName: 'Public domain',
+        descriptionUrl: '',
+        url: '');
     final Place p = Place(wikidataId: '1234', image: i, categories: <String>[]);
     await tester.pumpWidget(MaterialApp(
         home: DetailPage(

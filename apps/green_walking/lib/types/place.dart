@@ -2,7 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:latlong/latlong.dart';
 
 class PlaceExtract {
-  PlaceExtract({this.text, this.licenseShortName, this.licenseUrl});
+  PlaceExtract(
+      {@required this.text,
+      @required this.licenseShortName,
+      this.licenseUrl // e.g. public domain has no url
+      })
+      : assert(text != null && licenseShortName != null);
 
   factory PlaceExtract.fromJson(Map<dynamic, dynamic> j) {
     return PlaceExtract(
@@ -19,11 +24,15 @@ class PlaceExtract {
 
 class PlaceImage {
   PlaceImage(
-      {this.artist,
-      this.descriptionUrl,
-      this.licenseShortName,
-      this.licenseUrl,
-      this.url});
+      {@required this.artist,
+      @required this.descriptionUrl,
+      @required this.licenseShortName,
+      this.licenseUrl, // e.g. public domain has no URL
+      @required this.url})
+      : assert(artist != null &&
+            descriptionUrl != null &&
+            licenseShortName != null &&
+            url != null);
 
   factory PlaceImage.fromJson(Map<dynamic, dynamic> j) {
     return PlaceImage(
@@ -74,7 +83,7 @@ class Place {
     final double lat = j['coordinateLocation']['latitude'] as double;
     final double lng = j['coordinateLocation']['longitude'] as double;
     if (lat != null && lng != null) {
-      coordinateLocation = LatLng(lat.toDouble(), lng.toDouble());
+      coordinateLocation = LatLng(lat, lng);
     }
 
     PlaceImage image;
