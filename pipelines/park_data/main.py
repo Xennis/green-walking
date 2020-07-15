@@ -3,7 +3,9 @@ import logging
 import os.path
 
 from clients import WikidataQueryClient, WikidataEntityClient, CommonsImageInfoClient, WikipediaExtractClient
-from parkdata import FetchWikidata, ProcessWikidata, ProcessWikipedia, fields
+from parkdata import FetchWikidata, ProcessWikidata
+from core import fields
+from parkextract import FetchWikipedia, ProcessWikipedia
 
 
 def main():
@@ -13,7 +15,9 @@ def main():
     file_wikidata_list = "all-parks.txt"
     file_wikidata_details = "park-details.json"
     file_parks = "parks.json"
-    file_wikipedia = "parks-enriched.json"
+    file_wikipedia_articles = "wikipedia-articles.json"
+    file_wikipedia_details = "wikipedia-details.json"
+    file_parks_enriched = "parks-enriched.json"
 
     if not os.path.exists(file_wikidata_list):
         query = """\
@@ -55,30 +59,80 @@ def main():
                     continue
                 f_out.write(json.dumps(entity_data, sort_keys=True) + "\n")
 
-    if not os.path.exists(file_wikipedia):
-        extract = ProcessWikipedia(WikipediaExtractClient(user_agent))
+    if not os.path.exists(file_wikipedia_articles):
+        client = FetchWikipedia(WikipediaExtractClient(user_agent))
         with open(file_parks) as f_in:
-            with open(file_wikipedia, "w") as f_out:
+            with open(file_wikipedia_articles, "w") as f_out:
                 for line in f_in:
                     raw = json.loads(line.rstrip("\n"))
-                    titles_per_lang = {}
+                    title_per_lang = {}
+                    for lang, entry in raw.get(fields.WIKIPEDIA, {}).items():
+                        title_per_lang[lang] = entry.get(fields.TITLE)
+                    try:
+                        article_data = client.get_per_lang(raw.get(fields.WIKIDATA_ID), title_per_lang)
+                    except Exception as e:
+                        logging.warning(f"failed to parse line '{e}' of {type(e).__name__}:\n{line}")
+                        continue
+                    f_out.write(json.dumps(article_data, sort_keys=True) + "\n")
+
+    if not os.path.exists(file_wikipedia_details):
+        process = ProcessWikipedia()
+        with open(file_wikipedia_articles) as f_in:
+            with open(file_wikipedia_details, "w") as f_out:
+                for line in f_in:
+                    raw = json.loads(line.rstrip("\n"))
+                    try:
+                        article_data = process.process(raw)
+                    except Exception as e:
+                        logging.warning(f"failed to parse line '{e}' of {type(e).__name__}:\n{line}")
+                        continue
+                    if not article_data:
+                        continue
+                    f_out.write(json.dumps(article_data, sort_keys=True) + "\n")
+
+    if True:
+        wikipedia_articles = {}
+        with open(file_wikipedia_details) as f:
+            for line in f:
+                raw = json.loads(line.rstrip("\n"))
+                wikipedia_articles[raw.get(fields.WIKIDATA_ID)] = raw.get(fields.ARTICLES)
+
+        with open(file_parks) as f_in:
+            with open(file_parks_enriched, "w") as f_out:
+                for line in f_in:
+                    raw = json.loads(line.rstrip("\n"))
+                    wikidata_id = raw.get(fields.WIKIDATA_ID)
                     urls_per_lang = {}
                     for lang, entry in raw.get(fields.WIKIPEDIA, {}).items():
-                        titles_per_lang[lang] = entry.get(fields.TITLE)
                         urls_per_lang[lang] = entry.get(fields.URL)
 
                     del raw[fields.WIKIPEDIA]
                     raw["wikipediaUrl"] = urls_per_lang
                     try:
-                        raw["extract"] = extract.process(titles_per_lang)
+                        raw["extract"] = wikipedia_articles.get(wikidata_id)
                     except Exception as e:
                         logging.warning(f"failed to parse line '{e}' of {type(e).__name__}:\n{line}")
                         continue
 
-                    for lang, entry in raw.get(fields.WIKIPEDIA, {}).items():
-                        titles_per_lang[lang] = entry.get(fields.TITLE)
+                    coordinateLoc = raw.get(fields.COORDINATE_LOCATION)
+                    latitude = coordinateLoc.get(fields.LATITUDE)
+                    if not latitude:
+                        logging.info(f"Skipped {wikidata_id} because it has no latitude")
+                        continue
+                    longitude = coordinateLoc.get(fields.LONGITUDE)
+                    if not longitude:
+                        logging.info(f"Skipped {wikidata_id} because it has no longitude")
+                        continue
+                    raw[fields.COORDINATE_LOCATION] = {
+                        # The latitude/longitude fields in the app are loaded as double. At this point it can be an
+                        # integer (e.g. 9 instead of 9.0).
+                        fields.LATITUDE: float(latitude),
+                        fields.LONGITUDE: float(longitude),
+                    }
+
                     f_out.write(json.dumps(raw, sort_keys=True) + "\n")
 
 
 if __name__ == "__main__":
+    logging.getLogger().setLevel(logging.INFO)
     main()
