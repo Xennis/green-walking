@@ -65,7 +65,7 @@ class MainDrawer extends StatelessWidget {
             ),
             applicationName: 'Green Walking',
             applicationVersion: 'Version 0.1.0',
-            applicationLegalese: 'Developed by Xennis',
+            applicationLegalese: 'Entwickelt von Xennis',
             aboutBoxChildren: <Widget>[
               const SizedBox(height: 24),
               RichText(
@@ -73,10 +73,11 @@ class MainDrawer extends StatelessWidget {
                   children: <TextSpan>[
                     TextSpan(
                         style: textStyle,
+                        // To see the source code of this app, please visit the
                         text:
-                            'To see the source code of this app, please visit the '),
+                            'Um den Quellcode der App zu sehen, besuche bitte das '),
                     TextSpan(
-                      text: 'GitHub repository',
+                      text: 'GitHub Repository',
                       style: TextStyle(color: Theme.of(context).accentColor),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {

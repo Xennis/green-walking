@@ -39,8 +39,10 @@ class PlaceListTile extends StatelessWidget {
 }
 
 class CategoryChips extends StatelessWidget {
-  const CategoryChips({@required this.categories, this.truncateCutoff = 15})
-      : assert(categories != null);
+  const CategoryChips(
+      {Key key, @required this.categories, this.truncateCutoff = 15})
+      : assert(categories != null),
+        super(key: key);
 
   final List<String> categories;
   final int truncateCutoff;

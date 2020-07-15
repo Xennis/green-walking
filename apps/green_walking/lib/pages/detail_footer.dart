@@ -20,11 +20,11 @@ class DetailFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<Widget> children = <Widget>[
       _Attribution(
-        headline: 'Data',
+        headline: 'Daten',
         text: 'Powered by Wikidata',
         links: <String, String>{
           'Powered by Wikidata\n': 'https://www.wikidata.org',
-          'Improve this data': 'https://www.wikidata.org/wiki/$wikidataId',
+          'Verbessere diese Daten': 'https://www.wikidata.org/wiki/$wikidataId',
         },
       )
     ];
@@ -35,18 +35,18 @@ class DetailFooter extends StatelessWidget {
         links: <String, String>{
           '${image.artist}\n': image.descriptionUrl,
           '${image.licenseShortName}\n': image.licenseUrl,
-          'Improve this data': image.descriptionUrl
+          'Verbessere diese Daten': image.descriptionUrl
         },
       ));
     }
-    if (extract != null) {
+    if (extract != null && extract.text != null) {
       children.add(_Attribution(
         headline: 'Text',
         text: 'Text: Wikipedia / ${extract.licenseShortName}',
         links: <String, String>{
           'Wikipedia\n': wikipediaUrl,
           '${extract.licenseShortName}\n': extract.licenseUrl,
-          'Improve this data': wikipediaUrl
+          'Verbessere diese Daten': wikipediaUrl
         },
       ));
     }
