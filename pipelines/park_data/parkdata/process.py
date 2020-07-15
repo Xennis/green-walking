@@ -2,7 +2,7 @@ import logging
 from typing import Dict, Any, Iterable, List, Optional
 from bs4 import BeautifulSoup
 
-from parkdata import fields
+from core import fields
 
 
 class ProcessWikidata:
@@ -116,9 +116,9 @@ class ProcessWikidata:
                 "de": self._create_categories("de", instance_of, heritage_designation=heritage_designation),
                 #"en": self._create_categories("de", instance_of, heritage_designation=heritage_designation),
             },
-            "coordinateLocation": {
-                "latitude": coordinate_location[0].get("latitude") if coordinate_location else None,
-                "longitude": coordinate_location[0].get("longitude") if coordinate_location else None
+            fields.COORDINATE_LOCATION: {
+                fields.LATITUDE: coordinate_location[0].get("latitude") if coordinate_location else None,
+                fields.LONGITUDE: coordinate_location[0].get("longitude") if coordinate_location else None
             },
             "commonsUrl": sitelinks.get("commonswiki", {}).get("url"),
             "descriptions": {
@@ -141,12 +141,15 @@ class ProcessWikidata:
                 #"en": labels.get("en", {}).get("value"),
             },
             "officialWebsite": officialWebsite[0] if officialWebsite else None,
-            "wikidataId": entry.get("title"),
+            fields.WIKIDATA_ID: entry.get("title"),
             fields.WIKIPEDIA: {
                 "de": {
                     fields.TITLE: sitelinks.get("dewiki", {}).get("title"),
                     fields.URL: sitelinks.get("dewiki", {}).get("url"),
-                }
-                #"en": sitelinks.get("enwiki", {}).get("url")
+                },
+                "en": {
+                    fields.TITLE: sitelinks.get("enwiki", {}).get("title"),
+                    fields.URL: sitelinks.get("enwiki", {}).get("url"),
+                },
             },
         }
