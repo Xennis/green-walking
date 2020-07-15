@@ -83,8 +83,8 @@ class Place {
       }
     }
     LatLng coordinateLocation;
-    var lat = j['coordinateLocation']['latitude'];
-    var lng = j['coordinateLocation']['longitude'];
+    double lat = j['coordinateLocation']['latitude'];
+    double lng = j['coordinateLocation']['longitude'];
     if (lat != null && lng != null) {
       coordinateLocation = LatLng(lat.toDouble(), lng.toDouble());
     }
@@ -95,7 +95,7 @@ class Place {
     }
     PlaceExtract extract;
     if (j['extract'] != null) {
-      var rawExtractLang = j['extract'][lang];
+      Map<dynamic, dynamic> rawExtractLang = j['extract'][lang];
       if (rawExtractLang != null) {
         extract = PlaceExtract.fromJson(rawExtractLang);
       }

@@ -180,8 +180,9 @@ class _MapPageState extends State<MapPage> {
                                                   log("no park found");
                                                   return;
                                                 }
-                                                Navigator.of(context)
-                                                    .push(MaterialPageRoute(
+                                                Navigator.of(context).push<
+                                                        dynamic>(
+                                                    MaterialPageRoute<dynamic>(
                                                   builder: (context) =>
                                                       DetailPage(
                                                     park: p,

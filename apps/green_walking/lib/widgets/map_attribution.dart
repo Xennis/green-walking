@@ -28,7 +28,7 @@ class AttributionLayer extends StatelessWidget {
       alignment: Alignment.bottomLeft,
       child: Row(
         children: [
-          Text("   "),  // FIXME: Use proper spacing
+          Text("   "), // FIXME: Use proper spacing
           SvgPicture.asset(
             options.logoAssetName,
             semanticsLabel: 'Mapbox',
@@ -41,7 +41,7 @@ class AttributionLayer extends StatelessWidget {
                 color: options.color,
               ),
               onPressed: () {
-                showDialog(
+                showDialog<dynamic>(
                     context: context,
                     builder: (context) => AlertDialog(
                           title: Text('Mapbox Map'),

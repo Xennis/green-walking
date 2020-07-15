@@ -98,7 +98,7 @@ class _Attribution extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        showDialog(
+        showDialog<dynamic>(
             context: context,
             builder: (context) => AlertDialog(
                   title: Text(this.headline),
