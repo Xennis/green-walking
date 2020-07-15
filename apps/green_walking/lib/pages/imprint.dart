@@ -1,7 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+
+import '../routes.dart';
 
 class ImprintPage extends StatelessWidget {
   @override
@@ -45,10 +46,8 @@ class ImprintPage extends StatelessWidget {
                     text: 'Datenschutzerklärung',
                     style: const TextStyle(color: Colors.blue),
                     recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        // TODO: Enter URL
-                        launch('');
-                      },
+                      ..onTap =
+                          () => Navigator.of(context).pushNamed(Routes.privacy),
                   ),
                   const TextSpan(text: '.')
                 ],
