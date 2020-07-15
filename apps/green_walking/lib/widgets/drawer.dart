@@ -16,7 +16,7 @@ class MainDrawer extends StatelessWidget {
               color: Theme.of(context).accentColor,
             ),
             child: Column(children: <Widget>[
-              Row(children: [
+              Row(children: const <Widget>[
                 Text(
                   'Green Walking',
                   style: TextStyle(
@@ -26,8 +26,8 @@ class MainDrawer extends StatelessWidget {
                 ),
               ]),
               Row(
-                children: [
-                  Text("Entdecke deine grüne Stadt!",
+                children: const <Widget>[
+                  Text('Entdecke deine grüne Stadt!',
                       style: TextStyle(
                         color: Colors.white70,
                       )),
@@ -35,21 +35,21 @@ class MainDrawer extends StatelessWidget {
               )
             ]),
           ),
-          ListTile(
+          const ListTile(
             leading: Icon(Icons.settings),
             title: Text('Einstellungen'),
           ),
-          ListTile(
+          const ListTile(
             leading: Icon(Icons.help),
             title: Text('Hilfe'),
           ),
-          Divider(),
-          ListTile(
+          const Divider(),
+          const ListTile(
             leading: Icon(Icons.feedback),
             title: Text('Feedback senden'),
           ),
           AboutListTile(
-            icon: Icon(Icons.info),
+            icon: const Icon(Icons.info),
             applicationIcon: Image.asset(
               'assets/app-icon.png',
               width: 65,
@@ -59,7 +59,7 @@ class MainDrawer extends StatelessWidget {
             applicationVersion: 'Version 0.1.0',
             applicationLegalese: 'Developed by Xennis',
             aboutBoxChildren: <Widget>[
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               RichText(
                 text: TextSpan(
                   children: <TextSpan>[

@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:green_walking/services/parks.dart';
@@ -11,12 +11,12 @@ import 'package:green_walking/widgets/place_list_tile.dart';
 import 'package:latlong/latlong.dart';
 import 'package:user_location/user_location.dart';
 
-import '../widgets/map_attribution.dart';
 import '../types/place.dart';
+import '../widgets/map_attribution.dart';
 import 'detail.dart';
 
 class MapPage extends StatefulWidget {
-  MapPage({Key key}) : super(key: key);
+  const MapPage({Key key}) : super(key: key);
 
   @override
   _MapPageState createState() => _MapPageState();
@@ -28,31 +28,31 @@ class _MapPageState extends State<MapPage> {
   UserLocationOptions userLocationOptions;
   Future<String> accessToken;
 
-  List<Marker> markers = [];
-  List<Marker> userLocationMarkers = [];
+  List<Marker> markers = <Marker>[];
+  List<Marker> userLocationMarkers = <Marker>[];
 
   @override
   void initState() {
     super.initState();
     accessToken = DefaultAssetBundle.of(context)
-        .loadString("assets/mapbox-access-token.txt");
+        .loadString('assets/mapbox-access-token.txt');
 
-    mapController.onReady.then((value) {
-      ParkService.load(context).then((value) {
-        List<Marker> l = [];
-        value.forEach((p) {
+    mapController.onReady.then((Object value) {
+      ParkService.load(context).then((Iterable<Place> value) {
+        final List<Marker> l = <Marker>[];
+        for (final Place p in value) {
           l.add(Marker(
             anchorPos: AnchorPos.align(AnchorAlign.center),
             height: 50,
             width: 50,
             point: p.coordinateLocation,
-            builder: (_) => Icon(
+            builder: (_) => const Icon(
               Icons.location_on,
               color: Colors.pink,
               size: 50,
             ),
           ));
-        });
+        }
         setState(() {
           markers = l;
         });
@@ -77,8 +77,10 @@ class _MapPageState extends State<MapPage> {
           decoration: BoxDecoration(
               color: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(40.0),
-              boxShadow: [BoxShadow(color: Colors.grey, blurRadius: 10.0)]),
-          child: Icon(
+              boxShadow: const <BoxShadow>[
+                BoxShadow(color: Colors.grey, blurRadius: 10.0)
+              ]),
+          child: const Icon(
             Icons.location_searching,
             color: Colors.white,
           ),
@@ -92,22 +94,22 @@ class _MapPageState extends State<MapPage> {
     userLocationOptions = _createUserLocationOptions(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Green Walking'),
+        title: const Text('Green Walking'),
       ),
       drawer: MainDrawer(),
       body: FutureBuilder<String>(
           future: accessToken,
-          builder: (context, snapshot) {
+          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
             if (snapshot.hasData) {
               return Center(
-                  child: Row(children: [
+                  child: Row(children: <Widget>[
                 Flexible(
                   child: FlutterMap(
                       mapController: mapController,
                       options: MapOptions(
                         center: LatLng(53.5519, 9.8682),
                         zoom: 15.0,
-                        plugins: [
+                        plugins: <MapPlugin>[
                           AttributionPlugin(),
                           MarkerClusterPlugin(),
                           UserLocationPlugin(),
@@ -118,23 +120,24 @@ class _MapPageState extends State<MapPage> {
                         nePanBoundary: LatLng(55.5286, 16.6275),
                         onTap: (_) => _popupController.hidePopup(),
                       ),
-                      layers: [
+                      layers: <LayerOptions>[
                         TileLayerOptions(
                           urlTemplate:
-                              "https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}",
-                          additionalOptions: {
+                              'https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
+                          additionalOptions: <String, String>{
                             'accessToken': snapshot.data,
                             'id': 'outdoors-v11',
                           },
                           // It is recommended to use TileProvider with a caching and retry strategy, like
                           // NetworkTileProvider or CachedNetworkTileProvider
-                          tileProvider: CachedNetworkTileProvider(),
+                          tileProvider: const CachedNetworkTileProvider(),
                         ),
                         MarkerLayerOptions(markers: userLocationMarkers),
                         MarkerClusterLayerOptions(
-                          size: Size(40, 40),
+                          size: const Size(40, 40),
                           markers: markers,
-                          builder: (context, markers) {
+                          builder:
+                              (BuildContext context, List<Marker> markers) {
                             // Avoid using a FloatingActionButton here.
                             // See https://github.com/lpongetti/flutter_map_marker_cluster/issues/18
                             return Container(
@@ -145,7 +148,7 @@ class _MapPageState extends State<MapPage> {
                               child: Center(
                                 child: Text(
                                   markers.length.toString(),
-                                  style: TextStyle(color: Colors.white),
+                                  style: const TextStyle(color: Colors.white),
                                 ),
                               ),
                             );
@@ -153,7 +156,7 @@ class _MapPageState extends State<MapPage> {
                           popupOptions: PopupOptions(
                               popupSnap: PopupSnap.top,
                               popupController: _popupController,
-                              popupBuilder: (_, marker) {
+                              popupBuilder: (_, Marker marker) {
                                 final Place p = ParkService.get(marker.point);
                                 final TextStyle tx = TextStyle(
                                     color: Theme.of(context).accentColor);
@@ -177,14 +180,15 @@ class _MapPageState extends State<MapPage> {
                                               child: Text('DETAILS', style: tx),
                                               onPressed: () {
                                                 if (p == null) {
-                                                  log("no park found");
+                                                  log('no park found');
                                                   return;
                                                 }
                                                 Navigator.of(context).push<
                                                         dynamic>(
                                                     MaterialPageRoute<dynamic>(
-                                                  builder: (context) =>
-                                                      DetailPage(
+                                                  builder:
+                                                      (BuildContext context) =>
+                                                          DetailPage(
                                                     park: p,
                                                   ),
                                                 ));
@@ -200,12 +204,12 @@ class _MapPageState extends State<MapPage> {
                         ),
                         userLocationOptions,
                         AttributionOptions(
-                            logoAssetName: "assets/mapbox-logo.svg"),
+                            logoAssetName: 'assets/mapbox-logo.svg'),
                       ]),
                 )
               ]));
             }
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }),
     );
   }

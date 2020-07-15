@@ -1,20 +1,21 @@
-import 'package:flutter/widgets.dart';
-import 'package:latlong/latlong.dart';
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/widgets.dart';
+import 'package:latlong/latlong.dart';
 
 import '../types/place.dart';
 
-Map<LatLng, Place> places = Map();
+Map<LatLng, Place> places = <LatLng, Place>{};
 
 class ParkService {
   static Future<Iterable<Place>> load(BuildContext context) async {
-    String rawBlob =
-        await DefaultAssetBundle.of(context).loadString("assets/parks.json");
-    LineSplitter()
+    final String rawBlob =
+        await DefaultAssetBundle.of(context).loadString('assets/parks.json');
+    const LineSplitter()
         .convert(rawBlob)
-        .map((line) => Place.fromJson(json.decode(line) as Map))
-        .forEach((p) {
+        .map((String line) =>
+            Place.fromJson(json.decode(line) as Map<dynamic, dynamic>))
+        .forEach((Place p) {
       if (p.coordinateLocation == null) {
         return;
       }

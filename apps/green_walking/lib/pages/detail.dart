@@ -10,17 +10,17 @@ import '../widgets/place_list_tile.dart';
 import 'detail_footer.dart';
 
 class DetailPageArguments {
-  final Place place;
-
   DetailPageArguments(this.place);
+
+  final Place place;
 }
 
 class DetailPage extends StatelessWidget {
-  final Place park;
-
-  DetailPage({Key key, @required this.park})
+  const DetailPage({Key key, @required this.park})
       : assert(park != null),
         super(key: key);
+
+  final Place park;
 
   // FIXME: Rework this and the functions below.
   Widget _description(PlaceExtract extract, String description) {
@@ -31,14 +31,14 @@ class DetailPage extends StatelessWidget {
       // Use Wikidata description as fallback.
       return Text(
         description,
-        style: TextStyle(color: Colors.black),
+        style: const TextStyle(color: Colors.black),
       );
     }
     return RichText(
         textScaleFactor: 1.1,
         text: TextSpan(
             text: extract.text,
-            style: TextStyle(color: Colors.black, height: 1.5)));
+            style: const TextStyle(color: Colors.black, height: 1.5)));
   }
 
   Widget _location(String location) {
@@ -47,13 +47,13 @@ class DetailPage extends StatelessWidget {
     }
     return Text(
       location,
-      style: TextStyle(color: Colors.grey),
+      style: const TextStyle(color: Colors.grey),
     );
   }
 
   Widget _title(BuildContext context, String name) {
     if (name == null) {
-      return Text("Unbekannt");
+      return const Text('Unbekannt');
     }
     return Text(
       name,
@@ -68,7 +68,7 @@ class DetailPage extends StatelessWidget {
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           Widget fs;
-          String imageUrl = park.image?.url;
+          final String imageUrl = park.image?.url;
           if (imageUrl != null) {
             fs = FlexibleSpaceBar(
               background: CachedNetworkImage(
@@ -84,7 +84,7 @@ class DetailPage extends StatelessWidget {
               pinned: false,
               automaticallyImplyLeading: true,
               leading: IconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.arrow_back,
                   color: Colors.white,
                 ),
@@ -95,12 +95,12 @@ class DetailPage extends StatelessWidget {
           ];
         },
         body: ListView(
-          children: [
+          children: <Widget>[
             Padding(
-              padding: EdgeInsets.fromLTRB(15, 0, 15, 25),
+              padding: const EdgeInsets.fromLTRB(15, 0, 15, 25),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                children: <Widget>[
                   _title(context, park.name),
                   _location(park.location),
                   CategoryChips(
@@ -111,18 +111,17 @@ class DetailPage extends StatelessWidget {
                 ],
               ),
             ),
-            Expanded(
-                child: Container(
+            Container(
               decoration: BoxDecoration(
                   color: Colors.grey.shade100,
                   border: Border(
                       top: BorderSide(color: Colors.grey.shade300, width: 1))),
               child: Padding(
                 // Wide right padding because of floating action button.
-                padding: EdgeInsets.fromLTRB(15, 25, 85, 20),
+                padding: const EdgeInsets.fromLTRB(15, 25, 85, 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: <Widget>[
                     DetailFooter(
                       wikidataId: park.wikidataId,
                       image: park.image,
@@ -132,7 +131,7 @@ class DetailPage extends StatelessWidget {
                   ],
                 ),
               ),
-            ))
+            )
           ],
         ),
       ),
@@ -141,20 +140,20 @@ class DetailPage extends StatelessWidget {
 }
 
 class _DetailSpeedDial extends StatelessWidget {
-  final Place park;
+  const _DetailSpeedDial(this.park);
 
-  _DetailSpeedDial(this.park);
+  final Place park;
 
   @override
   Widget build(BuildContext context) {
-    List<SpeedDialChild> children = [
+    final List<SpeedDialChild> children = <SpeedDialChild>[
       SpeedDialChild(
         onTap: () {
           launch(
               'geo:${park.coordinateLocation.latitude},${park.coordinateLocation.longitude}?q=${park.name}');
         },
         label: 'Maps',
-        child: Icon(Icons.map),
+        child: const Icon(Icons.map),
         backgroundColor: Colors.pinkAccent,
       ),
     ];
@@ -166,7 +165,7 @@ class _DetailSpeedDial extends StatelessWidget {
           }
         },
         label: 'Wikipedia',
-        child: Icon(Icons.book),
+        child: const Icon(Icons.book),
         backgroundColor: Colors.greenAccent,
       ));
     }
@@ -178,7 +177,7 @@ class _DetailSpeedDial extends StatelessWidget {
           }
         },
         label: 'Commons',
-        child: Icon(Icons.photo),
+        child: const Icon(Icons.photo),
         backgroundColor: Colors.orangeAccent,
       ));
     }
@@ -190,7 +189,7 @@ class _DetailSpeedDial extends StatelessWidget {
           }
         },
         label: 'Website',
-        child: Icon(Icons.web),
+        child: const Icon(Icons.web),
         backgroundColor: Colors.blueAccent,
       ));
     }

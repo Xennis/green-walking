@@ -2,10 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:latlong/latlong.dart';
 
 class PlaceExtract {
-  final String text;
-  final String licenseShortName;
-  final String licenseUrl;
-
   PlaceExtract({this.text, this.licenseShortName, this.licenseUrl});
 
   factory PlaceExtract.fromJson(Map<dynamic, dynamic> j) {
@@ -15,15 +11,13 @@ class PlaceExtract {
       licenseUrl: j['licenseUrl'] as String,
     );
   }
+
+  final String text;
+  final String licenseShortName;
+  final String licenseUrl;
 }
 
 class PlaceImage {
-  final String artist;
-  final String descriptionUrl;
-  final String licenseShortName;
-  final String licenseUrl;
-  final String url;
-
   PlaceImage(
       {this.artist,
       this.descriptionUrl,
@@ -40,22 +34,15 @@ class PlaceImage {
       url: j['url'] as String,
     );
   }
+
+  final String artist;
+  final String descriptionUrl;
+  final String licenseShortName;
+  final String licenseUrl;
+  final String url;
 }
 
 class Place {
-  final List<String> aliases;
-  final List<String> categories;
-  final LatLng coordinateLocation;
-  final String commonsUrl;
-  final String description;
-  final PlaceExtract extract;
-  final PlaceImage image;
-  final String location;
-  final String name;
-  final String officialWebsite;
-  final String wikidataId;
-  final String wikipediaUrl;
-
   Place(
       {this.aliases,
       this.categories,
@@ -84,27 +71,28 @@ class Place {
       }
     }
     LatLng coordinateLocation;
-    double lat = j['coordinateLocation']['latitude'] as double;
-    double lng = j['coordinateLocation']['longitude'] as double;
+    final double lat = j['coordinateLocation']['latitude'] as double;
+    final double lng = j['coordinateLocation']['longitude'] as double;
     if (lat != null && lng != null) {
       coordinateLocation = LatLng(lat.toDouble(), lng.toDouble());
     }
 
     PlaceImage image;
     if (j['image'] != null) {
-      image = PlaceImage.fromJson(j['image'] as Map);
+      image = PlaceImage.fromJson(j['image'] as Map<dynamic, dynamic>);
     }
     PlaceExtract extract;
     if (j['extract'] != null) {
-      Map rawExtractLang = j['extract'][lang] as Map;
+      final Map<dynamic, dynamic> rawExtractLang =
+          j['extract'][lang] as Map<dynamic, dynamic>;
       if (rawExtractLang != null) {
         extract = PlaceExtract.fromJson(rawExtractLang);
       }
     }
 
     return Place(
-        aliases: List<String>.from(j['aliases'][lang] as Iterable),
-        categories: List<String>.from(j['categories'][lang] as Iterable),
+        aliases: List<String>.from(j['aliases'][lang] as List<dynamic>),
+        categories: List<String>.from(j['categories'][lang] as List<dynamic>),
         coordinateLocation: coordinateLocation,
         commonsUrl: j['commonsUrl'] as String,
         description: j['description'] as String,
@@ -116,4 +104,17 @@ class Place {
         wikidataId: j['wikidataId'] as String,
         wikipediaUrl: j['wikipediaUrl'][lang] as String);
   }
+
+  final List<String> aliases;
+  final List<String> categories;
+  final LatLng coordinateLocation;
+  final String commonsUrl;
+  final String description;
+  final PlaceExtract extract;
+  final PlaceImage image;
+  final String location;
+  final String name;
+  final String officialWebsite;
+  final String wikidataId;
+  final String wikipediaUrl;
 }
