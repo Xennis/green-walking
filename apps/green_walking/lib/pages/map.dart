@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:green_walking/services/parks.dart';
+import 'package:green_walking/services/shared_prefs.dart';
 import 'package:green_walking/widgets/drawer.dart';
 import 'package:green_walking/widgets/place_list_tile.dart';
 import 'package:latlong/latlong.dart';
@@ -14,6 +15,13 @@ import 'package:user_location/user_location.dart';
 import '../types/place.dart';
 import '../widgets/map_attribution.dart';
 import 'detail.dart';
+
+class MapConfig {
+  MapConfig({this.accessToken, this.lastLocation});
+
+  String accessToken;
+  LatLng lastLocation;
+}
 
 class MapPage extends StatefulWidget {
   const MapPage({Key key}) : super(key: key);
@@ -26,7 +34,6 @@ class _MapPageState extends State<MapPage> {
   final PopupController _popupController = PopupController();
   final MapController mapController = MapController();
   UserLocationOptions userLocationOptions;
-  Future<String> accessToken;
 
   List<Marker> markers = <Marker>[];
   List<Marker> userLocationMarkers = <Marker>[];
@@ -34,8 +41,6 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
-    accessToken = DefaultAssetBundle.of(context)
-        .loadString('assets/mapbox-access-token.txt');
 
     mapController.onReady.then((Object value) {
       ParkService.load(context).then((Iterable<Place> value) {
@@ -73,6 +78,8 @@ class _MapPageState extends State<MapPage> {
         fabRight: 16,
         fabWidth: 55,
         fabHeight: 55,
+        onLocationUpdate: (LatLng loc) =>
+            SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, loc),
         moveToCurrentLocationFloatingActionButton: Container(
           decoration: BoxDecoration(
               color: Theme.of(context).primaryColor,
@@ -87,6 +94,14 @@ class _MapPageState extends State<MapPage> {
         ));
   }
 
+  Future<MapConfig> createMapConfig() async {
+    final String accessToken = await DefaultAssetBundle.of(context)
+        .loadString('assets/mapbox-access-token.txt');
+    final LatLng lastLocation =
+        await SharedPrefs.getLatLng(SharedPrefs.KEY_LAST_LOCATION);
+    return MapConfig(accessToken: accessToken, lastLocation: lastLocation);
+  }
+
   @override
   Widget build(BuildContext context) {
     // You can use the userLocationOptions object to change the properties
@@ -97,9 +112,9 @@ class _MapPageState extends State<MapPage> {
         title: const Text('Green Walking'),
       ),
       drawer: MainDrawer(),
-      body: FutureBuilder<String>(
-          future: accessToken,
-          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+      body: FutureBuilder<MapConfig>(
+          future: createMapConfig(),
+          builder: (BuildContext context, AsyncSnapshot<MapConfig> snapshot) {
             if (snapshot.hasData) {
               return Center(
                   child: Row(children: <Widget>[
@@ -107,7 +122,9 @@ class _MapPageState extends State<MapPage> {
                   child: FlutterMap(
                       mapController: mapController,
                       options: MapOptions(
-                        center: LatLng(53.5519, 9.8682),
+                        center: (snapshot.data.lastLocation != null)
+                            ? snapshot.data.lastLocation
+                            : LatLng(53.5519, 9.8682),
                         zoom: 15.0,
                         plugins: <MapPlugin>[
                           AttributionPlugin(),
@@ -125,7 +142,7 @@ class _MapPageState extends State<MapPage> {
                           urlTemplate:
                               'https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
                           additionalOptions: <String, String>{
-                            'accessToken': snapshot.data,
+                            'accessToken': snapshot.data.accessToken,
                             'id': 'outdoors-v11',
                           },
                           // It is recommended to use TileProvider with a caching and retry strategy, like
