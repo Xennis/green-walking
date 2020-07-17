@@ -1,11 +1,70 @@
 import logging
-from typing import Dict, Any, Iterable, List, Optional
+from typing import Dict, Any, Iterable, List, Optional, Generator, Tuple
+from apache_beam import DoFn
 from bs4 import BeautifulSoup
 
-from core import fields
+from greenwalking.pipeline.parkdata import fields
 
 
-class ProcessWikidata:
+class ProcessDoFn(DoFn):
+    def process(self, element: Dict[str, Any], *args, **kwargs) -> Generator[Tuple[str, Dict[str, Any]], None, None]:
+        aliases = element.get("aliases", {})
+        descriptions = element.get("descriptions", {})
+        labels = element.get("labels", {})
+        sitelinks = element.get("sitelinks", {})
+
+        claims = self._resolve_claims_by_type(element.get("claims", {}))
+        administrative = claims.get("located in the administrative territorial entity", [])
+        coordinate_location: List[Dict[str, Any]] = claims.get("coordinate location", [])
+        heritage_designation: List[Dict[str, Any]] = claims.get("heritage designation", [])
+        instance_of: List[Dict[str, Any]] = claims.get("instance of", [])
+        location = claims.get("location")
+        officialWebsite = claims.get("official website")
+        image: List[List[Dict[str, Any]]] = claims.get("image", [])
+
+        wikidata_id: str = element["title"]
+
+        # FIXME: Process en data here and filter it out in the end
+        yield wikidata_id, {
+            "aliases": {
+                "de": [e.get("value") for e in aliases.get("de", [])],
+                # "en": [e.get("value") for e in aliases.get("en", [])],
+            },
+            "categories": {
+                "de": self._create_categories("de", instance_of, heritage_designation=heritage_designation),
+                # "en": self._create_categories("de", instance_of, heritage_designation=heritage_designation),
+            },
+            fields.COORDINATE_LOCATION: {
+                fields.LATITUDE: coordinate_location[0].get("latitude") if coordinate_location else None,
+                fields.LONGITUDE: coordinate_location[0].get("longitude") if coordinate_location else None,
+            },
+            "commonsUrl": sitelinks.get("commonswiki", {}).get("url"),
+            "descriptions": {
+                "de": descriptions.get("de", {}).get("value"),
+                # "en": descriptions.get("en", {}).get("value")
+            },
+            "image": self._filter_images(image),
+            "location": {
+                "de": {
+                    "location": location[0].get("de", {}).get("value") if location else None,
+                    "administrative": administrative[0].get("de", {}).get("value") if administrative else None,
+                },
+                # "en": {
+                #    "location": location[0].get("en", {}).get("value") if location else None,
+                #    "administrative": administrative[0].get("en", {}).get("value") if administrative else None
+                # },
+            },
+            "name": {
+                "de": labels.get("de", {}).get("value"),
+                # "en": labels.get("en", {}).get("value"),
+            },
+            "officialWebsite": officialWebsite[0] if officialWebsite else None,
+            fields.WIKIDATA_ID: wikidata_id,
+            fields.WIKIPEDIA: {
+                "de": {fields.TITLE: sitelinks.get("dewiki", {}).get("title"), fields.URL: sitelinks.get("dewiki", {}).get("url"),},
+                "en": {fields.TITLE: sitelinks.get("enwiki", {}).get("title"), fields.URL: sitelinks.get("enwiki", {}).get("url"),},
+            },
+        }
 
     @staticmethod
     def _extract_artist(raw: Optional[Dict[str, Any]]) -> Optional[str]:
@@ -26,7 +85,7 @@ class ProcessWikidata:
         # It's safer to parse for False: It's better to wrongly assume a media has a copyright than the other way round.
         copyrighted = bool(ext_meta_data.get("Copyrighted", {}).get("value") != "False")
         return {
-            fields.ARTIST: ProcessWikidata._extract_artist(ext_meta_data.get("Artist")),
+            fields.ARTIST: ProcessDoFn._extract_artist(ext_meta_data.get("Artist")),
             fields.COPYRIGHTED: copyrighted,
             fields.DESCRIPTION_URL: image_info.get("descriptionurl"),
             fields.LICENSE_SHORT_NAME: ext_meta_data.get("LicenseShortName", {}).get("value"),
@@ -36,7 +95,7 @@ class ProcessWikidata:
 
     @staticmethod
     def _resolve_claims_by_type(claims: Dict[str, Iterable[Dict[str, Any]]]) -> Dict[str, Any]:
-        res = {}
+        res: Dict[str, Any] = {}
         for prop, values in claims.items():
             res[prop] = []
             for value in values:
@@ -53,11 +112,11 @@ class ProcessWikidata:
                     res[prop].append(data_val.get("gw", {}).get("labels", {}))
                 elif data_type == "commonsMedia" and data_val_type == "string":
                     image_infos = data_val.get("gw", {}).get("imageinfo", [])
-                    res[prop].append([ProcessWikidata._resolve_commons_media(info) for info in image_infos])
+                    res[prop].append([ProcessDoFn._resolve_commons_media(info) for info in image_infos])
                 elif data_type == "url" and data_val_type == "string":
                     res[prop].append(data_val.get("value"))
                 else:
-                    logging.info("data_type %s and data_val_type %s not handled", data_type, data_val_type)
+                    logging.debug("data_type %s and data_val_type %s not handled", data_type, data_val_type)
         return res
 
     @staticmethod
@@ -73,11 +132,13 @@ class ProcessWikidata:
 
         if len(res) <= 5:
             return res
-        # TODO: Move this to the end of the pipeline
+        # FIXME: Move this to the end of the pipeline
         # Limit the number of categories. Pick the one with the shortest name because long names get truncated in the
         # app anyway.
-        return res.sort(key=len)[0:5]
+        res.sort(key=len)
+        return res[0:5]
 
+    # FIXME: Move this to the end of the pipeline
     @staticmethod
     def _filter_images(images: Optional[Iterable[List[Dict[str, Any]]]]) -> Optional[Dict[str, Any]]:
         if not images:
@@ -97,65 +158,3 @@ class ProcessWikidata:
             return image_info
 
         return None
-
-    def process(self, entry: Dict[str, Any]) -> Dict[str, Any]:
-        aliases = entry.get("aliases", {})
-        descriptions = entry.get("descriptions", {})
-        labels = entry.get("labels", {})
-        sitelinks = entry.get("sitelinks", {})
-
-        claims = self._resolve_claims_by_type(entry.get("claims", {}))
-        administrative = claims.get("located in the administrative territorial entity", [])
-        coordinate_location: List[Dict[str, Any]] = claims.get("coordinate location", [])
-        heritage_designation: List[Dict[str, Any]] = claims.get("heritage designation", [])
-        instance_of: List[Dict[str, Any]] = claims.get("instance of", [])
-        location = claims.get("location")
-        officialWebsite = claims.get("official website")
-        image: List[List[Dict[str, Any]]] = claims.get("image", [])
-
-        return {
-            "aliases": {
-                "de": [e.get("value") for e in aliases.get("de", [])],
-                #"en": [e.get("value") for e in aliases.get("en", [])],
-            },
-            "categories": {
-                "de": self._create_categories("de", instance_of, heritage_designation=heritage_designation),
-                #"en": self._create_categories("de", instance_of, heritage_designation=heritage_designation),
-            },
-            fields.COORDINATE_LOCATION: {
-                fields.LATITUDE: coordinate_location[0].get("latitude") if coordinate_location else None,
-                fields.LONGITUDE: coordinate_location[0].get("longitude") if coordinate_location else None
-            },
-            "commonsUrl": sitelinks.get("commonswiki", {}).get("url"),
-            "descriptions": {
-                "de": descriptions.get("de", {}).get("value"),
-                #"en": descriptions.get("en", {}).get("value")
-            },
-            "image": self._filter_images(image),
-            "location": {
-                "de": {
-                    "location": location[0].get("de", {}).get("value") if location else None,
-                    "administrative": administrative[0].get("de", {}).get("value") if administrative else None
-                },
-                #"en": {
-                #    "location": location[0].get("en", {}).get("value") if location else None,
-                #    "administrative": administrative[0].get("en", {}).get("value") if administrative else None
-                #},
-            },
-            "name": {
-                "de": labels.get("de", {}).get("value"),
-                #"en": labels.get("en", {}).get("value"),
-            },
-            "officialWebsite": officialWebsite[0] if officialWebsite else None,
-            fields.WIKIDATA_ID: entry.get("title"),
-            fields.WIKIPEDIA: {
-                "de": {
-                    fields.TITLE: sitelinks.get("dewiki", {}).get("title"),
-                    fields.URL: sitelinks.get("dewiki", {}).get("url"),
-                },
-                "en": {
-                    fields.TITLE: sitelinks.get("enwiki", {}).get("title"),
-                    fields.URL: sitelinks.get("enwiki", {}).get("url"),
-                },
-            },
-        }

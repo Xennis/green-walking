@@ -1,0 +1,24 @@
+name: Python check
+on: push
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.7' 
+    - name: Install dependencies
+      run: pip install --requirement requirements.txt
+      working-directory: pipelines/park_data
+    - name: Check format
+      run: make format-check
+      working-directory: pipelines/park_data
+    - name: Check types
+      run: make mypy
+      working-directory: pipelines/park_data
+    - name: Run tests
+      run: make test
+      working-directory: pipelines/park_data
