@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
+import '../core.dart';
 import '../types/place.dart';
 
 class PlaceListTile extends StatelessWidget {
@@ -8,12 +9,6 @@ class PlaceListTile extends StatelessWidget {
         super(key: key);
 
   final Place place;
-
-  String truncateString(String myString, int cutoff) {
-    return (myString.length <= cutoff)
-        ? myString
-        : '${myString.substring(0, cutoff)}...';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,12 +41,6 @@ class CategoryChips extends StatelessWidget {
 
   final List<String> categories;
   final int truncateCutoff;
-
-  String truncateString(String myString, int cutoff) {
-    return (myString.length <= cutoff)
-        ? myString
-        : '${myString.substring(0, cutoff)}...';
-  }
 
   List<Widget> createCategoryCips(BuildContext context) {
     final List<Widget> res = <Widget>[];

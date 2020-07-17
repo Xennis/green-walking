@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import '../core.dart';
 import '../types/place.dart';
 import '../widgets/place_list_tile.dart';
 import 'detail_footer.dart';
@@ -39,7 +40,7 @@ class DetailPage extends StatelessWidget {
       return Container();
     }
     return Text(
-      location,
+      truncateString(location, 80),
       style: const TextStyle(color: Colors.grey),
     );
   }
@@ -50,7 +51,7 @@ class DetailPage extends StatelessWidget {
       text = name;
     }
     return Text(
-      text,
+      truncateString(text, 50),
       style: Theme.of(context).textTheme.headline4,
     );
   }
