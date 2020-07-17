@@ -213,13 +213,15 @@ packages:
       name: flutter_map
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.9.0"
+    version: "0.10.1"
   flutter_map_marker_cluster:
     dependency: "direct main"
     description:
-      name: flutter_map_marker_cluster
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: fluttermap-10
+      resolved-ref: "00f56d9c43a441a2f364488806208a01d5a9cc7a"
+      url: "https://github.com/Xennis/flutter_map_marker_cluster.git"
+    source: git
     version: "0.2.8"
   flutter_map_marker_popup:
     dependency: transitive
@@ -613,7 +615,14 @@ packages:
       name: url_launcher
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.4.11"
+    version: "5.5.0"
+  url_launcher_linux:
+    dependency: transitive
+    description:
+      name: url_launcher_linux
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.1+1"
   url_launcher_macos:
     dependency: transitive
     description:
@@ -639,8 +648,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "2f7b3195160d06e66d309b9618f66d81030445cf"
-      resolved-ref: "2f7b3195160d06e66d309b9618f66d81030445cf"
+      ref: af89e2dd6c7f8cf91b5398c50ddd6acdd7b56ce3
+      resolved-ref: af89e2dd6c7f8cf91b5398c50ddd6acdd7b56ce3
       url: "https://github.com/igaurab/user_location_plugin.git"
     source: git
     version: "0.1.3"
