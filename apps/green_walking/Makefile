@@ -6,3 +6,6 @@ launcher-icon:
 
 test:
 	flutter test
+
+release:
+	flutter build appbundle
