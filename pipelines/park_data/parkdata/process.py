@@ -70,7 +70,13 @@ class ProcessWikidata:
             if label in res:
                 continue  # Deduplicate labels
             res.append(label)
-        return res
+
+        if len(res) <= 5:
+            return res
+        # TODO: Move this to the end of the pipeline
+        # Limit the number of categories. Pick the one with the shortest name because long names get truncated in the
+        # app anyway.
+        return res.sort(key=len)[0:5]
 
     @staticmethod
     def _filter_images(images: Optional[Iterable[List[Dict[str, Any]]]]) -> Optional[Dict[str, Any]]:
