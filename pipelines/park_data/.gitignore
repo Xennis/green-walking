@@ -5,6 +5,9 @@ __pycache__/
 # Python virtualen environment
 venv/
 
+# Cache
+.mypy_cache/
+
 # Local files
-all-parks.txt
+*.txt
 *.json

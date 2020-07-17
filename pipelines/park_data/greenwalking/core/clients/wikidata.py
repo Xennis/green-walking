@@ -35,7 +35,6 @@ class WikidataEntityClient:
 
     def __init__(self, user_agent: str):
         self._user_agent = user_agent
-        self._cache = {}
 
     def _do_request(self, entity_id: str) -> Dict[str, Any]:
         req = urllib.request.Request(self._API_ENDPOINT + f"{entity_id}.json")
