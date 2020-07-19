@@ -1,11 +1,13 @@
 import json
 import logging
+from collections import Iterable
 from typing import Tuple, Dict, Iterable, Any, TypeVar, Generator
 
 from apache_beam import Pipeline, ParDo, CoGroupByKey, DoFn, copy, Values, Map
 from apache_beam.io import WriteToText
 from apache_beam.options.pipeline_options import PipelineOptions, SetupOptions
 
+from greenwalking.core import language
 from greenwalking.pipeline.parkdata import wikidata, wikipedia, fields
 
 K = TypeVar("K")
@@ -23,6 +25,7 @@ class Combine(DoFn):
         wikidata_entries = list(tags[self.TAG_WIKIDATA])
         wikipedia_entries = list(tags[self.TAG_WIKIPEDIA])
 
+        # FIXME: Clean that up. Avoid duplicates early.
         # Because of redirect more then 1 is possible
         assert len(wikidata_entries) >= 1, f">=1 wikidata element for {key}, got {len(wikidata_entries)}"
         wikidata = copy.copy(wikidata_entries[0])
@@ -37,10 +40,6 @@ class Combine(DoFn):
         wikidata["wikipediaUrl"] = urls_per_lang
 
         if wikipedia:
-            # FIXME: Move this to the end of the pipeline
-            # if "en" in wikipedia:
-            #    wikidata = copy.copy(wikidata)
-            #    del wikipedia["en"]
             wikidata["extract"] = wikipedia
 
         # FIXME: Move this to the end of the pipeline. Add metric.
@@ -61,6 +60,31 @@ class Combine(DoFn):
         }
 
         yield key, wikidata
+
+
+class FilterLanguage(DoFn):
+
+    _LANG_TO_DELETE = language.ENGLISH
+
+    def process(self, element: Tuple[K, Dict[str, Any]], *args, **kwargs) -> Generator[Tuple[K, Dict[str, Any]], None, None]:
+        key, entry = element
+        entry = copy.copy(entry)
+        self._delete_non_german(entry)
+        yield key, entry
+
+    @staticmethod
+    def _delete_non_german(element: Any):
+        if isinstance(element, dict):
+            if FilterLanguage._LANG_TO_DELETE in element:
+                del element[FilterLanguage._LANG_TO_DELETE]
+                return
+            for _, value in element.items():
+                FilterLanguage._delete_non_german(value)
+            return
+
+        if not isinstance(element, (str, dict)) and isinstance(element, Iterable):
+            for e in element:
+                FilterLanguage._delete_non_german(e)
 
 
 class ParkdataPipelineOptions(PipelineOptions):
@@ -108,6 +132,7 @@ def run(argv=None):
             {Combine.TAG_WIKIDATA: wikidata_data, Combine.TAG_WIKIPEDIA: wikipedia_data,}
             | "combine/group_by_key" >> CoGroupByKey()
             | "combine/combine" >> ParDo(Combine())
+            | "combine/filter_lang" >> ParDo(FilterLanguage())
             | "combine/values" >> Values()
             | "combine/json_dump" >> Map(lambda element: json.dumps(element, sort_keys=True))
             | "combine/write" >> WriteToText("output", file_name_suffix=".json", shard_name_template="")

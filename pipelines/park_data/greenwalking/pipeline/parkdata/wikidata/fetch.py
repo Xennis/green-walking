@@ -8,6 +8,7 @@ from typing import Dict, Any, Iterable, Generator, Optional
 from apache_beam.io.filesystems import FileSystems
 from apache_beam.transforms.combiners import Count
 
+from greenwalking.core import language
 from greenwalking.core.clients import WikidataEntityClient, CommonsImageInfoClient
 
 
@@ -30,7 +31,7 @@ class _Fetch:
     def _resolve_claims(self, claims: Dict[str, Iterable[Dict[str, Any]]]) -> Dict[str, Any]:
         res: Dict[str, Any] = {}
         for prop_id, values in claims.items():
-            prop_name = self._do_request_cached(prop_id).get("labels", {}).get("en", {}).get("value")
+            prop_name = self._do_request_cached(prop_id).get("labels", {}).get(language.ENGLISH, {}).get("value")
             if not isinstance(prop_name, str):
                 logging.warning("type of property %s is %s, want str", prop_id, type(prop_id))
                 continue
