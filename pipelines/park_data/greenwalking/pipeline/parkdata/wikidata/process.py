@@ -3,6 +3,7 @@ from typing import Dict, Any, Iterable, List, Optional, Generator, Tuple
 from apache_beam import DoFn
 from bs4 import BeautifulSoup
 
+from greenwalking.core import language
 from greenwalking.pipeline.parkdata import fields
 
 
@@ -27,12 +28,12 @@ class ProcessDoFn(DoFn):
         # FIXME: Process en data here and filter it out in the end
         yield wikidata_id, {
             "aliases": {
-                "de": [e.get("value") for e in aliases.get("de", [])],
-                # "en": [e.get("value") for e in aliases.get("en", [])],
+                language.GERMAN: [e.get("value") for e in aliases.get(language.GERMAN, [])],
+                language.ENGLISH: [e.get("value") for e in aliases.get(language.ENGLISH, [])],
             },
             "categories": {
-                "de": self._create_categories("de", instance_of, heritage_designation=heritage_designation),
-                # "en": self._create_categories("de", instance_of, heritage_designation=heritage_designation),
+                language.GERMAN: self._create_categories(language.GERMAN, instance_of, heritage_designation=heritage_designation),
+                language.ENGLISH: self._create_categories(language.ENGLISH, instance_of, heritage_designation=heritage_designation),
             },
             fields.COORDINATE_LOCATION: {
                 fields.LATITUDE: coordinate_location[0].get("latitude") if coordinate_location else None,
@@ -40,29 +41,35 @@ class ProcessDoFn(DoFn):
             },
             "commonsUrl": sitelinks.get("commonswiki", {}).get("url"),
             "descriptions": {
-                "de": descriptions.get("de", {}).get("value"),
-                # "en": descriptions.get("en", {}).get("value")
+                language.GERMAN: descriptions.get(language.GERMAN, {}).get("value"),
+                language.ENGLISH: descriptions.get(language.ENGLISH, {}).get("value"),
             },
             "image": self._filter_images(image),
             "location": {
-                "de": {
-                    "location": location[0].get("de", {}).get("value") if location else None,
-                    "administrative": administrative[0].get("de", {}).get("value") if administrative else None,
+                language.GERMAN: {
+                    "location": location[0].get(language.GERMAN, {}).get("value") if location else None,
+                    "administrative": administrative[0].get(language.GERMAN, {}).get("value") if administrative else None,
                 },
-                # "en": {
-                #    "location": location[0].get("en", {}).get("value") if location else None,
-                #    "administrative": administrative[0].get("en", {}).get("value") if administrative else None
-                # },
+                language.ENGLISH: {
+                    "location": location[0].get(language.ENGLISH, {}).get("value") if location else None,
+                    "administrative": administrative[0].get(language.ENGLISH, {}).get("value") if administrative else None,
+                },
             },
             "name": {
-                "de": labels.get("de", {}).get("value"),
-                # "en": labels.get("en", {}).get("value"),
+                language.GERMAN: labels.get(language.GERMAN, {}).get("value"),
+                language.ENGLISH: labels.get(language.ENGLISH, {}).get("value"),
             },
             "officialWebsite": officialWebsite[0] if officialWebsite else None,
             fields.WIKIDATA_ID: wikidata_id,
             fields.WIKIPEDIA: {
-                "de": {fields.TITLE: sitelinks.get("dewiki", {}).get("title"), fields.URL: sitelinks.get("dewiki", {}).get("url"),},
-                "en": {fields.TITLE: sitelinks.get("enwiki", {}).get("title"), fields.URL: sitelinks.get("enwiki", {}).get("url"),},
+                language.GERMAN: {
+                    fields.TITLE: sitelinks.get("dewiki", {}).get("title"),
+                    fields.URL: sitelinks.get("dewiki", {}).get("url"),
+                },
+                language.ENGLISH: {
+                    fields.TITLE: sitelinks.get("enwiki", {}).get("title"),
+                    fields.URL: sitelinks.get("enwiki", {}).get("url"),
+                },
             },
         }
 

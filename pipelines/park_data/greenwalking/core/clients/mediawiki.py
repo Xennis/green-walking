@@ -42,6 +42,7 @@ class CommonsImageInfoClient:
         pages: Dict[str, Any] = resp["query"]["pages"]
         for page in pages.values():
             return page
+        # FIXME: Proper handling
         raise Exception("Nothing returned")
 
 
@@ -91,4 +92,5 @@ class WikipediaExtractClient:
         for page in pages.values():
             page["rightsinfo"] = query["rightsinfo"]
             return page
+        # FIXME: Proper handling
         raise Exception("Nothing returned")
