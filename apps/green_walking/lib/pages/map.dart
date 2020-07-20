@@ -54,6 +54,7 @@ class _MapPageState extends State<MapPage> {
         fabHeight: 55,
         onLocationUpdate: (LatLng loc) =>
             SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, loc),
+        pauseLocationUpdateIfWidgetIsPaused: true,
         onTapFAB: () {}, // Otherwise a null exception happens
         moveToCurrentLocationFloatingActionButton: Container(
           decoration: BoxDecoration(
