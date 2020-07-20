@@ -43,10 +43,11 @@ dependencies:
   flutter_svg: ^0.17.4 # Can't use new version because of dep conflicts with flutter_launcher_icons.
   dart_geohash: ^1.0.2
   url_launcher: ^5.5.0
+  # Use origin once https://github.com/igaurab/user_location_plugin/pull/76/ is merged and released.
   user_location:
     git:
-      ref: af89e2dd6c7f8cf91b5398c50ddd6acdd7b56ce3
-      url: https://github.com/igaurab/user_location_plugin.git
+      ref: feat-74/pause-location-update-stream
+      url: https://github.com/Xennis/user_location_plugin.git
   shared_preferences: ^0.5.8
 
 dev_dependencies:
