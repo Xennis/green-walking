@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+2
+version: 1.0.0+4
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -43,11 +43,10 @@ dependencies:
   flutter_svg: ^0.17.4 # Can't use new version because of dep conflicts with flutter_launcher_icons.
   dart_geohash: ^1.0.2
   url_launcher: ^5.5.0
-  # Use origin once https://github.com/igaurab/user_location_plugin/pull/76/ is merged and released.
   user_location:
     git:
-      ref: feat-74/pause-location-update-stream
-      url: https://github.com/Xennis/user_location_plugin.git
+      ref: 4b67aaaa170dde3a50bb436ef0211b493423550f
+      url: https://github.com/igaurab/user_location_plugin.git
   shared_preferences: ^0.5.8
 
 dev_dependencies:
