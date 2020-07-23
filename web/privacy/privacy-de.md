@@ -65,11 +65,7 @@ https://www.google.com/intl/de/policies/privacy/partners
 
 weitere datenschutzrechtliche Informationen für Sie bereit, so bspw. auch zu den Möglichkeiten, die Datennutzung zu unterbinden.
 
-Zudem bietet Google unter
-
-https://tools.google.com/dlpage/gaoptout?hl=de
-
-ein sog. Deaktivierungs-Add-on nebst weiteren Informationen hierzu an. Dieses Add-on lässt sich mit den gängigen Internet-Browsern installieren und bietet Ihnen weitergehende Kontrollmöglichkeit über die Daten, die Google bei Aufruf unseres Internetauftritts erfasst. Dabei teilt das Add-on dem JavaScript (ga.js) von Google Analytics mit, dass Informationen zum Besuch unserer App nicht an Google Analytics übermittelt werden sollen. Dies verhindert aber nicht, dass Informationen an uns oder an andere Webanalysedienste übermittelt werden. Ob und welche weiteren Webanalysedienste von uns eingesetzt werden, erfahren Sie natürlich ebenfalls in dieser Datenschutzerklärung.
+In der App erfolgt die Deaktivierung in den Einstellungen. Öffnen Sie hierzu die Einstellungen der App. Auf dieser Seite können Sie den Dienst deaktiveren.
 
 ### Firebase Crashlytics
 

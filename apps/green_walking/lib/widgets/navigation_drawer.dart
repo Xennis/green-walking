@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:green_walking/routes.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class MainDrawer extends StatelessWidget {
+class NavigationDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextStyle textStyle = Theme.of(context).textTheme.bodyText2;
@@ -37,10 +37,6 @@ class MainDrawer extends StatelessWidget {
             ]),
           ),
           //const ListTile(
-          //  leading: Icon(Icons.settings),
-          //  title: Text('Einstellungen'),
-          //),
-          //const ListTile(
           //  leading: Icon(Icons.help),
           //  title: Text('Hilfe'),
           //),
@@ -53,6 +49,11 @@ class MainDrawer extends StatelessWidget {
             leading: const Icon(Icons.feedback),
             title: const Text('Feedback senden'),
             onTap: () => Navigator.of(context).pushNamed(Routes.feedback),
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text('Einstellungen'),
+            onTap: () => Navigator.of(context).pushNamed(Routes.settings),
           ),
           const Divider(),
           AboutListTile(
@@ -93,7 +94,9 @@ class MainDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.lock),
             title: const Text('Datenschutz'),
-            onTap: () => Navigator.of(context).pushNamed(Routes.privacy),
+            onTap: () => launch(
+                'https://raw.githubusercontent.com/Xennis/green-walking/master/web/privacy/privacy-de.md'),
+            trailing: const Icon(Icons.open_in_new),
           ),
           ListTile(
             leading: const Icon(Icons.info),
