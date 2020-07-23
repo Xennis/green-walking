@@ -10,7 +10,7 @@ typedef UserLocationMarkerBuilder = Marker Function(
     BuildContext context, LatLng point);
 
 typedef UserLocationButtonWidgetBuilder = Widget Function(
-    BuildContext context, Future<void> Function() requestLocation);
+    BuildContext context, Future<LatLng> Function() requestLocation);
 
 class UserLocationOptions extends LayerOptions {
   UserLocationOptions(
@@ -48,7 +48,6 @@ class _UserLocationLayerState extends State<UserLocationLayer>
     with WidgetsBindingObserver {
   final Location _location = Location();
   StreamSubscription<LocationData> _onLocationChangedSub;
-  LatLng _lastLocation;
 
   @override
   void initState() {
@@ -73,7 +72,7 @@ class _UserLocationLayerState extends State<UserLocationLayer>
         _onLocationChangedSub?.cancel();
         break;
       case AppLifecycleState.resumed:
-        _onLocationChangedSub?.resume();
+        //_onLocationChangedSub?.resume();
         break;
       case AppLifecycleState.detached:
         break;
@@ -83,26 +82,19 @@ class _UserLocationLayerState extends State<UserLocationLayer>
   @override
   Widget build(BuildContext context) {
     return widget.options.buttonBuilder(context, () async {
-      if (_lastLocation == null ||
-          _onLocationChangedSub == null ||
-          _onLocationChangedSub.isPaused ||
-          await _location.serviceEnabled() == false) {
-        _subscribeToLocationChanges();
-        return;
-      }
-      widget.options.onLocationUpdate(_lastLocation);
+      return _subscribeToLocationChanges();
     });
   }
 
-  Future<void> _subscribeToLocationChanges() async {
+  Future<LatLng> _subscribeToLocationChanges() async {
     if (!await _location.serviceEnabled()) {
       if (!await _location.requestService()) {
-        return;
+        return null;
       }
     }
     if (await _location.hasPermission() == PermissionStatus.denied) {
       if (await _location.requestPermission() != PermissionStatus.granted) {
-        return;
+        return null;
       }
     }
     _onLocationChangedSub =
@@ -110,17 +102,23 @@ class _UserLocationLayerState extends State<UserLocationLayer>
       if (widget.options.markers.isNotEmpty) {
         widget.options.markers.removeLast();
       }
-      if (ld.latitude == null || ld.longitude == null) {
+      final LatLng loc = _locationDataToLatLng(ld);
+      if (loc == null) {
         return;
       }
-      final LatLng loc = LatLng(ld.latitude, ld.longitude);
       widget.options.markers.add(widget.options.markerBuilder(context, loc));
       widget.options.onLocationUpdate(loc);
-      setState(() {
-        _lastLocation = loc;
-      });
     });
+
+    return _locationDataToLatLng(await _location.getLocation());
   }
+}
+
+LatLng _locationDataToLatLng(LocationData ld) {
+  if (ld.latitude == null || ld.longitude == null) {
+    return null;
+  }
+  return LatLng(ld.latitude, ld.longitude);
 }
 
 class UserLocationPlugin extends MapPlugin {
