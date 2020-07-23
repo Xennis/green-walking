@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:green_walking/services/parks.dart';
 import 'package:green_walking/services/shared_prefs.dart';
+import 'package:green_walking/widgets/gdpr_dialog.dart';
 import 'package:green_walking/widgets/navigation_drawer.dart';
 import 'package:green_walking/widgets/place_list_tile.dart';
 import 'package:latlong/latlong.dart';
@@ -71,14 +71,14 @@ class _MapPageState extends State<MapPage> {
         ));
   }
 
-  Future<MapConfig> createMapConfig(BuildContext context) async {
-    // Privacy: Only enable analytics if it is set to enabled.
-    SharedPrefs.getBool(SharedPrefs.ANALYTICS_ENABLED).then((bool enabled) {
-      if (enabled) {
-        FirebaseAnalytics().setAnalyticsCollectionEnabled(true);
-      }
-    });
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => enableAnalyticsOrConsent(context));
+  }
 
+  Future<MapConfig> createMapConfig(BuildContext context) async {
     final String accessToken = await DefaultAssetBundle.of(context)
         .loadString('assets/mapbox-access-token.txt');
     final LatLng lastLocation =
@@ -230,6 +230,7 @@ class _MapPageState extends State<MapPage> {
                 )
               ]));
             }
+
             return const Center(child: CircularProgressIndicator());
           }),
     );
