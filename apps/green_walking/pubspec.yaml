@@ -40,7 +40,7 @@ dependencies:
       ref: fluttermap-10
       url: https://github.com/Xennis/flutter_map_marker_cluster.git
   flutter_speed_dial: ^1.2.5
-  flutter_svg: ^0.17.4 # Can't use new version because of dep conflicts with flutter_launcher_icons.
+  flutter_svg: ^0.18.0
   dart_geohash: ^1.0.2
   url_launcher: ^5.5.0
   user_location:
@@ -50,7 +50,7 @@ dependencies:
   shared_preferences: ^0.5.8
 
 dev_dependencies:
-  flutter_launcher_icons: ^0.7.5
+  #flutter_launcher_icons: ^0.7.5
   flutter_test:
     sdk: flutter
 
@@ -98,6 +98,6 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
 
-flutter_icons:
-  android: true
-  image_path: "assets/app-icon.png"
+#flutter_icons:
+#  android: true
+#  image_path: "assets/app-icon.png"
