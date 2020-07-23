@@ -36,6 +36,9 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   final MapController mapController = MapController();
   final PopupController _popupController = PopupController();
+  // (south-west, north-east)
+  final LatLngBounds _mapBounds =
+      LatLngBounds(LatLng(46.1037, 5.2381), LatLng(55.5286, 16.6275));
   List<Marker> userLocationMarkers = <Marker>[];
 
   @override
@@ -48,8 +51,11 @@ class _MapPageState extends State<MapPage> {
   Future<MapConfig> createMapConfig(BuildContext context) async {
     final String accessToken = await DefaultAssetBundle.of(context)
         .loadString('assets/mapbox-access-token.txt');
-    final LatLng lastLocation =
+    LatLng lastLocation =
         await SharedPrefs.getLatLng(SharedPrefs.KEY_LAST_LOCATION);
+    if (!_mapBounds.contains(lastLocation)) {
+      lastLocation = null;
+    }
 
     final Iterable<Place> places = await ParkService.load(context);
     final List<Marker> parkMarkers = <Marker>[];
@@ -103,8 +109,8 @@ class _MapPageState extends State<MapPage> {
                         ],
                         minZoom: 8, // zoom out
                         maxZoom: 18, // zoom in
-                        swPanBoundary: LatLng(46.1037, 5.2381),
-                        nePanBoundary: LatLng(55.5286, 16.6275),
+                        swPanBoundary: _mapBounds.southWest,
+                        nePanBoundary: _mapBounds.northEast,
                         onTap: (_) => _popupController.hidePopup(),
                       ),
                       layers: <LayerOptions>[
@@ -192,66 +198,39 @@ class _MapPageState extends State<MapPage> {
                         UserLocationOptions(
                             markers: userLocationMarkers,
                             onLocationUpdate: (LatLng loc) {
-                              mapController.move(loc, 15.0);
                               SharedPrefs.setLatLng(
                                   SharedPrefs.KEY_LAST_LOCATION, loc);
                             },
                             buttonBuilder: (BuildContext context,
-                                Function requestLocation) {
-                              return Align(
-                                // The "right" has not really an affect here.
-                                alignment: Alignment.bottomRight,
-                                child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        bottom: 16.0, right: 16.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: <Widget>[
-                                        FloatingActionButton(
-                                            child: const Icon(
-                                              Icons.location_searching,
-                                              color: Colors.white,
-                                            ),
-                                            onPressed: () => requestLocation()),
-                                      ],
-                                    )),
-                              );
-                            },
+                                    Future<LatLng> Function()
+                                        requestLocation) =>
+                                _UserLocationButton(
+                                  onPressed: () {
+                                    requestLocation().then((LatLng loc) {
+                                      if (loc == null) {
+                                        Scaffold.of(context).showSnackBar(
+                                            const SnackBar(
+                                                content: Text(
+                                                    'Position außerhalb von Deutschland')));
+                                      } else if (!_mapBounds.contains(loc)) {
+                                        Scaffold.of(context).showSnackBar(
+                                            const SnackBar(
+                                                content: Text(
+                                                    'Position außerhalb von Deutschland')));
+                                        return;
+                                      } else {
+                                        mapController.move(loc, 15.0);
+                                      }
+                                    });
+                                  },
+                                ),
                             markerBuilder:
                                 (BuildContext context, LatLng point) {
                               return Marker(
                                   height: 60.0,
                                   width: 60.0,
                                   point: point,
-                                  builder: (BuildContext context) {
-                                    return Container(
-                                      child: Column(
-                                        children: <Widget>[
-                                          Stack(
-                                            alignment:
-                                                AlignmentDirectional.center,
-                                            children: <Widget>[
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: Colors.blue[300]
-                                                        .withOpacity(0.7)),
-                                                height: 20.0,
-                                                width: 20.0,
-                                              ),
-                                              Container(
-                                                decoration: const BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: Colors.blueAccent),
-                                                height: 12.0,
-                                                width: 12.0,
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  });
+                                  builder: (_) => _UserLocationMarker());
                             }),
                         AttributionOptions(
                             logoAssetName: 'assets/mapbox-logo.svg'),
@@ -262,6 +241,63 @@ class _MapPageState extends State<MapPage> {
 
             return const Center(child: CircularProgressIndicator());
           }),
+    );
+  }
+}
+
+class _UserLocationButton extends StatelessWidget {
+  const _UserLocationButton({Key key, this.onPressed}) : super(key: key);
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      // The "right" has not really an affect here.
+      alignment: Alignment.bottomRight,
+      child: Padding(
+          padding: const EdgeInsets.only(bottom: 16.0, right: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              FloatingActionButton(
+                  child: const Icon(
+                    Icons.location_searching,
+                    color: Colors.white,
+                  ),
+                  onPressed: () => onPressed()),
+            ],
+          )),
+    );
+  }
+}
+
+class _UserLocationMarker extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Stack(
+            alignment: AlignmentDirectional.center,
+            children: <Widget>[
+              Container(
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.blue[300].withOpacity(0.7)),
+                height: 20.0,
+                width: 20.0,
+              ),
+              Container(
+                decoration: const BoxDecoration(
+                    shape: BoxShape.circle, color: Colors.blueAccent),
+                height: 12.0,
+                width: 12.0,
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
