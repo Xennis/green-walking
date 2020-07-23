@@ -167,13 +167,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.4.1"
-  flutter_compass:
-    dependency: transitive
-    description:
-      name: flutter_compass
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.4.2+1"
   flutter_image:
     dependency: transitive
     description:
@@ -276,7 +269,7 @@ packages:
     source: hosted
     version: "0.1.6"
   location:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: location
       url: "https://pub.dartlang.org"
@@ -616,15 +609,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.2"
-  user_location:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: "4b67aaaa170dde3a50bb436ef0211b493423550f"
-      resolved-ref: "4b67aaaa170dde3a50bb436ef0211b493423550f"
-      url: "https://github.com/igaurab/user_location_plugin.git"
-    source: git
-    version: "0.1.3"
   uuid:
     dependency: transitive
     description:

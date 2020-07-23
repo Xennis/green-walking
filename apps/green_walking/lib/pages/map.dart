@@ -9,12 +9,12 @@ import 'package:green_walking/services/parks.dart';
 import 'package:green_walking/services/shared_prefs.dart';
 import 'package:green_walking/widgets/gdpr_dialog.dart';
 import 'package:green_walking/widgets/navigation_drawer.dart';
+import 'package:green_walking/widgets/map/user_location.dart';
 import 'package:green_walking/widgets/place_list_tile.dart';
 import 'package:latlong/latlong.dart';
-import 'package:user_location/user_location.dart';
 
 import '../types/place.dart';
-import '../widgets/map_attribution.dart';
+import '../widgets/map/attribution.dart';
 import 'detail.dart';
 
 class MapConfig {
@@ -34,42 +34,9 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  final PopupController _popupController = PopupController();
   final MapController mapController = MapController();
-  UserLocationOptions userLocationOptions;
-
+  final PopupController _popupController = PopupController();
   List<Marker> userLocationMarkers = <Marker>[];
-
-  UserLocationOptions _createUserLocationOptions(BuildContext context) {
-    return UserLocationOptions(
-        context: context,
-        mapController: mapController,
-        markers: userLocationMarkers,
-        showHeading: true,
-        zoomToCurrentLocationOnLoad: false,
-        updateMapLocationOnPositionChange: false,
-        showMoveToCurrentLocationFloatingActionButton: true,
-        fabBottom: 16,
-        fabRight: 16,
-        fabWidth: 55,
-        fabHeight: 55,
-        onLocationUpdate: (LatLng loc) =>
-            SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, loc),
-        locationUpdateInBackground: false,
-        onTapFAB: () {}, // Otherwise a null exception happens
-        moveToCurrentLocationFloatingActionButton: Container(
-          decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-              borderRadius: BorderRadius.circular(40.0),
-              boxShadow: const <BoxShadow>[
-                BoxShadow(color: Colors.grey, blurRadius: 10.0)
-              ]),
-          child: const Icon(
-            Icons.location_searching,
-            color: Colors.white,
-          ),
-        ));
-  }
 
   @override
   void initState() {
@@ -110,7 +77,6 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     // You can use the userLocationOptions object to change the properties
     // of UserLocationOptions in runtime
-    userLocationOptions = _createUserLocationOptions(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Green Walking'),
@@ -153,7 +119,6 @@ class _MapPageState extends State<MapPage> {
                           // NetworkTileProvider or CachedNetworkTileProvider
                           tileProvider: const CachedNetworkTileProvider(),
                         ),
-                        MarkerLayerOptions(markers: userLocationMarkers),
                         MarkerClusterLayerOptions(
                           size: const Size(40, 40),
                           markers: snapshot.data.parks,
@@ -223,7 +188,71 @@ class _MapPageState extends State<MapPage> {
                                 );
                               }),
                         ),
-                        userLocationOptions,
+                        MarkerLayerOptions(markers: userLocationMarkers),
+                        UserLocationOptions(
+                            markers: userLocationMarkers,
+                            onLocationUpdate: (LatLng loc) {
+                              mapController.move(loc, 15.0);
+                              SharedPrefs.setLatLng(
+                                  SharedPrefs.KEY_LAST_LOCATION, loc);
+                            },
+                            buttonBuilder: (BuildContext context,
+                                Function requestLocation) {
+                              return Align(
+                                // The "right" has not really an affect here.
+                                alignment: Alignment.bottomRight,
+                                child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        bottom: 16.0, right: 16.0),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: <Widget>[
+                                        FloatingActionButton(
+                                            child: const Icon(
+                                              Icons.location_searching,
+                                              color: Colors.white,
+                                            ),
+                                            onPressed: () => requestLocation()),
+                                      ],
+                                    )),
+                              );
+                            },
+                            markerBuilder:
+                                (BuildContext context, LatLng point) {
+                              return Marker(
+                                  height: 60.0,
+                                  width: 60.0,
+                                  point: point,
+                                  builder: (BuildContext context) {
+                                    return Container(
+                                      child: Column(
+                                        children: <Widget>[
+                                          Stack(
+                                            alignment:
+                                                AlignmentDirectional.center,
+                                            children: <Widget>[
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: Colors.blue[300]
+                                                        .withOpacity(0.7)),
+                                                height: 20.0,
+                                                width: 20.0,
+                                              ),
+                                              Container(
+                                                decoration: const BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: Colors.blueAccent),
+                                                height: 12.0,
+                                                width: 12.0,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  });
+                            }),
                         AttributionOptions(
                             logoAssetName: 'assets/mapbox-logo.svg'),
                       ]),

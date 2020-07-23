@@ -42,11 +42,8 @@ dependencies:
   flutter_speed_dial: ^1.2.5
   flutter_svg: ^0.18.0
   dart_geohash: ^1.0.2
+  location: ^3.0.2
   url_launcher: ^5.5.0
-  user_location:
-    git:
-      ref: 4b67aaaa170dde3a50bb436ef0211b493423550f
-      url: https://github.com/igaurab/user_location_plugin.git
   shared_preferences: ^0.5.8
 
 dev_dependencies:
