@@ -6,28 +6,33 @@ import 'package:flutter_map/plugin_api.dart';
 import 'package:location/location.dart';
 import 'package:latlong/latlong.dart';
 
+enum UserLocationServiceStatus {
+  disabled,
+  permissionDenied,
+  subscribed,
+  paused,
+  unsubscribed,
+}
+
 typedef UserLocationMarkerBuilder = Marker Function(
     BuildContext context, LatLng point);
-
-typedef UserLocationButtonWidgetBuilder = Widget Function(
-    BuildContext context, Future<LatLng> Function() requestLocation);
 
 class UserLocationOptions extends LayerOptions {
   UserLocationOptions(
       {@required this.markers,
       @required this.onLocationUpdate,
+      @required this.onLocationRequested,
       @required this.markerBuilder,
-      @required this.buttonBuilder,
-      this.updateIntervalMs = 1000 * 10})
+      this.updateIntervalMs = 1000 * 5})
       : assert(markers != null &&
             onLocationUpdate != null &&
-            markerBuilder != null &&
-            buttonBuilder != null),
+            onLocationRequested != null &&
+            markerBuilder != null),
         super();
 
-  final Function(LatLng) onLocationUpdate;
+  final void Function(LatLng) onLocationUpdate;
+  final void Function(LatLng) onLocationRequested;
   final UserLocationMarkerBuilder markerBuilder;
-  final UserLocationButtonWidgetBuilder buttonBuilder;
   final int updateIntervalMs;
   List<Marker> markers;
 }
@@ -48,12 +53,34 @@ class _UserLocationLayerState extends State<UserLocationLayer>
     with WidgetsBindingObserver {
   final Location _location = Location();
   StreamSubscription<LocationData> _onLocationChangedSub;
+  final ValueNotifier<UserLocationServiceStatus> _serviceStatus =
+      ValueNotifier<UserLocationServiceStatus>(null);
+  final ValueNotifier<LatLng> _lastLocation = ValueNotifier<LatLng>(null);
+  bool _locationRequested = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _location.changeSettings(interval: widget.options.updateIntervalMs);
+    _locationRequested = true;
+    _initOnLocationUpdateSubscription().then(
+        (UserLocationServiceStatus status) => _serviceStatus.value = status);
+    _lastLocation.addListener(() {
+      final LatLng loc = _lastLocation.value;
+      widget.options.onLocationUpdate(loc);
+      if (widget.options.markers.isNotEmpty) {
+        widget.options.markers.removeLast();
+      }
+      if (loc == null) {
+        return;
+      }
+      widget.options.markers.add(widget.options.markerBuilder(context, loc));
+      if (_locationRequested) {
+        _locationRequested = false;
+        widget.options.onLocationRequested(loc);
+      }
+    });
   }
 
   @override
@@ -67,13 +94,23 @@ class _UserLocationLayerState extends State<UserLocationLayer>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     switch (state) {
-      case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
         _onLocationChangedSub?.cancel();
+        if (_serviceStatus?.value == UserLocationServiceStatus.subscribed) {
+          _serviceStatus.value = UserLocationServiceStatus.paused;
+        } else {
+          _serviceStatus.value = null;
+        }
         break;
       case AppLifecycleState.resumed:
-        //_onLocationChangedSub?.resume();
+        if (_serviceStatus?.value == UserLocationServiceStatus.paused) {
+          _serviceStatus.value = null;
+          _initOnLocationUpdateSubscription().then(
+              (UserLocationServiceStatus value) =>
+                  _serviceStatus.value = value);
+        }
         break;
+      case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
         break;
     }
@@ -81,36 +118,85 @@ class _UserLocationLayerState extends State<UserLocationLayer>
 
   @override
   Widget build(BuildContext context) {
-    return widget.options.buttonBuilder(context, () async {
-      return _subscribeToLocationChanges();
-    });
+    return Align(
+      // The "right" has not really an affect here.
+      alignment: Alignment.bottomRight,
+      child: Padding(
+          padding: const EdgeInsets.only(bottom: 16.0, right: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              FloatingActionButton(
+                  child: ValueListenableBuilder<UserLocationServiceStatus>(
+                      valueListenable: _serviceStatus,
+                      builder: (BuildContext context,
+                          UserLocationServiceStatus value, Widget child) {
+                        switch (value) {
+                          case UserLocationServiceStatus.disabled:
+                          case UserLocationServiceStatus.permissionDenied:
+                          case UserLocationServiceStatus.unsubscribed:
+                            return const Icon(
+                              Icons.location_disabled,
+                              color: Colors.white,
+                            );
+                            break;
+                          case UserLocationServiceStatus.subscribed:
+                          default:
+                            return const Icon(
+                              Icons.location_searching,
+                              color: Colors.white,
+                            );
+                            break;
+                        }
+                      }),
+                  onPressed: () async {
+                    if (_serviceStatus?.value ==
+                        UserLocationServiceStatus.disabled) {
+                      if (!await _location.requestService()) {
+                        return;
+                      }
+                      _serviceStatus.value = null;
+                    }
+                    if (_serviceStatus?.value !=
+                            UserLocationServiceStatus.subscribed ||
+                        _lastLocation?.value == null ||
+                        !await _location.serviceEnabled()) {
+                      _initOnLocationUpdateSubscription().then(
+                          (UserLocationServiceStatus value) =>
+                              _serviceStatus.value = value);
+                      _locationRequested = true;
+                    } else {
+                      widget.options.onLocationRequested(_lastLocation.value);
+                    }
+                  }),
+            ],
+          )),
+    );
   }
 
-  Future<LatLng> _subscribeToLocationChanges() async {
+  Future<UserLocationServiceStatus> _initOnLocationUpdateSubscription() async {
     if (!await _location.serviceEnabled()) {
-      if (!await _location.requestService()) {
-        return null;
-      }
+      _lastLocation.value = null;
+      return UserLocationServiceStatus.disabled;
     }
     if (await _location.hasPermission() == PermissionStatus.denied) {
       if (await _location.requestPermission() != PermissionStatus.granted) {
-        return null;
+        _lastLocation.value = null;
+        return UserLocationServiceStatus.permissionDenied;
       }
     }
+    await _onLocationChangedSub?.cancel();
     _onLocationChangedSub =
         _location.onLocationChanged.listen((LocationData ld) {
-      if (widget.options.markers.isNotEmpty) {
-        widget.options.markers.removeLast();
-      }
-      final LatLng loc = _locationDataToLatLng(ld);
-      if (loc == null) {
-        return;
-      }
-      widget.options.markers.add(widget.options.markerBuilder(context, loc));
-      widget.options.onLocationUpdate(loc);
+      _lastLocation.value = _locationDataToLatLng(ld);
+    }, onError: (Object error) {
+      _lastLocation.value = null;
+      _serviceStatus.value = UserLocationServiceStatus.unsubscribed;
+    }, onDone: () {
+      _lastLocation.value = null;
+      _serviceStatus.value = UserLocationServiceStatus.unsubscribed;
     });
-
-    return _locationDataToLatLng(await _location.getLocation());
+    return UserLocationServiceStatus.subscribed;
   }
 }
 

@@ -201,29 +201,20 @@ class _MapPageState extends State<MapPage> {
                               SharedPrefs.setLatLng(
                                   SharedPrefs.KEY_LAST_LOCATION, loc);
                             },
-                            buttonBuilder: (BuildContext context,
-                                    Future<LatLng> Function()
-                                        requestLocation) =>
-                                _UserLocationButton(
-                                  onPressed: () {
-                                    requestLocation().then((LatLng loc) {
-                                      if (loc == null) {
-                                        Scaffold.of(context).showSnackBar(
-                                            const SnackBar(
-                                                content: Text(
-                                                    'Position außerhalb von Deutschland')));
-                                      } else if (!_mapBounds.contains(loc)) {
-                                        Scaffold.of(context).showSnackBar(
-                                            const SnackBar(
-                                                content: Text(
-                                                    'Position außerhalb von Deutschland')));
-                                        return;
-                                      } else {
-                                        mapController.move(loc, 15.0);
-                                      }
-                                    });
-                                  },
-                                ),
+                            onLocationRequested: (LatLng loc) {
+                              if (loc == null) {
+                                Scaffold.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content:
+                                            Text('Keine Position gefunden')));
+                              } else if (!_mapBounds.contains(loc)) {
+                                Scaffold.of(context).showSnackBar(const SnackBar(
+                                    content: Text(
+                                        'Position außerhalb von Deutschland')));
+                              } else {
+                                mapController.move(loc, 15.0);
+                              }
+                            },
                             markerBuilder:
                                 (BuildContext context, LatLng point) {
                               return Marker(
@@ -241,33 +232,6 @@ class _MapPageState extends State<MapPage> {
 
             return const Center(child: CircularProgressIndicator());
           }),
-    );
-  }
-}
-
-class _UserLocationButton extends StatelessWidget {
-  const _UserLocationButton({Key key, this.onPressed}) : super(key: key);
-
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      // The "right" has not really an affect here.
-      alignment: Alignment.bottomRight,
-      child: Padding(
-          padding: const EdgeInsets.only(bottom: 16.0, right: 16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              FloatingActionButton(
-                  child: const Icon(
-                    Icons.location_searching,
-                    color: Colors.white,
-                  ),
-                  onPressed: () => onPressed()),
-            ],
-          )),
     );
   }
 }
