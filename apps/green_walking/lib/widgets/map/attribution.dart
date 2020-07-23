@@ -32,7 +32,7 @@ class AttributionLayer extends StatelessWidget {
       alignment: Alignment.bottomLeft,
       child: Row(
         children: <Widget>[
-          const Text('   '), // FIXME: Use proper spacing
+          const Text('  '), // FIXME: Use proper spacing
           SvgPicture.asset(
             attrOptions.logoAssetName,
             semanticsLabel: 'Mapbox',
