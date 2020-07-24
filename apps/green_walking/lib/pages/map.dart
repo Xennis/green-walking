@@ -53,7 +53,9 @@ class _MapPageState extends State<MapPage> {
         .loadString('assets/mapbox-access-token.txt');
     LatLng lastLocation =
         await SharedPrefs.getLatLng(SharedPrefs.KEY_LAST_LOCATION);
-    if (!_mapBounds.contains(lastLocation)) {
+    if (lastLocation != null &&
+        _mapBounds != null &&
+        !_mapBounds.contains(lastLocation)) {
       lastLocation = null;
     }
 
