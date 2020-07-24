@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
@@ -24,6 +25,40 @@ class MapConfig {
   String accessToken;
   LatLng lastLocation;
   List<Marker> parks;
+
+  static Future<MapConfig> create(
+      AssetBundle assetBundle, LatLngBounds mapBounds) async {
+    final String accessToken =
+        await assetBundle.loadString('assets/mapbox-access-token.txt');
+    LatLng lastLocation =
+        await SharedPrefs.getLatLng(SharedPrefs.KEY_LAST_LOCATION);
+    if (lastLocation != null &&
+        mapBounds != null &&
+        !mapBounds.contains(lastLocation)) {
+      lastLocation = null;
+    }
+
+    final Iterable<Place> places = await ParkService.load(assetBundle);
+    final List<Marker> parkMarkers = <Marker>[];
+    for (final Place p in places) {
+      parkMarkers.add(Marker(
+        anchorPos: AnchorPos.align(AnchorAlign.center),
+        height: 50,
+        width: 50,
+        point: p.coordinateLocation,
+        builder: (_) => const Icon(
+          Icons.location_on,
+          color: Colors.pink,
+          size: 50,
+        ),
+      ));
+    }
+
+    return MapConfig(
+        accessToken: accessToken,
+        lastLocation: lastLocation,
+        parks: parkMarkers);
+  }
 }
 
 class MapPage extends StatefulWidget {
@@ -48,39 +83,6 @@ class _MapPageState extends State<MapPage> {
         .addPostFrameCallback((_) => enableAnalyticsOrConsent(context));
   }
 
-  Future<MapConfig> createMapConfig(BuildContext context) async {
-    final String accessToken = await DefaultAssetBundle.of(context)
-        .loadString('assets/mapbox-access-token.txt');
-    LatLng lastLocation =
-        await SharedPrefs.getLatLng(SharedPrefs.KEY_LAST_LOCATION);
-    if (lastLocation != null &&
-        _mapBounds != null &&
-        !_mapBounds.contains(lastLocation)) {
-      lastLocation = null;
-    }
-
-    final Iterable<Place> places = await ParkService.load(context);
-    final List<Marker> parkMarkers = <Marker>[];
-    for (final Place p in places) {
-      parkMarkers.add(Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
-        height: 50,
-        width: 50,
-        point: p.coordinateLocation,
-        builder: (_) => const Icon(
-          Icons.location_on,
-          color: Colors.pink,
-          size: 50,
-        ),
-      ));
-    }
-
-    return MapConfig(
-        accessToken: accessToken,
-        lastLocation: lastLocation,
-        parks: parkMarkers);
-  }
-
   @override
   Widget build(BuildContext context) {
     // You can use the userLocationOptions object to change the properties
@@ -91,7 +93,7 @@ class _MapPageState extends State<MapPage> {
       ),
       drawer: NavigationDrawer(),
       body: FutureBuilder<MapConfig>(
-          future: createMapConfig(context),
+          future: MapConfig.create(DefaultAssetBundle.of(context), _mapBounds),
           builder: (BuildContext context, AsyncSnapshot<MapConfig> snapshot) {
             if (snapshot.hasData) {
               return Center(
