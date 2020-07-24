@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:latlong/latlong.dart';
 
 import '../types/place.dart';
@@ -8,9 +8,8 @@ import '../types/place.dart';
 Map<LatLng, Place> places = <LatLng, Place>{};
 
 class ParkService {
-  static Future<Iterable<Place>> load(BuildContext context) async {
-    final String rawBlob =
-        await DefaultAssetBundle.of(context).loadString('assets/parks.json');
+  static Future<Iterable<Place>> load(AssetBundle assetBundle) async {
+    final String rawBlob = await assetBundle.loadString('assets/parks.json');
     const LineSplitter()
         .convert(rawBlob)
         .map((String line) =>
