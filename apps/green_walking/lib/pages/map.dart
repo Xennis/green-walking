@@ -200,33 +200,71 @@ class _MapPageState extends State<MapPage> {
                         ),
                         MarkerLayerOptions(markers: userLocationMarkers),
                         UserLocationOptions(
-                            markers: userLocationMarkers,
-                            onLocationUpdate: (LatLng loc) {
-                              SharedPrefs.setLatLng(
-                                  SharedPrefs.KEY_LAST_LOCATION, loc);
-                            },
-                            onLocationRequested: (LatLng loc) {
-                              if (loc == null) {
-                                Scaffold.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content:
-                                            Text('Keine Position gefunden')));
-                              } else if (!_mapBounds.contains(loc)) {
-                                Scaffold.of(context).showSnackBar(const SnackBar(
-                                    content: Text(
-                                        'Position außerhalb von Deutschland')));
-                              } else {
-                                mapController.move(loc, 15.0);
-                              }
-                            },
-                            markerBuilder:
-                                (BuildContext context, LatLng point) {
-                              return Marker(
-                                  height: 60.0,
-                                  width: 60.0,
-                                  point: point,
-                                  builder: (_) => _UserLocationMarker());
-                            }),
+                          markers: userLocationMarkers,
+                          onLocationUpdate: (LatLng loc) {
+                            SharedPrefs.setLatLng(
+                                SharedPrefs.KEY_LAST_LOCATION, loc);
+                          },
+                          onLocationRequested: (LatLng loc) {
+                            if (loc == null) {
+                              Scaffold.of(context).showSnackBar(const SnackBar(
+                                  content: Text('Keine Position gefunden')));
+                            } else if (!_mapBounds.contains(loc)) {
+                              Scaffold.of(context).showSnackBar(const SnackBar(
+                                  content: Text(
+                                      'Position außerhalb von Deutschland')));
+                            } else {
+                              mapController.move(loc, 15.0);
+                            }
+                          },
+                          buttonBuilder: (BuildContext context,
+                              ValueNotifier<UserLocationServiceStatus> status,
+                              Function onPressed) {
+                            return Align(
+                              // The "right" has not really an affect here.
+                              alignment: Alignment.bottomRight,
+                              child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      bottom: 16.0, right: 16.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: <Widget>[
+                                      FloatingActionButton(
+                                          child: ValueListenableBuilder<
+                                                  UserLocationServiceStatus>(
+                                              valueListenable: status,
+                                              builder: (BuildContext context,
+                                                  UserLocationServiceStatus
+                                                      value,
+                                                  Widget child) {
+                                                switch (value) {
+                                                  case UserLocationServiceStatus
+                                                      .disabled:
+                                                  case UserLocationServiceStatus
+                                                      .permissionDenied:
+                                                  case UserLocationServiceStatus
+                                                      .unsubscribed:
+                                                    return const Icon(
+                                                      Icons.location_disabled,
+                                                      color: Colors.white,
+                                                    );
+                                                    break;
+                                                  case UserLocationServiceStatus
+                                                      .subscribed:
+                                                  default:
+                                                    return const Icon(
+                                                      Icons.location_searching,
+                                                      color: Colors.white,
+                                                    );
+                                                    break;
+                                                }
+                                              }),
+                                          onPressed: () => onPressed()),
+                                    ],
+                                  )),
+                            );
+                          },
+                        ),
                         AttributionOptions(
                             logoAssetName: 'assets/mapbox-logo.svg'),
                       ]),
@@ -236,36 +274,6 @@ class _MapPageState extends State<MapPage> {
 
             return const Center(child: CircularProgressIndicator());
           }),
-    );
-  }
-}
-
-class _UserLocationMarker extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          Stack(
-            alignment: AlignmentDirectional.center,
-            children: <Widget>[
-              Container(
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.blue[300].withOpacity(0.7)),
-                height: 20.0,
-                width: 20.0,
-              ),
-              Container(
-                decoration: const BoxDecoration(
-                    shape: BoxShape.circle, color: Colors.blueAccent),
-                height: 12.0,
-                width: 12.0,
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 }
