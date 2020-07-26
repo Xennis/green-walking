@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:location/location.dart';
 import 'package:latlong/latlong.dart';
@@ -18,15 +20,17 @@ typedef UserLocationButtonBuilder = Widget Function(BuildContext context,
     ValueNotifier<UserLocationServiceStatus>, Function onPressed);
 
 typedef UserLocationMarkerBuilder = Marker Function(
-    BuildContext context, LatLng point);
+    BuildContext context, LatLng point, ValueNotifier<double> heading);
 
 UserLocationMarkerBuilder _defaultMarkerBuilder =
-    (BuildContext context, LatLng point) {
+    (BuildContext context, LatLng point, ValueNotifier<double> heading) {
   return Marker(
       height: 60.0,
       width: 60.0,
       point: point,
-      builder: (_) => UserLocationMarker());
+      builder: (_) => UserLocationMarker(
+            heading: heading,
+          ));
 };
 
 class UserLocationOptions extends LayerOptions {
@@ -66,9 +70,11 @@ class _UserLocationLayerState extends State<UserLocationLayer>
     with WidgetsBindingObserver {
   final Location _location = Location();
   StreamSubscription<LocationData> _onLocationChangedSub;
+  StreamSubscription<double> _compassEventsSub;
   final ValueNotifier<UserLocationServiceStatus> _serviceStatus =
       ValueNotifier<UserLocationServiceStatus>(null);
   final ValueNotifier<LatLng> _lastLocation = ValueNotifier<LatLng>(null);
+  final ValueNotifier<double> _heading = ValueNotifier<double>(null);
   bool _locationRequested = false;
 
   @override
@@ -89,8 +95,8 @@ class _UserLocationLayerState extends State<UserLocationLayer>
         return;
       }
       widget.options.markers.add(widget.options.markerBuilder != null
-          ? widget.options.markerBuilder(context, loc)
-          : _defaultMarkerBuilder(context, loc));
+          ? widget.options.markerBuilder(context, loc, _heading)
+          : _defaultMarkerBuilder(context, loc, _heading));
       if (_locationRequested) {
         _locationRequested = false;
         widget.options.onLocationRequested?.call(loc);
@@ -100,6 +106,7 @@ class _UserLocationLayerState extends State<UserLocationLayer>
 
   @override
   void dispose() {
+    _compassEventsSub?.cancel();
     _onLocationChangedSub?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -110,6 +117,7 @@ class _UserLocationLayerState extends State<UserLocationLayer>
     super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.paused:
+        _compassEventsSub?.cancel();
         _onLocationChangedSub?.cancel();
         if (_serviceStatus?.value == UserLocationServiceStatus.subscribed) {
           _serviceStatus.value = UserLocationServiceStatus.paused;
@@ -212,6 +220,10 @@ class _UserLocationLayerState extends State<UserLocationLayer>
       _lastLocation.value = null;
       _serviceStatus.value = UserLocationServiceStatus.unsubscribed;
     });
+    await _compassEventsSub?.cancel();
+    _compassEventsSub = FlutterCompass.events.listen((double heading) {
+      _heading.value = heading;
+    });
     return UserLocationServiceStatus.subscribed;
   }
 }
@@ -240,6 +252,10 @@ class UserLocationPlugin extends MapPlugin {
 }
 
 class UserLocationMarker extends StatelessWidget {
+  const UserLocationMarker({Key key, this.heading}) : super(key: key);
+  final ValueNotifier<double> heading;
+  static final CustomPainter headingerPainter = UserLocationHeadingCircle();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -248,23 +264,70 @@ class UserLocationMarker extends StatelessWidget {
           Stack(
             alignment: AlignmentDirectional.center,
             children: <Widget>[
+              ValueListenableBuilder<double>(
+                  valueListenable: heading,
+                  builder: (BuildContext context, double value, Widget child) {
+                    if (value == null) {
+                      return Container();
+                    }
+                    return Transform.rotate(
+                      angle: degree2Radian(value),
+                      child: CustomPaint(
+                        painter: headingerPainter,
+                      ),
+                    );
+                  }),
               Container(
                 decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.blue[300].withOpacity(0.7)),
-                height: 20.0,
-                width: 20.0,
+                height: 22.0,
+                width: 22.0,
               ),
               Container(
                 decoration: const BoxDecoration(
                     shape: BoxShape.circle, color: Colors.blueAccent),
-                height: 12.0,
-                width: 12.0,
+                height: 14.0,
+                width: 14.0,
               ),
             ],
           ),
         ],
       ),
     );
+  }
+}
+
+double degree2Radian(double degree) {
+  return degree * pi / 180.0;
+}
+
+class UserLocationHeadingCircle extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Rect rect = Rect.fromCircle(
+      center: Offset.zero,
+      radius: 50,
+    );
+    final Gradient gradient = RadialGradient(
+      colors: <Color>[
+        Colors.blue.shade500.withOpacity(0.6),
+        Colors.blue.shade500.withOpacity(0.3),
+        Colors.transparent,
+      ],
+      stops: const <double>[
+        0.0,
+        0.5,
+        1.0,
+      ],
+    );
+    final Paint paint = Paint();
+    paint.shader = gradient.createShader(rect);
+    canvas.drawArc(rect, degree2Radian(200), degree2Radian(140), true, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
   }
 }
