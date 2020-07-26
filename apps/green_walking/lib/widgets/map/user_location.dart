@@ -14,32 +14,45 @@ enum UserLocationServiceStatus {
   unsubscribed,
 }
 
+typedef UserLocationButtonBuilder = Widget Function(BuildContext context,
+    ValueNotifier<UserLocationServiceStatus>, Function onPressed);
+
 typedef UserLocationMarkerBuilder = Marker Function(
     BuildContext context, LatLng point);
+
+UserLocationMarkerBuilder _defaultMarkerBuilder =
+    (BuildContext context, LatLng point) {
+  return Marker(
+      height: 60.0,
+      width: 60.0,
+      point: point,
+      builder: (_) => UserLocationMarker());
+};
 
 class UserLocationOptions extends LayerOptions {
   UserLocationOptions(
       {@required this.markers,
-      @required this.onLocationUpdate,
-      @required this.onLocationRequested,
-      @required this.markerBuilder,
+      this.onLocationUpdate,
+      this.onLocationRequested,
+      @required this.buttonBuilder,
+      this.markerBuilder,
       this.updateIntervalMs = 1000 * 5})
-      : assert(markers != null &&
-            onLocationUpdate != null &&
-            onLocationRequested != null &&
-            markerBuilder != null),
+      : assert(markers != null && buttonBuilder != null),
         super();
 
   final void Function(LatLng) onLocationUpdate;
   final void Function(LatLng) onLocationRequested;
+  final UserLocationButtonBuilder buttonBuilder;
   final UserLocationMarkerBuilder markerBuilder;
   final int updateIntervalMs;
   List<Marker> markers;
 }
 
 class UserLocationLayer extends StatefulWidget {
-  const UserLocationLayer({Key key, this.options, this.map, this.stream})
-      : super(key: key);
+  const UserLocationLayer(
+      {Key key, @required this.options, this.map, this.stream})
+      : assert(options != null),
+        super(key: key);
 
   final UserLocationOptions options;
   final MapState map;
@@ -68,17 +81,19 @@ class _UserLocationLayerState extends State<UserLocationLayer>
         (UserLocationServiceStatus status) => _serviceStatus.value = status);
     _lastLocation.addListener(() {
       final LatLng loc = _lastLocation.value;
-      widget.options.onLocationUpdate(loc);
+      widget.options.onLocationUpdate?.call(loc);
       if (widget.options.markers.isNotEmpty) {
         widget.options.markers.removeLast();
       }
       if (loc == null) {
         return;
       }
-      widget.options.markers.add(widget.options.markerBuilder(context, loc));
+      widget.options.markers.add(widget.options.markerBuilder != null
+          ? widget.options.markerBuilder(context, loc)
+          : _defaultMarkerBuilder(context, loc));
       if (_locationRequested) {
         _locationRequested = false;
-        widget.options.onLocationRequested(loc);
+        widget.options.onLocationRequested?.call(loc);
       }
     });
   }
@@ -166,7 +181,8 @@ class _UserLocationLayerState extends State<UserLocationLayer>
                               _serviceStatus.value = value);
                       _locationRequested = true;
                     } else {
-                      widget.options.onLocationRequested(_lastLocation.value);
+                      widget.options.onLocationRequested
+                          ?.call(_lastLocation.value);
                     }
                   }),
             ],
@@ -220,5 +236,35 @@ class UserLocationPlugin extends MapPlugin {
   @override
   bool supportsLayer(LayerOptions options) {
     return options is UserLocationOptions;
+  }
+}
+
+class UserLocationMarker extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Stack(
+            alignment: AlignmentDirectional.center,
+            children: <Widget>[
+              Container(
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.blue[300].withOpacity(0.7)),
+                height: 20.0,
+                width: 20.0,
+              ),
+              Container(
+                decoration: const BoxDecoration(
+                    shape: BoxShape.circle, color: Colors.blueAccent),
+                height: 12.0,
+                width: 12.0,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
