@@ -47,7 +47,7 @@ android {
     defaultConfig {
         // Unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "org.xennis.apps.green_walking"
-        minSdkVersion 23 // Version 6.0
+        minSdkVersion 16 // Version 4.1
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
