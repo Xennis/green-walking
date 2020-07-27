@@ -2,6 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'intl.dart';
 import 'routes.dart';
 
 void main() {
@@ -14,11 +16,20 @@ void main() {
   });
 }
 
-class GreenWalkingApp extends StatelessWidget {
+class GreenWalkingApp extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _GreenWalkingAppState();
+}
+
+class _GreenWalkingAppState extends State<GreenWalkingApp> {
+  AppLocalizationsDelegate _localeOverrideDelegate =
+      const AppLocalizationsDelegate(Locale('de', ''));
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Green Walking',
+      onGenerateTitle: (BuildContext context) =>
+          AppLocalizations.of(context).title,
       theme: ThemeData(
         primarySwatch: Colors.green,
         accentColor: Colors.blue,
@@ -32,14 +43,15 @@ class GreenWalkingApp extends StatelessWidget {
         final Map<String, WidgetBuilder> routes = Routes.get(context);
         return routes;
       }(),
-      localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
-        // ... app-specific localization delegate[s] here
+      localizationsDelegates: <LocalizationsDelegate<dynamic>>[
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
+        _localeOverrideDelegate
       ],
       supportedLocales: const <Locale>[
         Locale('de', ''),
+        Locale('en', ''),
       ],
     );
   }

@@ -7,10 +7,10 @@ import 'package:dart_geohash/dart_geohash.dart';
 class SharedPrefs {
   static const String KEY_LAST_LOCATION = 'last-location';
   static const String ANALYTICS_ENABLED = 'analytics-enabled';
+  static const String LANGUAGE = 'language';
 
   static Future<LatLng> getLatLng(String key) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String raw = prefs.getString(key);
+    final String raw = await getString(key);
     if (raw == null) {
       return null;
     }
@@ -30,11 +30,20 @@ class SharedPrefs {
     }
     try {
       final String raw = GeoHasher().encode(val.longitude, val.latitude);
-      SharedPreferences.getInstance()
-          .then((SharedPreferences prefs) => prefs.setString(key, raw));
+      setString(key, raw);
     } catch (e) {
       log('failed to store location: ' + e.toString());
     }
+  }
+
+  static Future<String> getString(String key) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString(key);
+  }
+
+  static void setString(String key, String val) {
+    SharedPreferences.getInstance()
+        .then((SharedPreferences prefs) => prefs.setString(key, val));
   }
 
   static Future<bool> getBool(String key) async {

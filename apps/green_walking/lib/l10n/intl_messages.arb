@@ -1,0 +1,77 @@
+{
+  "@@last_modified": "2020-07-27T01:10:01.370958",
+  "title": "Green Walking",
+  "@title": {
+    "description": "Title of the application",
+    "type": "text",
+    "placeholders": {}
+  },
+  "slogan": "Discover your green city!",
+  "@slogan": {
+    "description": "Slogan of the application",
+    "type": "text",
+    "placeholders": {}
+  },
+  "website": "Website",
+  "@website": {
+    "description": "Website label",
+    "type": "text",
+    "placeholders": {}
+  },
+  "maps": "Maps",
+  "@maps": {
+    "description": "Maps label",
+    "type": "text",
+    "placeholders": {}
+  },
+  "nameless": "Nameless",
+  "@nameless": {
+    "description": "Places without a name",
+    "type": "text",
+    "placeholders": {}
+  },
+  "missingDescription": "The park has no description yet.",
+  "@missingDescription": {
+    "description": "Places without a description",
+    "type": "text",
+    "placeholders": {}
+  },
+  "settingsPage": "Settings",
+  "@settingsPage": {
+    "description": "Label for settings page",
+    "type": "text",
+    "placeholders": {}
+  },
+  "feedbackPage": "Send feedback",
+  "@feedbackPage": {
+    "description": "Label for feedback page",
+    "type": "text",
+    "placeholders": {}
+  },
+  "aboutPage": "About the app",
+  "@aboutPage": {
+    "description": "Label for about page",
+    "type": "text",
+    "placeholders": {}
+  },
+  "aboutVersion": "Version {version}",
+  "@aboutVersion": {
+    "description": "Version on the about page",
+    "type": "text",
+    "placeholders": {
+      "version": {
+        "example": "1.0.0"
+      }
+    }
+  },
+  "aboutLegalese": "Developed by {name}",
+  "@aboutLegalese": {
+    "description": "Label for about page",
+    "type": "text",
+    "placeholders": {
+      "name": {
+        "example": "Xennis"
+      }
+    }
+  }
+}
