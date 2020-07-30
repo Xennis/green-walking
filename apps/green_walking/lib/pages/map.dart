@@ -129,6 +129,9 @@ class _MapPageState extends State<MapPage> {
                           // NetworkTileProvider or CachedNetworkTileProvider
                           tileProvider: const CachedNetworkTileProvider(),
                         ),
+                        // Before MarkerClusterLayerOptions. Otherwise the user location is on top of markers
+                        // and especially on top of pop-ups.
+                        MarkerLayerOptions(markers: userLocationMarkers),
                         MarkerClusterLayerOptions(
                           size: const Size(40, 40),
                           markers: snapshot.data.parks,
@@ -198,7 +201,6 @@ class _MapPageState extends State<MapPage> {
                                 );
                               }),
                         ),
-                        MarkerLayerOptions(markers: userLocationMarkers),
                         UserLocationOptions(
                           markers: userLocationMarkers,
                           onLocationUpdate: (LatLng loc) {
