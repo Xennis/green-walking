@@ -1,4 +1,4 @@
-name: Flutter check
+name: Flutter
 on: push
 jobs:
   check:
