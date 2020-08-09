@@ -1,5 +1,6 @@
 apache-beam==2.22.0
 beautifulsoup4==4.9.1
+google-cloud-firestore==1.8.1
 sparqlwrapper==1.8.5
 sqlitedict==1.6.0
 # CI only:
