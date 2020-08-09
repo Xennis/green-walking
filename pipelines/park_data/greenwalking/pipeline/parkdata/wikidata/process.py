@@ -25,53 +25,60 @@ class ProcessDoFn(DoFn):
 
         wikidata_id: str = element["title"]
 
-        # FIXME: Process en data here and filter it out in the end
-        yield wikidata_id, {
-            "aliases": {
-                language.GERMAN: [e.get("value") for e in aliases.get(language.GERMAN, [])],
-                language.ENGLISH: [e.get("value") for e in aliases.get(language.ENGLISH, [])],
-            },
-            "categories": {
-                language.GERMAN: self._create_categories(language.GERMAN, instance_of, heritage_designation=heritage_designation),
-                language.ENGLISH: self._create_categories(language.ENGLISH, instance_of, heritage_designation=heritage_designation),
-            },
-            fields.COORDINATE_LOCATION: {
-                fields.LATITUDE: coordinate_location[0].get("latitude") if coordinate_location else None,
-                fields.LONGITUDE: coordinate_location[0].get("longitude") if coordinate_location else None,
-            },
-            "commonsUrl": sitelinks.get("commonswiki", {}).get("url"),
-            "descriptions": {
-                language.GERMAN: descriptions.get(language.GERMAN, {}).get("value"),
-                language.ENGLISH: descriptions.get(language.ENGLISH, {}).get("value"),
-            },
-            "image": self._filter_images(image),
-            "location": {
-                language.GERMAN: {
-                    "location": location[0].get(language.GERMAN, {}).get("value") if location else None,
-                    "administrative": administrative[0].get(language.GERMAN, {}).get("value") if administrative else None,
+        try:
+            yield wikidata_id, {
+                "aliases": {
+                    language.GERMAN: [e.get("value") for e in aliases.get(language.GERMAN, [])],
+                    language.ENGLISH: [e.get("value") for e in aliases.get(language.ENGLISH, [])],
                 },
-                language.ENGLISH: {
-                    "location": location[0].get(language.ENGLISH, {}).get("value") if location else None,
-                    "administrative": administrative[0].get(language.ENGLISH, {}).get("value") if administrative else None,
+                "categories": {
+                    language.GERMAN: self._create_categories(
+                        language.GERMAN, instance_of, heritage_designation=heritage_designation
+                    ),
+                    language.ENGLISH: self._create_categories(
+                        language.ENGLISH, instance_of, heritage_designation=heritage_designation
+                    ),
                 },
-            },
-            "name": {
-                language.GERMAN: labels.get(language.GERMAN, {}).get("value"),
-                language.ENGLISH: labels.get(language.ENGLISH, {}).get("value"),
-            },
-            "officialWebsite": officialWebsite[0] if officialWebsite else None,
-            fields.WIKIDATA_ID: wikidata_id,
-            fields.WIKIPEDIA: {
-                language.GERMAN: {
-                    fields.TITLE: sitelinks.get("dewiki", {}).get("title"),
-                    fields.URL: sitelinks.get("dewiki", {}).get("url"),
+                fields.COORDINATE_LOCATION: {
+                    fields.LATITUDE: coordinate_location[0].get("latitude") if coordinate_location else None,
+                    fields.LONGITUDE: coordinate_location[0].get("longitude") if coordinate_location else None,
                 },
-                language.ENGLISH: {
-                    fields.TITLE: sitelinks.get("enwiki", {}).get("title"),
-                    fields.URL: sitelinks.get("enwiki", {}).get("url"),
+                "commonsUrl": sitelinks.get("commonswiki", {}).get("url"),
+                "descriptions": {
+                    language.GERMAN: descriptions.get(language.GERMAN, {}).get("value"),
+                    language.ENGLISH: descriptions.get(language.ENGLISH, {}).get("value"),
                 },
-            },
-        }
+                "image": self._filter_images(image),
+                "location": {
+                    language.GERMAN: {
+                        "location": location[0].get(language.GERMAN, {}).get("value") if location else None,
+                        "administrative": administrative[0].get(language.GERMAN, {}).get("value") if administrative else None,
+                    },
+                    language.ENGLISH: {
+                        "location": location[0].get(language.ENGLISH, {}).get("value") if location else None,
+                        "administrative": administrative[0].get(language.ENGLISH, {}).get("value") if administrative else None,
+                    },
+                },
+                "name": {
+                    language.GERMAN: labels.get(language.GERMAN, {}).get("value"),
+                    language.ENGLISH: labels.get(language.ENGLISH, {}).get("value"),
+                },
+                "officialWebsite": officialWebsite[0] if officialWebsite else None,
+                fields.WIKIDATA_ID: wikidata_id,
+                fields.WIKIPEDIA: {
+                    language.GERMAN: {
+                        fields.TITLE: sitelinks.get("dewiki", {}).get("title"),
+                        fields.URL: sitelinks.get("dewiki", {}).get("url"),
+                    },
+                    language.ENGLISH: {
+                        fields.TITLE: sitelinks.get("enwiki", {}).get("title"),
+                        fields.URL: sitelinks.get("enwiki", {}).get("url"),
+                    },
+                },
+            }
+        except Exception as e:
+            logging.warning(f"{self.__class__.__name__} error {type(e).__name__}: {e}")
+            logging.exception("failed for id %s: %s", wikidata_id)
 
     @staticmethod
     def _extract_artist(raw: Optional[Dict[str, Any]]) -> Optional[str]:

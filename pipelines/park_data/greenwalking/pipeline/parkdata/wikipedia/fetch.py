@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any, Tuple, Iterable, Generator, TypeVar, Optional
+from typing import Any, Tuple, Generator, TypeVar, Optional
 
 from apache_beam import PTransform, pvalue, Flatten, DoFn, Dict, ParDo, Map, MapTuple
 from apache_beam.io import ReadFromText, WriteToText
@@ -62,7 +62,6 @@ class Fetch(PTransform):
             input_or_inputs
             | "known/read" >> ReadFromText(FileSystems.join(self._base_path, self._STATE_FILE), validate=False)
             | "known/json_load" >> Map(lambda element: json.loads(element))
-            # FIXME: Avoid the with_output_types. Use function instead of lambda to fix it.
             | "known/kv" >> Map(lambda element: tuple(element)).with_output_types(Tuple[str, Dict[str, Dict[str, Any]]])
         )
         known_count = known | "known_count" >> Count.Globally()

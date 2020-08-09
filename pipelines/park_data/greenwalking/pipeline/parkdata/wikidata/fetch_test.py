@@ -13,7 +13,7 @@ from greenwalking.pipeline.parkdata.wikidata import Fetch
 class TestFetch(unittest.TestCase):
     def test_known(self):
         with tempfile.TemporaryDirectory() as base_path:
-            state_file = os.path.join(base_path, Fetch._STATE_FILE)
+            state_file = os.path.join(base_path, "state.json")
             with open(state_file, "w") as f:
                 f.write(
                     """\
@@ -24,7 +24,7 @@ class TestFetch(unittest.TestCase):
             expected = [{"some": "json"}, {"another": "jsonx"}]
 
             with TestPipeline() as p:
-                actual = p | Create(["Q1234", "Q54321"]) | Fetch(base_path, user_agent="some-agent")
+                actual = p | Create(["Q1234", "Q54321"]) | Fetch(state_file, user_agent="some-agent")
                 assert_that(actual, equal_to(expected))
 
             actual_state = []

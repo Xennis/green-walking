@@ -1,3 +1,5 @@
+check: format-check mypy test
+
 test:
 	@echo ">>> unit test"
 	python -m unittest discover -p '*_test.py'
