@@ -4,7 +4,7 @@ from apache_beam import DoFn
 from bs4 import BeautifulSoup
 
 from greenwalking.core import language
-from greenwalking.pipeline.parkdata import fields
+from greenwalking.pipeline.places import fields
 
 
 class ProcessDoFn(DoFn):

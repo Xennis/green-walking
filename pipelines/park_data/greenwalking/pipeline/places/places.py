@@ -8,7 +8,7 @@ from apache_beam.io.filesystems import FileSystems
 from apache_beam.options.pipeline_options import PipelineOptions, SetupOptions
 
 from greenwalking.core import language
-from greenwalking.pipeline.parkdata import wikidata, wikipedia, fields
+from greenwalking.pipeline.places import wikidata, wikipedia, fields
 
 K = TypeVar("K")
 
