@@ -9,7 +9,7 @@ from apache_beam.options.pipeline_options import PipelineOptions, SetupOptions
 from google.cloud import firestore
 from google.oauth2 import service_account
 
-from greenwalking.core import language
+from greenwalking.core import language, geohash
 from greenwalking.pipeline.places import wikidata, wikipedia, fields
 
 K = TypeVar("K")
@@ -54,12 +54,15 @@ class Combine(DoFn):
         if not longitude:
             logging.info(f"Skipped {key} because it has no longitude")
             return
+        lat = float(latitude)
+        lng = float(longitude)
         wikidata[fields.COORDINATE_LOCATION] = {
             # The latitude/longitude fields in the app are loaded as double. At this point it can be an
             # integer (e.g. 9 instead of 9.0).
-            fields.LATITUDE: float(latitude),
-            fields.LONGITUDE: float(longitude),
+            fields.LATITUDE: lat,
+            fields.LONGITUDE: lng,
         }
+        wikidata[fields.GEOHASH] = geohash.encode(latitude=lat, longitude=longitude)
 
         yield key, wikidata
 
