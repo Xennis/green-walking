@@ -1,11 +1,12 @@
 import json
 import logging
+import os
 
 from apache_beam import PTransform, ParDo, pvalue, DoFn, Flatten, Map
 from apache_beam.io import ReadFromText, WriteToText
 from typing import Dict, Any, Iterable, Generator, Optional
+from sqlitedict import SqliteDict
 
-from apache_beam.io.filesystems import FileSystems
 from apache_beam.transforms.combiners import Count
 
 from greenwalking.core import language
@@ -16,17 +17,25 @@ class _Fetch:
     def __init__(self, wikidata_client: WikidataEntityClient, commons_client: CommonsImageInfoClient):
         self._wikidata_client = wikidata_client
         self._commons_client = commons_client
-        self._cache: Dict[str, Any] = {}
+        self._cache = SqliteDict("wd_qache.sqlite", autocommit=True)
 
     def _do_request_cached(self, entity_id: str) -> Dict[str, Any]:
         if entity_id in self._cache:
             return self._cache[entity_id]
         resp = self._wikidata_client.get(entity_id)
+        labels = resp.get("labels", {})
         # Limit to a few fields to reduce the memory consumption of the cache and the amount of data in the output. For
         # example the entity Germany of the property country is a really large entity.
-        data = {"labels": resp.get("labels"), "claims": {"instance of": resp.get("claims", {}).get("P31")}}
+        data = {
+            "labels": {language.GERMAN: labels.get(language.GERMAN, {}), language.ENGLISH: labels.get(language.ENGLISH, {})},
+            "claims": {"instance of": resp.get("claims", {}).get("P31")},
+        }
         self._cache[entity_id] = data
         return data
+
+    def close(self):
+        if self._cache:
+            self._cache.close()
 
     def _resolve_claims(self, claims: Dict[str, Iterable[Dict[str, Any]]]) -> Dict[str, Any]:
         res: Dict[str, Any] = {}
@@ -74,6 +83,10 @@ class _FetchDoFn(DoFn):
             wikidata_client=WikidataEntityClient(self._user_agent), commons_client=CommonsImageInfoClient(self._user_agent)
         )
 
+    def finish_bundle(self):
+        if self._client:
+            self._client.close()
+
     def process(self, element: str, *args, **kwargs) -> Generator[Dict[str, Any], None, None]:
         known_count: Optional[int] = kwargs.get("known_count")
         if isinstance(known_count, int) and known_count > 0:
@@ -85,23 +98,24 @@ class _FetchDoFn(DoFn):
 
 
 class Fetch(PTransform):
-    _STATE_FILE = "wikidata-raw-data.json"
-
-    def __init__(self, base_path: str, user_agent: str, **kwargs):
+    def __init__(self, state_file: str, user_agent: str, **kwargs):
         super().__init__(**kwargs)
-        self._base_path = base_path
+        self._state_file = state_file
         self._user_agent = user_agent
 
     def expand(self, input_or_inputs):
+        state_filename, state_file_ext = os.path.splitext(self._state_file)
+
         known = (
             input_or_inputs
-            | "known/read" >> ReadFromText(FileSystems.join(self._base_path, self._STATE_FILE), validate=False)
+            | "known/read" >> ReadFromText(self._state_file, validate=False)
+            # | "known/fix_none_issue"
+            # >> Map(lambda element: element.replace('"en": null', '"en": {}').replace('"de": null', '"de": {}'))
             | "known/json_load" >> Map(lambda element: json.loads(element))
         )
 
         known_count = known | "known_count" >> Count.Globally()
 
-        state_file_split = self._STATE_FILE.split(".")
         new = (
             input_or_inputs
             # FIXME: Avoid ParDo here to not do parallel requests
@@ -112,12 +126,7 @@ class Fetch(PTransform):
         (
             data
             | "state/json_dump" >> Map(lambda element: json.dumps(element, sort_keys=True))
-            | "state/write"
-            >> WriteToText(
-                FileSystems.join(self._base_path, state_file_split[0]),
-                file_name_suffix=".{}".format(state_file_split[1]),
-                shard_name_template="",
-            )
+            | "state/write" >> WriteToText(state_filename, file_name_suffix=state_file_ext, shard_name_template="",)
         )
 
         return data

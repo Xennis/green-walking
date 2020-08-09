@@ -1,8 +1,7 @@
-import copy
 import json
 import urllib.request
 import urllib.parse
-from typing import Dict, Any, Iterable, Optional
+from typing import Dict, Any, Iterable
 
 
 class CommonsImageInfoClient:
@@ -11,8 +10,9 @@ class CommonsImageInfoClient:
     _API_ENDPOINT = "https://commons.wikimedia.org/w/api.php"
     _NAMESPACE_FILE = "File"
 
-    def __init__(self, user_agent: str):
+    def __init__(self, user_agent: str, timeout: int = 60):
         self._user_agent = user_agent
+        self._timeout = timeout
 
     def _do_request(self, titles: Iterable[str]) -> Dict[str, Any]:
         """
@@ -33,7 +33,7 @@ class CommonsImageInfoClient:
         )
         req = urllib.request.Request(f"{self._API_ENDPOINT}?{params}")
         req.add_header("User-Agent", self._user_agent)
-        resp = urllib.request.urlopen(req).read()
+        resp = urllib.request.urlopen(req, timeout=self._timeout).read()
         return json.loads(resp)
 
     def get(self, name: str) -> Dict[str, Dict[str, Any]]:
@@ -50,8 +50,9 @@ class WikipediaExtractClient:
 
     _API_ENDPOINT_TEMPLATE = "https://{lang}.wikipedia.org/w/api.php"
 
-    def __init__(self, user_agent: str):
+    def __init__(self, user_agent: str, timeout: int = 60):
         self._user_agent = user_agent
+        self._timeout = timeout
 
     def _do_request(self, lang: str, titles: Iterable[str]) -> Dict[str, Any]:
         """
@@ -77,7 +78,7 @@ class WikipediaExtractClient:
         )
         req = urllib.request.Request(f"{endpoint}?{params}")
         req.add_header("User-Agent", self._user_agent)
-        resp = urllib.request.urlopen(req).read()
+        resp = urllib.request.urlopen(req, timeout=self._timeout).read()
         return json.loads(resp)
 
     def get(self, lang: str, title: str) -> Dict[str, Dict[str, Any]]:

@@ -1,6 +1,7 @@
 apache-beam==2.22.0
 beautifulsoup4==4.9.1
 sparqlwrapper==1.8.5
+sqlitedict==1.6.0
 # CI only:
 black==19.10b0  # Code format
 pylint==2.5.3  # Lint

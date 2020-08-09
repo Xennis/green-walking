@@ -1,10 +1,10 @@
 import json
 import logging
-from collections import Iterable
 from typing import Tuple, Dict, Iterable, Any, TypeVar, Generator
 
-from apache_beam import Pipeline, ParDo, CoGroupByKey, DoFn, copy, Values, Map
+from apache_beam import Pipeline, ParDo, CoGroupByKey, DoFn, copy, Values, Map, Flatten
 from apache_beam.io import WriteToText
+from apache_beam.io.filesystems import FileSystems
 from apache_beam.options.pipeline_options import PipelineOptions, SetupOptions
 
 from greenwalking.core import language
@@ -107,24 +107,75 @@ class ParkdataPipelineOptions(PipelineOptions):
             ),
         )
 
+    @staticmethod
+    def wd_query_park() -> str:
+        return """\
+SELECT ?item WHERE {
+    # item (instance of) p
+    ?item wdt:P31 ?p;
+        # item (country) Germany
+        wdt:P17 wd:Q183 .
+    # p in (park, botanical garden, green space, urban park, recreation area, landscape garden)
+    FILTER (?p IN (wd:Q22698, wd:Q167346, wd:Q22652, wd:Q22746, wd:Q2063507, wd:Q15077303 ) )
+}"""
+
+    @staticmethod
+    def wd_query_monument() -> str:
+        # For coordinate examples see https://en.wikibooks.org/wiki/SPARQL/WIKIDATA_Precision,_Units_and_Coordinates#Coordinates
+        return """\
+SELECT DISTINCT ?item WHERE {
+    # item (instance of) p
+    ?item wdt:P31 ?p;
+        # item (country) Germany
+        wdt:P17 wd:Q183;
+        # item (coordinate location) coordinate
+        wdt:P625 ?coordinate.
+    # item "has site links"
+    ?article schema:about ?item;
+        schema:isPartOf ?sitelink.
+    # p in (natural monument in Germany)
+    FILTER(?p IN(wd:Q21573182))
+}"""
+
 
 def run(argv=None):
     pipeline_options = PipelineOptions(argv)
-    parkdata_options = pipeline_options.view_as(ParkdataPipelineOptions)
+    options = pipeline_options.view_as(ParkdataPipelineOptions)
     # Save the main session that defines global import, functions and variables. Otherwise they are not saved during
     # the serialization. Details see https://cloud.google.com/dataflow/docs/resources/faq#how_do_i_handle_nameerrors
-    pipeline_options.view_as(SetupOptions).save_main_session = parkdata_options.save_session
+    pipeline_options.view_as(SetupOptions).save_main_session = options.save_session
     with Pipeline(options=pipeline_options) as p:
-        wikidata_data = (
+        park_data = (
             p
-            | "wikidata/query" >> wikidata.Query(parkdata_options.base_path, user_agent=parkdata_options.user_agent)
-            | "wikidata/fetch" >> wikidata.Fetch(parkdata_options.base_path, user_agent=parkdata_options.user_agent)
-            | "wikidata/process" >> ParDo(wikidata.Process())
+            | "park/query"
+            >> wikidata.Query(
+                query=options.wd_query_park(),
+                state_file=FileSystems.join(options.base_path, "park-wikidata-ids.txt"),
+                user_agent=options.user_agent,
+            )
+            | "park/fetch"
+            >> wikidata.Fetch(FileSystems.join(options.base_path, "park-wikidata-raw-data.json"), user_agent=options.user_agent)
+        )
+
+        monument_data = (
+            p
+            | "monument/query"
+            >> wikidata.Query(
+                query=options.wd_query_monument(),
+                state_file=FileSystems.join(options.base_path, "monument-wikidata-ids.txt"),
+                user_agent=options.user_agent,
+            )
+            | "monument/fetch"
+            >> wikidata.Fetch(FileSystems.join(options.base_path, "monument-wikidata-raw-data.json"), user_agent=options.user_agent)
+        )
+
+        wikidata_data = (
+            [park_data, monument_data] | "wikidata/flatten" >> Flatten() | "wikidata/process" >> ParDo(wikidata.Process())
         )
 
         wikipedia_data = (
             wikidata_data
-            | "wikipedia/fetch" >> wikipedia.Fetch(parkdata_options.base_path, user_agent=parkdata_options.user_agent)
+            | "wikipedia/fetch" >> wikipedia.Fetch(options.base_path, user_agent=options.user_agent)
             | "wikipedia/process" >> ParDo(wikipedia.Process())
         )
 
