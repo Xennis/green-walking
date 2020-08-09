@@ -6,6 +6,8 @@ from apache_beam import Pipeline, ParDo, CoGroupByKey, DoFn, copy, Values, Map, 
 from apache_beam.io import WriteToText
 from apache_beam.io.filesystems import FileSystems
 from apache_beam.options.pipeline_options import PipelineOptions, SetupOptions
+from google.cloud import firestore
+from google.oauth2 import service_account
 
 from greenwalking.core import language
 from greenwalking.pipeline.places import wikidata, wikipedia, fields
@@ -87,6 +89,44 @@ class FilterLanguage(DoFn):
                 FilterLanguage._delete_non_german(e)
 
 
+class FirestoreWrite(DoFn):
+
+    # The total maximimum is 500. Source: https://firebase.google.com/docs/firestore/manage-data/transactions
+    _MAX_DOCUMENTS = 250
+
+    def __init__(self, project: str, collection: str, credentials: str):
+        super().__init__()
+        self._project = project
+        self._collection = collection
+        self._credentials = credentials
+        self._client = None
+        self._mutations: Dict[str, Any] = {}
+
+    def start_bundle(self):
+        self._mutations = {}
+        credentials = service_account.Credentials.from_service_account_file(self._credentials)
+        self._client = firestore.Client(project=self._project, credentials=credentials)
+
+    def finish_bundle(self):
+        if self._mutations:
+            self._flash_batch()
+
+    def process(self, element: Tuple[str, Any], *args, **kwargs) -> None:
+        (key, value) = element
+        self._mutations[key] = value
+        if len(self._mutations) > self._MAX_DOCUMENTS:
+            self._flash_batch()
+
+    def _flash_batch(self):
+        client: firestore.Client = self._client
+        batch = client.batch()
+        for doc_id, doc in self._mutations.items():
+            ref = client.collection(self._collection).document(doc_id)
+            batch.set(ref, doc)
+        _ = batch.commit()
+        self._mutations = {}
+
+
 class ParkdataPipelineOptions(PipelineOptions):
     @classmethod
     def _add_argparse_args(cls, parser):
@@ -96,6 +136,7 @@ class ParkdataPipelineOptions(PipelineOptions):
         )
 
         parser.add_argument("--base_path", default=".", dest="base_path", type=str, help="Base path for all files")
+        parser.add_argument("--project-id", dest="project_id", type=str, help="GCP project ID", required=True)
 
         parser.add_argument(
             "--no-save-session",
@@ -179,12 +220,20 @@ def run(argv=None):
             | "wikipedia/process" >> ParDo(wikipedia.Process())
         )
 
-        (
+        places = (
             {Combine.TAG_WIKIDATA: wikidata_data, Combine.TAG_WIKIPEDIA: wikipedia_data,}
             | "combine/group_by_key" >> CoGroupByKey()
             | "combine/combine" >> ParDo(Combine())
             | "combine/filter_lang" >> ParDo(FilterLanguage())
-            | "combine/values" >> Values()
-            | "combine/json_dump" >> Map(lambda element: json.dumps(element, sort_keys=True))
-            | "combine/write" >> WriteToText("output", file_name_suffix=".json", shard_name_template="")
+        )
+
+        (
+            places
+            | "json_output/values" >> Values()
+            | "json_output/json_dump" >> Map(lambda element: json.dumps(element, sort_keys=True))
+            | "json_output/write" >> WriteToText("output", file_name_suffix=".json", shard_name_template="")
+        )
+
+        places | "firestore_output" >> ParDo(
+            FirestoreWrite(project=options.project_id, collection="places", credentials="gcp-service-account.json")
         )
