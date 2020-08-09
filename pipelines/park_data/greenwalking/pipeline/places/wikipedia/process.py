@@ -2,7 +2,7 @@ from typing import Dict, Any, Optional, Tuple, TypeVar, Generator
 
 from apache_beam import DoFn
 
-from greenwalking.pipeline.parkdata import fields
+from greenwalking.pipeline.places import fields
 
 K = TypeVar("K")
 

@@ -8,7 +8,7 @@ from apache_beam.io.filesystems import FileSystems
 from apache_beam.transforms.combiners import Count
 
 from greenwalking.core.clients import WikipediaExtractClient
-from greenwalking.pipeline.parkdata import fields
+from greenwalking.pipeline.places import fields
 
 K = TypeVar("K")
 

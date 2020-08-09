@@ -8,8 +8,8 @@ from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that, equal_to
 
 from greenwalking.core import language
-from greenwalking.pipeline.parkdata import fields
-from greenwalking.pipeline.parkdata.wikipedia import Fetch
+from greenwalking.pipeline.places import fields
+from greenwalking.pipeline.places.wikipedia import Fetch
 
 
 class TestFetch(unittest.TestCase):
