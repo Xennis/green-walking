@@ -1,9 +1,8 @@
-import json
 import logging
-from typing import Tuple, Dict, Iterable, Any, TypeVar, Generator
+from dataclasses import dataclass
+from typing import Tuple, Dict, Iterable, Any, TypeVar, Generator, Optional
 
-from apache_beam import Pipeline, ParDo, CoGroupByKey, DoFn, copy, Values, Map, Flatten
-from apache_beam.io import WriteToText
+from apache_beam import Pipeline, ParDo, CoGroupByKey, DoFn, copy, Flatten, MapTuple
 from apache_beam.io.filesystems import FileSystems
 from apache_beam.options.pipeline_options import PipelineOptions, SetupOptions
 from google.cloud import firestore
@@ -13,6 +12,12 @@ from greenwalking.core import language, geohash
 from greenwalking.pipeline.places import wikidata, wikipedia, fields
 
 K = TypeVar("K")
+
+
+@dataclass
+class GeoPoint:
+    latitude: float
+    longitude: float
 
 
 class Combine(DoFn):
@@ -44,25 +49,17 @@ class Combine(DoFn):
         if wikipedia:
             wikidata["extract"] = wikipedia
 
-        # FIXME: Move this to the end of the pipeline. Add metric.
-        coordinateLoc = wikidata.get(fields.COORDINATE_LOCATION)
-        latitude = coordinateLoc.get(fields.LATITUDE)
-        if not latitude:
-            logging.info(f"Skipped {key} because it has no latitude")
+        geopoint_dict = wikidata.get(fields.GEOPOINT)
+        latitude = geopoint_dict.get(fields.LATITUDE)
+        longitude = geopoint_dict.get(fields.LONGITUDE)
+        if not latitude or not longitude:
+            # FIXME: Move this into the query, i.e. filter for records with a location.
+            logging.info(f"Skipped {key} because it has no latitude or longitude")
             return
-        longitude = coordinateLoc.get(fields.LONGITUDE)
-        if not longitude:
-            logging.info(f"Skipped {key} because it has no longitude")
-            return
-        lat = float(latitude)
-        lng = float(longitude)
-        wikidata[fields.COORDINATE_LOCATION] = {
-            # The latitude/longitude fields in the app are loaded as double. At this point it can be an
-            # integer (e.g. 9 instead of 9.0).
-            fields.LATITUDE: lat,
-            fields.LONGITUDE: lng,
-        }
-        wikidata[fields.GEOHASH] = geohash.encode(latitude=lat, longitude=longitude)
+        # At this point latitude/longitude can be an float or integer (e.g. 9 instead of 9.0). Ensure float.
+        geopoint = GeoPoint(latitude=float(latitude), longitude=float(longitude))
+        wikidata[fields.GEOPOINT] = geopoint
+        wikidata[fields.GEOHASH] = geohash.encode(latitude=geopoint.latitude, longitude=geopoint.longitude)
 
         yield key, wikidata
 
@@ -128,6 +125,16 @@ class FirestoreWrite(DoFn):
             batch.set(ref, doc)
         _ = batch.commit()
         self._mutations = {}
+
+
+def use_firestore_types(key: K, value: Dict[str, Any]) -> Tuple[K, Dict[str, Any]]:
+    """The pipeline itself should be independent from Firestore types because that is just one possible sink. That's why
+    this function here should be called just before writing to Firestore."""
+    geopoint: Optional[GeoPoint] = value.get(fields.GEOPOINT)
+    if geopoint:
+        value = copy.copy(value)
+        value[fields.GEOPOINT] = firestore.GeoPoint(latitude=geopoint.latitude, longitude=geopoint.longitude)
+    return key, value
 
 
 class ParkdataPipelineOptions(PipelineOptions):
@@ -232,11 +239,7 @@ def run(argv=None):
 
         (
             places
-            | "json_output/values" >> Values()
-            | "json_output/json_dump" >> Map(lambda element: json.dumps(element, sort_keys=True))
-            | "json_output/write" >> WriteToText("output", file_name_suffix=".json", shard_name_template="")
-        )
-
-        places | "firestore_output" >> ParDo(
-            FirestoreWrite(project=options.project_id, collection="places", credentials="gcp-service-account.json")
+            | "firestore_output/convert_types" >> MapTuple(use_firestore_types)
+            | "firestore_output/write"
+            >> ParDo(FirestoreWrite(project=options.project_id, collection="places", credentials="gcp-service-account.json"))
         )
