@@ -1,6 +1,6 @@
 ARTICLES = "articles"
 ARTIST = "artist"
-COORDINATE_LOCATION = "coordinateLocation"
+GEOPOINT = "geopoint"
 COPYRIGHTED = "copyrighted"
 DESCRIPTION_URL = "descriptionUrl"
 GEOHASH = "geohash"

@@ -39,7 +39,7 @@ class ProcessDoFn(DoFn):
                         language.ENGLISH, instance_of, heritage_designation=heritage_designation
                     ),
                 },
-                fields.COORDINATE_LOCATION: {
+                fields.GEOPOINT: {
                     fields.LATITUDE: coordinate_location[0].get("latitude") if coordinate_location else None,
                     fields.LONGITUDE: coordinate_location[0].get("longitude") if coordinate_location else None,
                 },
