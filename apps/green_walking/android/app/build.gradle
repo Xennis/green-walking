@@ -51,6 +51,8 @@ android {
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        // enabled by default for minSdkVersion >= 21
+        multiDexEnabled true
     }
 
     signingConfigs {
@@ -74,6 +76,9 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    // firesbase stack leads to > 65K methods. Hence https://developer.android.com/studio/build/multidex is needed.
+    // That's default for minSdkVersion >= 21.
+    implementation 'androidx.multidex:multidex:2.0.1'
 
     implementation 'com.google.firebase:firebase-analytics:17.4.4'
 }
