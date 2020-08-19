@@ -20,6 +20,17 @@ class GeoPoint:
     longitude: float
 
 
+class AddType(DoFn):
+    def __init__(self, typ: str):
+        super().__init__()
+        self._typ = typ
+
+    def process(self, element: Dict[str, Any], *args, **kwargs) -> Generator[Dict[str, Any], None, None]:
+        element = copy.copy(element)
+        element[fields.TYP] = self._typ
+        yield element
+
+
 class Combine(DoFn):
 
     TAG_WIKIDATA = "wikidata"
@@ -206,6 +217,7 @@ def run(argv=None):
             )
             | "park/fetch"
             >> wikidata.Fetch(FileSystems.join(options.base_path, "park-wikidata-raw-data.json"), user_agent=options.user_agent)
+            | "park/add_type" >> ParDo(AddType("park"))
         )
 
         monument_data = (
@@ -218,6 +230,7 @@ def run(argv=None):
             )
             | "monument/fetch"
             >> wikidata.Fetch(FileSystems.join(options.base_path, "monument-wikidata-raw-data.json"), user_agent=options.user_agent)
+            | "monument/add_type" >> ParDo(AddType("monument"))
         )
 
         wikidata_data = (
