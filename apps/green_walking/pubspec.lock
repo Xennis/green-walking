@@ -198,12 +198,10 @@ packages:
   flutter_compass:
     dependency: "direct main"
     description:
-      path: "."
-      ref: "feat/fallback-to-magnetic-sensor"
-      resolved-ref: "5af5d9d5b04a63a70acafb1c17d28d44e8cfbfdf"
-      url: "https://github.com/Xennis/flutter_compass.git"
-    source: git
-    version: "0.4.2+1"
+      name: flutter_compass
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.3"
   flutter_image:
     dependency: transitive
     description:
