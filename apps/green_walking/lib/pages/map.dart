@@ -1,13 +1,15 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:dart_geohash/dart_geohash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
-import 'package:green_walking/services/parks.dart';
+import 'package:green_walking/services/places.dart';
 import 'package:green_walking/services/shared_prefs.dart';
+import 'package:green_walking/types/marker.dart';
 import 'package:green_walking/widgets/gdpr_dialog.dart';
 import 'package:green_walking/widgets/navigation_drawer.dart';
 import 'package:green_walking/widgets/map/user_location.dart';
@@ -19,12 +21,10 @@ import '../widgets/map/attribution.dart';
 import 'detail.dart';
 
 class MapConfig {
-  MapConfig({this.accessToken, this.lastLocation, @required this.parks})
-      : assert(parks != null);
+  MapConfig({this.accessToken, this.lastLocation});
 
   String accessToken;
   LatLng lastLocation;
-  List<Marker> parks;
 
   static Future<MapConfig> create(
       AssetBundle assetBundle, LatLngBounds mapBounds) async {
@@ -38,26 +38,7 @@ class MapConfig {
       lastLocation = null;
     }
 
-    final Iterable<Place> places = await ParkService.load(assetBundle);
-    final List<Marker> parkMarkers = <Marker>[];
-    for (final Place p in places) {
-      parkMarkers.add(Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
-        height: 50,
-        width: 50,
-        point: p.coordinateLocation,
-        builder: (_) => const Icon(
-          Icons.location_on,
-          color: Colors.pink,
-          size: 50,
-        ),
-      ));
-    }
-
-    return MapConfig(
-        accessToken: accessToken,
-        lastLocation: lastLocation,
-        parks: parkMarkers);
+    return MapConfig(accessToken: accessToken, lastLocation: lastLocation);
   }
 }
 
@@ -74,13 +55,51 @@ class _MapPageState extends State<MapPage> {
   // (south-west, north-east)
   final LatLngBounds _mapBounds =
       LatLngBounds(LatLng(46.1037, 5.2381), LatLng(55.5286, 16.6275));
+  List<PlaceMarker> places = <PlaceMarker>[];
   List<Marker> userLocationMarkers = <Marker>[];
+  GeoHash _lastGeohash;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance
         .addPostFrameCallback((_) => enableAnalyticsOrConsent(context));
+  }
+
+  void onPositionChanged(MapPosition position, bool hasGesture) {
+    final LatLng center = position.center;
+    if (center == null) {
+      return;
+    }
+
+    final GeoHash _newGeohash = GeoHash.fromDecimalDegrees(
+        center.longitude, center.latitude,
+        precision: 4);
+    if (_lastGeohash != null && _lastGeohash.contains(_newGeohash.geohash)) {
+      return;
+    }
+    //log("${hasGesture} lat ${_lastGeohash?.geohash} new ${_newGeohash.geohash}");
+    _lastGeohash = _newGeohash;
+
+    PlaceService.nearby(_newGeohash).then((List<Place> value) {
+      setState(() {
+        places = value
+            .map((Place e) => PlaceMarker(
+                  place: e,
+                  anchorPos: AnchorPos.align(AnchorAlign.center),
+                  height: 50,
+                  width: 50,
+                  point: e.geopoint,
+                  builder: (_) => const Icon(
+                    Icons.location_on,
+                    color: Colors.pink,
+                    size: 50,
+                  ),
+                ))
+            .toList();
+        _lastGeohash = _newGeohash;
+      });
+    });
   }
 
   @override
@@ -105,17 +124,18 @@ class _MapPageState extends State<MapPage> {
                         center: (snapshot.data.lastLocation != null)
                             ? snapshot.data.lastLocation
                             : LatLng(53.5519, 9.8682),
-                        zoom: 15.0,
+                        zoom: 14.0,
                         plugins: <MapPlugin>[
                           AttributionPlugin(),
                           MarkerClusterPlugin(),
                           UserLocationPlugin(),
                         ],
-                        minZoom: 8, // zoom out
+                        minZoom: 12, // zoom out
                         maxZoom: 18, // zoom in
                         swPanBoundary: _mapBounds.southWest,
                         nePanBoundary: _mapBounds.northEast,
                         onTap: (_) => _popupController.hidePopup(),
+                        onPositionChanged: onPositionChanged,
                       ),
                       layers: <LayerOptions>[
                         TileLayerOptions(
@@ -134,7 +154,7 @@ class _MapPageState extends State<MapPage> {
                         MarkerLayerOptions(markers: userLocationMarkers),
                         MarkerClusterLayerOptions(
                           size: const Size(40, 40),
-                          markers: snapshot.data.parks,
+                          markers: places,
                           builder:
                               (BuildContext context, List<Marker> markers) {
                             // Avoid using a FloatingActionButton here.
@@ -156,7 +176,7 @@ class _MapPageState extends State<MapPage> {
                               popupSnap: PopupSnap.top,
                               popupController: _popupController,
                               popupBuilder: (_, Marker marker) {
-                                final Place p = ParkService.get(marker.point);
+                                final Place p = (marker as PlaceMarker).place;
                                 final TextStyle tx = TextStyle(
                                     color: Theme.of(context).accentColor);
                                 return Container(
