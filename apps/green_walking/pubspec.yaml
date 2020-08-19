@@ -36,6 +36,7 @@ dependencies:
   firebase_crashlytics: ^0.1.4+1
   flutter_compass: ^0.4.3
   flutter_map: ^0.10.1+1
+  flutter_map_location: ^0.7.0
   # Use origin once https://github.com/lpongetti/flutter_map_marker_cluster/pull/47 is merged and released.
   flutter_map_marker_cluster:
     git:

@@ -7,13 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map_location/flutter_map_location.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:green_walking/services/places.dart';
 import 'package:green_walking/services/shared_prefs.dart';
 import 'package:green_walking/types/marker.dart';
 import 'package:green_walking/widgets/gdpr_dialog.dart';
 import 'package:green_walking/widgets/navigation_drawer.dart';
-import 'package:green_walking/widgets/map/user_location.dart';
 import 'package:green_walking/widgets/place_list_tile.dart';
 import 'package:latlong/latlong.dart';
 
@@ -134,7 +134,7 @@ class _MapPageState extends State<MapPage> {
                         plugins: <MapPlugin>[
                           AttributionPlugin(),
                           MarkerClusterPlugin(),
-                          UserLocationPlugin(),
+                          LocationPlugin(),
                         ],
                         minZoom: 12, // zoom out
                         maxZoom: 18, // zoom in
@@ -227,26 +227,30 @@ class _MapPageState extends State<MapPage> {
                                 );
                               }),
                         ),
-                        UserLocationOptions(
+                        LocationOptions(
                           markers: userLocationMarkers,
-                          onLocationUpdate: (LatLng loc) {
+                          onLocationUpdate: (LatLngData ld) {
+                            if (ld == null) {
+                              return;
+                            }
                             SharedPrefs.setLatLng(
-                                SharedPrefs.KEY_LAST_LOCATION, loc);
+                                SharedPrefs.KEY_LAST_LOCATION, ld.location);
                           },
-                          onLocationRequested: (LatLng loc) {
-                            if (loc == null) {
+                          onLocationRequested: (LatLngData ld) {
+                            final LatLng loca = ld?.location;
+                            if (loca == null) {
                               Scaffold.of(context).showSnackBar(const SnackBar(
                                   content: Text('Keine Position gefunden')));
-                            } else if (!_mapBounds.contains(loc)) {
+                            } else if (!_mapBounds.contains(loca)) {
                               Scaffold.of(context).showSnackBar(const SnackBar(
                                   content: Text(
                                       'Position außerhalb von Deutschland')));
                             } else {
-                              mapController.move(loc, 15.0);
+                              mapController.move(loca, 15.0);
                             }
                           },
                           buttonBuilder: (BuildContext context,
-                              ValueNotifier<UserLocationServiceStatus> status,
+                              ValueNotifier<LocationServiceStatus> status,
                               Function onPressed) {
                             return Align(
                               // The "right" has not really an affect here.
@@ -259,25 +263,24 @@ class _MapPageState extends State<MapPage> {
                                     children: <Widget>[
                                       FloatingActionButton(
                                           child: ValueListenableBuilder<
-                                                  UserLocationServiceStatus>(
+                                                  LocationServiceStatus>(
                                               valueListenable: status,
                                               builder: (BuildContext context,
-                                                  UserLocationServiceStatus
-                                                      value,
+                                                  LocationServiceStatus value,
                                                   Widget child) {
                                                 switch (value) {
-                                                  case UserLocationServiceStatus
+                                                  case LocationServiceStatus
                                                       .disabled:
-                                                  case UserLocationServiceStatus
+                                                  case LocationServiceStatus
                                                       .permissionDenied:
-                                                  case UserLocationServiceStatus
+                                                  case LocationServiceStatus
                                                       .unsubscribed:
                                                     return const Icon(
                                                       Icons.location_disabled,
                                                       color: Colors.white,
                                                     );
                                                     break;
-                                                  case UserLocationServiceStatus
+                                                  case LocationServiceStatus
                                                       .subscribed:
                                                   default:
                                                     return const Icon(
