@@ -84,15 +84,17 @@ class _MapPageState extends State<MapPage> {
     PlaceService.nearby(_newGeohash).then((List<Place> value) {
       setState(() {
         places = value
-            .map((Place e) => PlaceMarker(
-                  place: e,
+            .map((Place p) => PlaceMarker(
+                  place: p,
                   anchorPos: AnchorPos.align(AnchorAlign.center),
                   height: 50,
                   width: 50,
-                  point: e.geopoint,
-                  builder: (_) => const Icon(
+                  point: p.geopoint,
+                  builder: (_) => Icon(
                     Icons.location_on,
-                    color: Colors.pink,
+                    color: p.type == Place.TypeMonument
+                        ? Colors.brown
+                        : Colors.pink,
                     size: 50,
                   ),
                 ))

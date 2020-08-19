@@ -64,6 +64,7 @@ class Place {
       this.location,
       this.name,
       this.officialWebsite,
+      this.type,
       @required this.wikidataId,
       this.wikipediaUrl})
       : assert(wikidataId != null);
@@ -110,9 +111,12 @@ class Place {
         location: location,
         name: j['name'][lang] as String,
         officialWebsite: j['officialWebsite'] as String,
+        type: j['type'] as String,
         wikidataId: j['wikidataId'] as String,
         wikipediaUrl: j['wikipediaUrl'][lang] as String);
   }
+
+  static const String TypeMonument = 'monument';
 
   final List<String> aliases;
   final List<String> categories;
@@ -124,6 +128,7 @@ class Place {
   final String location;
   final String name;
   final String officialWebsite;
+  final String type;
   final String wikidataId;
   final String wikipediaUrl;
 }
