@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:latlong/latlong.dart';
 
@@ -55,7 +56,7 @@ class Place {
   Place(
       {this.aliases,
       this.categories,
-      this.coordinateLocation,
+      this.geopoint,
       this.commonsUrl,
       this.description,
       this.extract,
@@ -67,7 +68,7 @@ class Place {
       this.wikipediaUrl})
       : assert(wikidataId != null);
 
-  factory Place.fromJson(Map<dynamic, dynamic> j) {
+  factory Place.fromFirestore(Map<dynamic, dynamic> j) {
     const String lang = 'de';
     String location = j['location'][lang]['location'] as String;
     final String locAdministrative =
@@ -79,11 +80,10 @@ class Place {
         location = location + ', ' + locAdministrative;
       }
     }
-    LatLng coordinateLocation;
-    final double lat = j['coordinateLocation']['latitude'] as double;
-    final double lng = j['coordinateLocation']['longitude'] as double;
-    if (lat != null && lng != null) {
-      coordinateLocation = LatLng(lat, lng);
+    LatLng geopoint;
+    final GeoPoint g = j['geopoint'] as GeoPoint;
+    if (g?.latitude != null && g?.longitude != null) {
+      geopoint = LatLng(g.latitude, g.longitude);
     }
 
     PlaceImage image;
@@ -102,7 +102,7 @@ class Place {
     return Place(
         aliases: List<String>.from(j['aliases'][lang] as List<dynamic>),
         categories: List<String>.from(j['categories'][lang] as List<dynamic>),
-        coordinateLocation: coordinateLocation,
+        geopoint: geopoint,
         commonsUrl: j['commonsUrl'] as String,
         description: j['description'] as String,
         extract: extract,
@@ -116,7 +116,7 @@ class Place {
 
   final List<String> aliases;
   final List<String> categories;
-  final LatLng coordinateLocation;
+  final LatLng geopoint;
   final String commonsUrl;
   final String description;
   final PlaceExtract extract;

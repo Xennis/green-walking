@@ -147,7 +147,7 @@ class _DetailSpeedDial extends StatelessWidget {
       SpeedDialChild(
         onTap: () {
           String uri =
-              'geo:${park.coordinateLocation.latitude},${park.coordinateLocation.longitude}';
+              'geo:${park.geopoint.latitude},${park.geopoint.longitude}';
           if (park.name != null) {
             uri += '?q=${park.name}';
           }
