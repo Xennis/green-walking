@@ -38,7 +38,7 @@ dependencies:
     git:
       ref: feat/fallback-to-magnetic-sensor
       url: https://github.com/Xennis/flutter_compass.git
-  flutter_map: ^0.10.1
+  flutter_map: ^0.10.1+1
   # Use origin once https://github.com/lpongetti/flutter_map_marker_cluster/pull/47 is merged and released.
   flutter_map_marker_cluster:
     git:
