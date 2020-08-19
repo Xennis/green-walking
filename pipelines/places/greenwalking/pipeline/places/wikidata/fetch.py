@@ -109,8 +109,6 @@ class Fetch(PTransform):
         known = (
             input_or_inputs
             | "known/read" >> ReadFromText(self._state_file, validate=False)
-            # | "known/fix_none_issue"
-            # >> Map(lambda element: element.replace('"en": null', '"en": {}').replace('"de": null', '"de": {}'))
             | "known/json_load" >> Map(lambda element: json.loads(element))
         )
 

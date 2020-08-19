@@ -75,6 +75,7 @@ class ProcessDoFn(DoFn):
                         fields.URL: sitelinks.get("enwiki", {}).get("url"),
                     },
                 },
+                fields.TYP: element.get(fields.TYP),
             }
         except Exception as e:
             logging.warning(f"{self.__class__.__name__} error {type(e).__name__}: {e}")
