@@ -17,6 +17,7 @@ import 'package:green_walking/widgets/navigation_drawer.dart';
 import 'package:green_walking/widgets/place_list_tile.dart';
 import 'package:latlong/latlong.dart';
 
+import '../core.dart';
 import '../types/place.dart';
 import '../widgets/map/attribution.dart';
 import 'detail.dart';
@@ -96,9 +97,7 @@ class _MapPageState extends State<MapPage> {
                   point: p.geopoint,
                   builder: (_) => Icon(
                     Icons.location_on,
-                    color: p.type == Place.TypeMonument
-                        ? Colors.brown
-                        : Colors.pink,
+                    color: placeTypeToColor(p.type),
                     size: 50,
                   ),
                 ))
