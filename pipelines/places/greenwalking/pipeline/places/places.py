@@ -1,15 +1,15 @@
 import logging
 from dataclasses import dataclass
-from typing import Tuple, Dict, Iterable, Any, TypeVar, Generator, Optional
+from typing import Tuple, Dict, Iterable, Any, TypeVar, Generator, Optional, List
 
-from apache_beam import Pipeline, ParDo, CoGroupByKey, DoFn, copy, Flatten, MapTuple
+from apache_beam import Pipeline, ParDo, CoGroupByKey, DoFn, copy, Flatten, MapTuple, Map
 from apache_beam.io.filesystems import FileSystems
 from apache_beam.options.pipeline_options import PipelineOptions, SetupOptions
 from google.cloud import firestore
 from google.oauth2 import service_account
 
 from greenwalking.core import language, geohash
-from greenwalking.pipeline.places import wikidata, wikipedia, fields
+from greenwalking.pipeline.places import wikidata, wikipedia, fields, commons
 
 K = TypeVar("K")
 
@@ -20,28 +20,19 @@ class GeoPoint:
     longitude: float
 
 
-class AddType(DoFn):
-    def __init__(self, typ: str):
-        super().__init__()
-        self._typ = typ
-
-    def process(self, element: Dict[str, Any], *args, **kwargs) -> Generator[Dict[str, Any], None, None]:
-        element = copy.copy(element)
-        element[fields.TYP] = self._typ
-        yield element
-
-
 class Combine(DoFn):
 
+    TAG_COMMONS = "commons"
     TAG_WIKIDATA = "wikidata"
     TAG_WIKIPEDIA = "wikipedia"
 
     def process(
-        self, element: Tuple[K, Dict[str, Iterable[Dict[str, Any]]]], *args, **kwargs
+        self, element: Tuple[K, Dict[str, Iterable[Any]]], *args, **kwargs
     ) -> Generator[Tuple[K, Dict[str, Any]], None, None]:
         key, tags = element
-        wikidata_entries = list(tags[self.TAG_WIKIDATA])
-        wikipedia_entries = list(tags[self.TAG_WIKIPEDIA])
+        commons_entries: Iterable[Iterable[Dict[str, Any]]] = tags[self.TAG_COMMONS]
+        wikidata_entries: List[Dict[str, Any]] = list(tags[self.TAG_WIKIDATA])
+        wikipedia_entries: List[Dict[str, Any]] = list(tags[self.TAG_WIKIPEDIA])
 
         # FIXME: Clean that up. Avoid duplicates early.
         # Because of redirect more then 1 is possible
@@ -72,7 +63,29 @@ class Combine(DoFn):
         wikidata[fields.GEOPOINT] = geopoint
         wikidata[fields.GEOHASH] = geohash.encode(latitude=geopoint.latitude, longitude=geopoint.longitude)
 
+        wikidata[fields.IMAGE] = self._filter_images(commons_entries)
+
         yield key, wikidata
+
+    @staticmethod
+    def _filter_images(images: Optional[Iterable[Iterable[Dict[str, Any]]]]) -> Optional[Dict[str, Any]]:
+        if not images:
+            return None
+        for image_infos in images:
+            image_info = list(image_infos)[0]
+            # The artist name is required to show a proper attribution. There are images like
+            # https://commons.wikimedia.org/wiki/File:Lustgarten_3.JPG that have an author but it's not machine-readable
+            # (see categories).
+            if not image_info.get(fields.ARTIST):
+                continue
+            if not image_info.get(fields.LICENSE_SHORT_NAME):
+                continue
+            if not image_info.get(fields.DESCRIPTION_URL):
+                continue
+            # fields.LICENSE_URL can be None, e.g. for public domain
+            return image_info
+
+        return None
 
 
 class FilterLanguage(DoFn):
@@ -199,6 +212,23 @@ SELECT DISTINCT ?item WHERE {
     FILTER(?p IN(wd:Q21573182))
 }"""
 
+    @staticmethod
+    def wd_query_nature() -> str:
+        return """\
+SELECT DISTINCT ?item WHERE {
+    # item (instance of) p
+    ?item wdt:P31 ?p;
+        # item (country) Germany
+        wdt:P17 wd:Q183;
+        # item (coordinate location) coordinate
+        wdt:P625 ?coordinate.
+    # item "has site links"
+    ?article schema:about ?item;
+        schema:isPartOf ?sitelink.
+    # p in (nature reserve in Germany)
+    FILTER(?p IN(wd:Q759421))
+}"""
+
 
 def run(argv=None):
     pipeline_options = PipelineOptions(argv)
@@ -207,7 +237,7 @@ def run(argv=None):
     # the serialization. Details see https://cloud.google.com/dataflow/docs/resources/faq#how_do_i_handle_nameerrors
     pipeline_options.view_as(SetupOptions).save_main_session = options.save_session
     with Pipeline(options=pipeline_options) as p:
-        park_data = (
+        park_ids = (
             p
             | "park/query"
             >> wikidata.Query(
@@ -215,12 +245,10 @@ def run(argv=None):
                 state_file=FileSystems.join(options.base_path, "park-wikidata-ids.txt"),
                 user_agent=options.user_agent,
             )
-            | "park/fetch"
-            >> wikidata.Fetch(FileSystems.join(options.base_path, "park-wikidata-raw-data.json"), user_agent=options.user_agent)
-            | "park/add_type" >> ParDo(AddType("park"))
+            | "park/add_type" >> Map(lambda id: (id, "park"))
         )
 
-        monument_data = (
+        monument_ids = (
             p
             | "monument/query"
             >> wikidata.Query(
@@ -228,23 +256,37 @@ def run(argv=None):
                 state_file=FileSystems.join(options.base_path, "monument-wikidata-ids.txt"),
                 user_agent=options.user_agent,
             )
-            | "monument/fetch"
-            >> wikidata.Fetch(FileSystems.join(options.base_path, "monument-wikidata-raw-data.json"), user_agent=options.user_agent)
-            | "monument/add_type" >> ParDo(AddType("monument"))
+            | "monument/add_type" >> Map(lambda id: (id, "monument"))
         )
 
-        wikidata_data = (
-            [park_data, monument_data] | "wikidata/flatten" >> Flatten() | "wikidata/process" >> ParDo(wikidata.Process())
+        nature_ids = (
+            p
+            | "nature/query"
+            >> wikidata.Query(
+                query=options.wd_query_nature(),
+                state_file=FileSystems.join(options.base_path, "nature-wikidata-ids.txt"),
+                user_agent=options.user_agent,
+            )
+            | "nature/add_type" >> Map(lambda id: (id, "nature"))
         )
 
-        wikipedia_data = (
-            wikidata_data
-            | "wikipedia/fetch" >> wikipedia.Fetch(options.base_path, user_agent=options.user_agent)
-            | "wikipedia/process" >> ParDo(wikipedia.Process())
+        wikidata_data, commons_ids = (
+            [park_ids, monument_ids, nature_ids]
+            | "wikidata/flatten" >> Flatten()
+            | "wikidata/transform"
+            >> wikidata.Transform(FileSystems.join(options.base_path, "wikidata_cache.sqlite"), user_agent=options.user_agent)
+        )
+
+        commons_data = commons_ids | "commons_fetch" >> commons.Transform(
+            FileSystems.join(options.base_path, "commons_cache.sqlite"), user_agent=options.user_agent
+        )
+
+        wikipedia_data = wikidata_data | "wikipedia" >> wikipedia.Transform(
+            FileSystems.join(options.base_path, "wikipedia_qache.sqlite"), user_agent=options.user_agent
         )
 
         places = (
-            {Combine.TAG_WIKIDATA: wikidata_data, Combine.TAG_WIKIPEDIA: wikipedia_data,}
+            {Combine.TAG_COMMONS: commons_data, Combine.TAG_WIKIDATA: wikidata_data, Combine.TAG_WIKIPEDIA: wikipedia_data,}
             | "combine/group_by_key" >> CoGroupByKey()
             | "combine/combine" >> ParDo(Combine())
             | "combine/filter_lang" >> ParDo(FilterLanguage())
