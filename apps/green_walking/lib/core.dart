@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:green_walking/types/place.dart';
+
 String truncateString(String myString, int cutoff) {
   if (myString == null) {
     return null;
@@ -8,4 +11,16 @@ String truncateString(String myString, int cutoff) {
   return (myString.length <= cutoff)
       ? myString
       : '${myString.substring(0, cutoff)}...';
+}
+
+MaterialColor placeTypeToColor(String type) {
+  switch (type) {
+    case Place.TypeMonument:
+      return Colors.brown;
+      break;
+    case Place.TypeNature:
+      return Colors.green;
+    default:
+      return Colors.pink;
+  }
 }
