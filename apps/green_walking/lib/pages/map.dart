@@ -91,7 +91,7 @@ class _MapPageState extends State<MapPage> {
         places = value
             .map((Place p) => PlaceMarker(
                   place: p,
-                  anchorPos: AnchorPos.align(AnchorAlign.center),
+                  anchorPos: AnchorPos.align(AnchorAlign.top),
                   height: 50,
                   width: 50,
                   point: p.geopoint,
