@@ -16,4 +16,7 @@ launcher-icon:
 	flutter pub run flutter_launcher_icons:main
 
 release:
+	@echo ">>> Flutter release web"
+	flutter build web
+	@echo ">>> Flutter release Android"
 	flutter build appbundle
