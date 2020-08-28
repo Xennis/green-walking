@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/plugin_api.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:green_walking/src/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AttributionOptions extends LayerOptions {
@@ -33,7 +33,7 @@ class AttributionLayer extends StatelessWidget {
       child: Row(
         children: <Widget>[
           const Text('  '), // FIXME: Use proper spacing
-          SvgPicture.asset(
+          PlatformSvgPicture.asset(
             attrOptions.logoAssetName,
             semanticsLabel: 'Mapbox',
             width: 80,
