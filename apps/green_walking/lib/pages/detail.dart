@@ -25,7 +25,7 @@ class DetailPage extends StatelessWidget {
       // Use Wikidata description as fallback.
       text = description;
     } else {
-      text = 'Der Park hat bisher keine Beschreibung.';
+      text = 'Der Ort hat bisher keine Beschreibung.';
     }
     return RichText(
         textScaleFactor: 1.1,
