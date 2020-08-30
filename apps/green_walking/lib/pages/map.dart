@@ -159,6 +159,9 @@ class _MapPageState extends State<MapPage> {
                         MarkerLayerOptions(markers: userLocationMarkers),
                         MarkerClusterLayerOptions(
                           size: const Size(40, 40),
+                          fitBoundsOptions: const FitBoundsOptions(
+                            padding: EdgeInsets.all(100),
+                          ),
                           markers: places,
                           builder:
                               (BuildContext context, List<Marker> markers) {
