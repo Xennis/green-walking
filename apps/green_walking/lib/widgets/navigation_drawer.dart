@@ -65,7 +65,7 @@ class NavigationDrawer extends StatelessWidget {
               height: 65,
             ),
             applicationName: 'Green Walking',
-            applicationVersion: 'Version 1.2.0',
+            applicationVersion: 'Version 1.3.0',
             applicationLegalese: 'Entwickelt von Xennis',
             aboutBoxChildren: <Widget>[
               const SizedBox(height: 24),
