@@ -11,6 +11,7 @@ import 'package:flutter_map_location/flutter_map_location.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:green_walking/services/places.dart';
 import 'package:green_walking/services/shared_prefs.dart';
+import 'package:green_walking/src/mapbox.dart';
 import 'package:green_walking/types/marker.dart';
 import 'package:green_walking/widgets/gdpr_dialog.dart';
 import 'package:green_walking/widgets/navigation_drawer.dart';
@@ -63,6 +64,7 @@ class _MapPageState extends State<MapPage> {
   List<PlaceMarker> places = <PlaceMarker>[];
   List<Marker> userLocationMarkers = <Marker>[];
   GeoHash _lastGeohash;
+  MabboxTileset mapboxStyle = MabboxTileset.outdoor;
 
   @override
   void initState() {
@@ -114,6 +116,26 @@ class _MapPageState extends State<MapPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Green Walking'),
+        actions: <Widget>[
+          PopupMenuButton<MabboxTileset>(
+            onSelected: (MabboxTileset style) {
+              setState(() {
+                mapboxStyle = style;
+              });
+            },
+            itemBuilder: (BuildContext context) =>
+                <PopupMenuEntry<MabboxTileset>>[
+              const PopupMenuItem<MabboxTileset>(
+                value: MabboxTileset.outdoor,
+                child: Text('Standard'),
+              ),
+              const PopupMenuItem<MabboxTileset>(
+                value: MabboxTileset.satellite,
+                child: Text('Satellit'),
+              ),
+            ],
+          ),
+        ],
       ),
       drawer: NavigationDrawer(),
       body: FutureBuilder<MapConfig>(
@@ -145,14 +167,14 @@ class _MapPageState extends State<MapPage> {
                       layers: <LayerOptions>[
                         TileLayerOptions(
                           urlTemplate:
-                              'https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
+                              'https://api.mapbox.com/styles/v1/mapbox/${mapboxStyle.id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
                           additionalOptions: <String, String>{
                             'accessToken': snapshot.data.accessToken,
-                            'id': 'outdoors-v11',
+                            // Use if https://github.com/fleaflet/flutter_map/pull/740/ is merged.
+                            //'id': mapboxStyle,
                           },
-                          // It is recommended to use TileProvider with a caching and retry strategy, like
-                          // NetworkTileProvider or CachedNetworkTileProvider
                           tileProvider: const CachedNetworkTileProvider(),
+                          overrideTilesWhenUrlChanges: true,
                         ),
                         // Before MarkerClusterLayerOptions. Otherwise the user location is on top of markers
                         // and especially on top of pop-ups.
@@ -299,7 +321,13 @@ class _MapPageState extends State<MapPage> {
                           },
                         ),
                         AttributionOptions(
-                            logoAssetName: 'assets/mapbox-logo.svg'),
+                            logoAssetName: 'assets/mapbox-logo.svg',
+                            // Use white for satellite layer it's better visible.
+                            color: mapboxStyle == MabboxTileset.satellite
+                                ? Colors.white
+                                : Colors.blueGrey,
+                            satelliteLayer:
+                                mapboxStyle == MabboxTileset.satellite),
                       ]),
                 )
               ]));

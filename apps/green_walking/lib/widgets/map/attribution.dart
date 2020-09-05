@@ -8,12 +8,17 @@ import 'package:url_launcher/url_launcher.dart';
 class AttributionOptions extends LayerOptions {
   AttributionOptions({
     @required this.logoAssetName,
+    this.satelliteLayer = false,
     this.color = Colors.blueGrey,
   })  : assert(logoAssetName != null),
         super();
 
   final Color color;
   final String logoAssetName;
+
+  /// If true additional links required for the satellite layer will be
+  /// displayed.
+  final bool satelliteLayer;
 }
 
 class AttributionLayer extends StatelessWidget {
@@ -28,6 +33,50 @@ class AttributionLayer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AttributionOptions attrOptions = options as AttributionOptions;
+    final List<Widget> links = <Widget>[
+      RichText(
+        text: TextSpan(
+          text: '© Mapbox\n',
+          style: const TextStyle(color: Colors.blue),
+          recognizer: TapGestureRecognizer()
+            ..onTap = () {
+              launch('https://www.mapbox.com/about/maps/');
+            },
+        ),
+      ),
+      RichText(
+        text: TextSpan(
+          text: '© OpenStreetMap\n',
+          style: const TextStyle(color: Colors.blue),
+          recognizer: TapGestureRecognizer()
+            ..onTap = () {
+              launch('http://www.openstreetmap.org/copyright');
+            },
+        ),
+      ),
+      RichText(
+        text: TextSpan(
+          text: 'Verbessere diese Daten',
+          style: const TextStyle(color: Colors.blue),
+          recognizer: TapGestureRecognizer()
+            ..onTap = () {
+              launch('https://www.mapbox.com/map-feedback/');
+            },
+        ),
+      ),
+    ];
+    if (attrOptions.satelliteLayer) {
+      links.add(RichText(
+        text: TextSpan(
+          text: '\n© Maxar',
+          style: const TextStyle(color: Colors.blue),
+          recognizer: TapGestureRecognizer()
+            ..onTap = () {
+              launch('https://www.maxar.com');
+            },
+        ),
+      ));
+    }
     return Align(
       alignment: Alignment.bottomLeft,
       child: Row(
@@ -51,41 +100,7 @@ class AttributionLayer extends StatelessWidget {
                           title: const Text('Mapbox Karte'),
                           content: SingleChildScrollView(
                             child: ListBody(
-                              children: <Widget>[
-                                RichText(
-                                  text: TextSpan(
-                                    text: '© Mapbox\n',
-                                    style: const TextStyle(color: Colors.blue),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () {
-                                        launch(
-                                            'https://www.mapbox.com/about/maps/');
-                                      },
-                                  ),
-                                ),
-                                RichText(
-                                  text: TextSpan(
-                                    text: '© OpenStreetMap\n',
-                                    style: const TextStyle(color: Colors.blue),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () {
-                                        launch(
-                                            'http://www.openstreetmap.org/copyright');
-                                      },
-                                  ),
-                                ),
-                                RichText(
-                                  text: TextSpan(
-                                    text: 'Verbessere diese Daten',
-                                    style: const TextStyle(color: Colors.blue),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () {
-                                        launch(
-                                            'https://www.mapbox.com/map-feedback/');
-                                      },
-                                  ),
-                                ),
-                              ],
+                              children: links,
                             ),
                           ),
                           actions: <Widget>[
