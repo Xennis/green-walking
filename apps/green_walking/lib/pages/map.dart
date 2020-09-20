@@ -160,7 +160,7 @@ class _MapPageState extends State<MapPage> {
                       layers: <LayerOptions>[
                         TileLayerOptions(
                           urlTemplate:
-                              'https://api.mapbox.com/styles/v1/mapbox/${mapboxStyle.id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
+                              'https://api.mapbox.com/styles/v1/${mapboxStyle.id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
                           additionalOptions: <String, String>{
                             'accessToken': snapshot.data.accessToken,
                             // Use if https://github.com/fleaflet/flutter_map/pull/740/ is merged.
