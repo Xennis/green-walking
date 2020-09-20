@@ -152,7 +152,7 @@ class _MapPageState extends State<MapPage> {
                           MarkerClusterPlugin(),
                           LocationPlugin(),
                         ],
-                        minZoom: 12, // zoom out
+                        minZoom: 11, // zoom out
                         maxZoom: 18, // zoom in
                         onTap: (_) => _popupController.hidePopup(),
                         onPositionChanged: onPositionChanged,
