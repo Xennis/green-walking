@@ -29,8 +29,7 @@ class MapConfig {
   String accessToken;
   LatLng lastLocation;
 
-  static Future<MapConfig> create(
-      AssetBundle assetBundle, LatLngBounds mapBounds) async {
+  static Future<MapConfig> create(AssetBundle assetBundle) async {
     // FIXME: Move out here.
     await Firebase.initializeApp();
 
@@ -38,9 +37,7 @@ class MapConfig {
         await assetBundle.loadString('assets/mapbox-access-token.txt');
     LatLng lastLocation =
         await SharedPrefs.getLatLng(SharedPrefs.KEY_LAST_LOCATION);
-    if (lastLocation != null &&
-        mapBounds != null &&
-        !mapBounds.contains(lastLocation)) {
+    if (lastLocation != null) {
       lastLocation = null;
     }
 
@@ -59,8 +56,6 @@ class _MapPageState extends State<MapPage> {
   final MapController mapController = MapController();
   final PopupController _popupController = PopupController();
   // (south-west, north-east)
-  final LatLngBounds _mapBounds =
-      LatLngBounds(LatLng(46.1037, 5.2381), LatLng(55.5286, 16.6275));
   List<PlaceMarker> places = <PlaceMarker>[];
   List<Marker> userLocationMarkers = <Marker>[];
   GeoHash _lastGeohash;
@@ -139,7 +134,7 @@ class _MapPageState extends State<MapPage> {
       ),
       drawer: NavigationDrawer(),
       body: FutureBuilder<MapConfig>(
-          future: MapConfig.create(DefaultAssetBundle.of(context), _mapBounds),
+          future: MapConfig.create(DefaultAssetBundle.of(context)),
           builder: (BuildContext context, AsyncSnapshot<MapConfig> snapshot) {
             if (snapshot.hasData) {
               return Center(
@@ -159,8 +154,6 @@ class _MapPageState extends State<MapPage> {
                         ],
                         minZoom: 12, // zoom out
                         maxZoom: 18, // zoom in
-                        swPanBoundary: _mapBounds.southWest,
-                        nePanBoundary: _mapBounds.northEast,
                         onTap: (_) => _popupController.hidePopup(),
                         onPositionChanged: onPositionChanged,
                       ),
@@ -265,10 +258,6 @@ class _MapPageState extends State<MapPage> {
                             if (loca == null) {
                               Scaffold.of(context).showSnackBar(const SnackBar(
                                   content: Text('Keine Position gefunden')));
-                            } else if (!_mapBounds.contains(loca)) {
-                              Scaffold.of(context).showSnackBar(const SnackBar(
-                                  content: Text(
-                                      'Position außerhalb von Deutschland')));
                             } else {
                               mapController.move(loca, 15.0);
                             }
