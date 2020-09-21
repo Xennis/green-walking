@@ -6,7 +6,7 @@ extension MabboxTilesetExtension on MabboxTileset {
       case MabboxTileset.outdoor:
         return 'xennis/ckfbioyul1iln1ap0pm5hrcgy';
       case MabboxTileset.satellite:
-        return 'mapbox/satellite-streets-v11';
+        return 'xennis/ckfc5mxh33tjg19qvk6m5f5hj';
       default:
         return null;
     }
