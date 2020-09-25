@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:dart_geohash/dart_geohash.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -32,9 +31,6 @@ class MapConfig {
   LatLng lastLocation;
 
   static Future<MapConfig> create(AssetBundle assetBundle) async {
-    // FIXME: Move out here.
-    await Firebase.initializeApp();
-
     final String accessToken =
         await assetBundle.loadString('assets/mapbox-access-token.txt');
     LatLng lastLocation =
