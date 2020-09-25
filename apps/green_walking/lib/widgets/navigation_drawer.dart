@@ -36,15 +36,6 @@ class NavigationDrawer extends StatelessWidget {
               )
             ]),
           ),
-          //const ListTile(
-          //  leading: Icon(Icons.help),
-          //  title: Text('Hilfe'),
-          //),
-          //),
-          //const ListTile(
-          //  leading: Icon(Icons.help),
-          //  title: Text('Support'),
-          //),
           ListTile(
             leading: const Icon(Icons.feedback),
             title: const Text('Feedback senden'),
