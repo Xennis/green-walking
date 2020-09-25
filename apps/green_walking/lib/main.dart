@@ -2,6 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'intl.dart';
 import 'routes.dart';
 
 void main() {
@@ -33,12 +35,13 @@ class GreenWalkingApp extends StatelessWidget {
         return routes;
       }(),
       localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
-        // ... app-specific localization delegate[s] here
+        AppLocalizationsDelegate(),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const <Locale>[
+        Locale('en', ''), // first element is the fallback
         Locale('de', ''),
       ],
     );

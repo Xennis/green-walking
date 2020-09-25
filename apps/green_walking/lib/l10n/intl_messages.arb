@@ -1,0 +1,29 @@
+{
+  "@@last_modified": "2020-09-26T01:50:52.405689",
+  "aboutPage": "About the app",
+  "@aboutPage": {
+    "description": "Label for about page",
+    "type": "text",
+    "placeholders": {}
+  },
+  "aboutVersion": "Version {version}",
+  "@aboutVersion": {
+    "description": "Version on the about page",
+    "type": "text",
+    "placeholders": {
+      "version": {
+        "example": "1.0.0"
+      }
+    }
+  },
+  "aboutLegalese": "Developed by {name}",
+  "@aboutLegalese": {
+    "description": "Developer attribution",
+    "type": "text",
+    "placeholders": {
+      "name": {
+        "example": "Xennis"
+      }
+    }
+  }
+}
