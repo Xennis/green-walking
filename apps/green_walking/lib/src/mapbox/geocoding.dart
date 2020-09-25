@@ -60,7 +60,6 @@ class MapboxGeocoding {
     final Uri url = Uri.https('api.mapbox.com',
         '/geocoding/v5/mapbox.places/$query.json', <String, String>{
       'access_token': token,
-      'country': 'DE',
       'language': 'de',
       'limit': '5',
       'proximity': loc != null ? '${loc.longitude},${loc.latitude}' : ''
