@@ -1,4 +1,4 @@
-check: format-check lint test
+check: lint test
 
 format-check:
 	@echo ">>> Check Dart format"
