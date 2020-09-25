@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:green_walking/routes.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../intl.dart';
+
 class NavigationDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -48,7 +50,7 @@ class NavigationDrawer extends StatelessWidget {
           ),
           const Divider(),
           AboutListTile(
-            child: const Text('Über die App'),
+            child: Text(AppLocalizations.of(context).aboutPage),
             icon: const Icon(Icons.explore),
             applicationIcon: Image.asset(
               'assets/app-icon.png',
@@ -56,8 +58,10 @@ class NavigationDrawer extends StatelessWidget {
               height: 65,
             ),
             applicationName: 'Green Walking',
-            applicationVersion: 'Version 1.4.0',
-            applicationLegalese: 'Entwickelt von Xennis',
+            applicationVersion:
+                AppLocalizations.of(context).aboutVersion('1.4.0'),
+            applicationLegalese:
+                AppLocalizations.of(context).aboutLegalese('Xennis'),
             aboutBoxChildren: <Widget>[
               const SizedBox(height: 24),
               RichText(

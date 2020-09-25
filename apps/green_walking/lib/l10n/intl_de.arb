@@ -1,0 +1,29 @@
+{
+  "@@locale": "de",
+  "aboutPage": "Über die App",
+  "@aboutPage": {
+    "description": "Label for about page",
+    "type": "text",
+    "placeholders": {}
+  },
+  "aboutVersion": "Version {version}",
+  "@aboutVersion": {
+    "description": "Version on the about page",
+    "type": "text",
+    "placeholders": {
+      "version": {
+        "example": "1.0.0"
+      }
+    }
+  },
+  "aboutLegalese": "Entwickelt von {name}",
+  "@aboutLegalese": {
+    "description": "Developer attribution",
+    "type": "text",
+    "placeholders": {
+      "name": {
+        "example": "Xennis"
+      }
+    }
+  }
+}
