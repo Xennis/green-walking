@@ -9,9 +9,11 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_location/flutter_map_location.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
+import 'package:green_walking/pages/search.dart';
 import 'package:green_walking/services/places.dart';
 import 'package:green_walking/services/shared_prefs.dart';
 import 'package:green_walking/src/mapbox.dart';
+import 'package:green_walking/src/mapbox/geocoding.dart';
 import 'package:green_walking/types/marker.dart';
 import 'package:green_walking/widgets/gdpr_dialog.dart';
 import 'package:green_walking/widgets/navigation_drawer.dart';
@@ -53,6 +55,7 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final MapController mapController = MapController();
   final PopupController _popupController = PopupController();
   // (south-west, north-east)
@@ -106,224 +109,268 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    // You can use the userLocationOptions object to change the properties
-    // of UserLocationOptions in runtime
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Green Walking'),
-        actions: <Widget>[
-          PopupMenuButton<MabboxTileset>(
-            onSelected: (MabboxTileset style) {
-              setState(() {
-                mapboxStyle = style;
-              });
-            },
-            itemBuilder: (BuildContext context) =>
-                <PopupMenuEntry<MabboxTileset>>[
-              const PopupMenuItem<MabboxTileset>(
-                value: MabboxTileset.outdoor,
-                child: Text('Standard'),
-              ),
-              const PopupMenuItem<MabboxTileset>(
-                value: MabboxTileset.satellite,
-                child: Text('Satellit'),
-              ),
-            ],
-          ),
-        ],
-      ),
+      key: _scaffoldKey,
       drawer: NavigationDrawer(),
       body: FutureBuilder<MapConfig>(
           future: MapConfig.create(DefaultAssetBundle.of(context)),
           builder: (BuildContext context, AsyncSnapshot<MapConfig> snapshot) {
             if (snapshot.hasData) {
-              return Center(
-                  child: Row(children: <Widget>[
-                Flexible(
-                  child: FlutterMap(
-                      mapController: mapController,
-                      options: MapOptions(
-                        center: (snapshot.data.lastLocation != null)
-                            ? snapshot.data.lastLocation
-                            : LatLng(53.5519, 9.8682),
-                        zoom: 14.0,
-                        plugins: <MapPlugin>[
-                          AttributionPlugin(),
-                          MarkerClusterPlugin(),
-                          LocationPlugin(),
-                        ],
-                        minZoom: 11, // zoom out
-                        maxZoom: 18, // zoom in
-                        onTap: (_) => _popupController.hidePopup(),
-                        onPositionChanged: onPositionChanged,
-                      ),
-                      layers: <LayerOptions>[
-                        TileLayerOptions(
-                          urlTemplate:
-                              'https://api.mapbox.com/styles/v1/${mapboxStyle.id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
-                          additionalOptions: <String, String>{
-                            'accessToken': snapshot.data.accessToken,
-                            // Use if https://github.com/fleaflet/flutter_map/pull/740/ is merged.
-                            //'id': mapboxStyle,
-                          },
-                          tileProvider: const CachedNetworkTileProvider(),
-                          overrideTilesWhenUrlChanges: true,
-                        ),
-                        // Before MarkerClusterLayerOptions. Otherwise the user location is on top of markers
-                        // and especially on top of pop-ups.
-                        MarkerLayerOptions(markers: userLocationMarkers),
-                        MarkerClusterLayerOptions(
-                          size: const Size(40, 40),
-                          fitBoundsOptions: const FitBoundsOptions(
-                            padding: EdgeInsets.all(100),
-                          ),
-                          markers: places,
-                          builder:
-                              (BuildContext context, List<Marker> markers) {
-                            // Avoid using a FloatingActionButton here.
-                            // See https://github.com/lpongetti/flutter_map_marker_cluster/issues/18
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).accentColor,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  markers.length.toString(),
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            );
-                          },
-                          popupOptions: PopupOptions(
-                              popupSnap: PopupSnap.top,
-                              popupController: _popupController,
-                              popupBuilder: (_, Marker marker) {
-                                final Place p = (marker as PlaceMarker).place;
-                                final TextStyle tx = TextStyle(
-                                    color: Theme.of(context).accentColor);
-                                return Container(
-                                  width: 300,
-                                  child: Card(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        PlaceListTile(
-                                          place: p,
-                                        ),
-                                        ButtonBar(
-                                          children: <Widget>[
-                                            FlatButton(
-                                              child: Text('OK', style: tx),
-                                              onPressed: () =>
-                                                  _popupController.hidePopup(),
-                                            ),
-                                            FlatButton(
-                                              child: Text('DETAILS', style: tx),
-                                              onPressed: () {
-                                                if (p == null) {
-                                                  log('no park found');
-                                                  return;
-                                                }
-                                                Navigator.of(context).push<
-                                                        dynamic>(
-                                                    MaterialPageRoute<dynamic>(
-                                                  builder:
-                                                      (BuildContext context) =>
-                                                          DetailPage(
-                                                    park: p,
-                                                  ),
-                                                ));
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }),
-                        ),
-                        LocationOptions(
-                          markers: userLocationMarkers,
-                          onLocationUpdate: (LatLngData ld) {
-                            if (ld == null) {
-                              return;
-                            }
-                            SharedPrefs.setLatLng(
-                                SharedPrefs.KEY_LAST_LOCATION, ld.location);
-                          },
-                          onLocationRequested: (LatLngData ld) {
-                            final LatLng loca = ld?.location;
-                            if (loca == null) {
-                              Scaffold.of(context).showSnackBar(const SnackBar(
-                                  content: Text('Keine Position gefunden')));
-                            } else {
-                              mapController.move(loca, 15.0);
-                            }
-                          },
-                          buttonBuilder: (BuildContext context,
-                              ValueNotifier<LocationServiceStatus> status,
-                              Function onPressed) {
-                            return Align(
-                              // The "right" has not really an affect here.
-                              alignment: Alignment.bottomRight,
-                              child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      bottom: 16.0, right: 16.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: <Widget>[
-                                      FloatingActionButton(
-                                          child: ValueListenableBuilder<
-                                                  LocationServiceStatus>(
-                                              valueListenable: status,
-                                              builder: (BuildContext context,
-                                                  LocationServiceStatus value,
-                                                  Widget child) {
-                                                switch (value) {
-                                                  case LocationServiceStatus
-                                                      .disabled:
-                                                  case LocationServiceStatus
-                                                      .permissionDenied:
-                                                  case LocationServiceStatus
-                                                      .unsubscribed:
-                                                    return const Icon(
-                                                      Icons.location_disabled,
-                                                      color: Colors.white,
-                                                    );
-                                                    break;
-                                                  case LocationServiceStatus
-                                                      .subscribed:
-                                                  default:
-                                                    return const Icon(
-                                                      Icons.location_searching,
-                                                      color: Colors.white,
-                                                    );
-                                                    break;
-                                                }
-                                              }),
-                                          onPressed: () => onPressed()),
-                                    ],
-                                  )),
-                            );
-                          },
-                        ),
-                        AttributionOptions(
-                            logoAssetName: 'assets/mapbox-logo.svg',
-                            // Use white for satellite layer it's better visible.
-                            color: mapboxStyle == MabboxTileset.satellite
-                                ? Colors.white
-                                : Colors.blueGrey,
-                            satelliteLayer:
-                                mapboxStyle == MabboxTileset.satellite),
-                      ]),
-                )
-              ]));
+              return Stack(
+                children: <Widget>[
+                  Center(
+                      child: Row(children: <Widget>[
+                    Flexible(
+                      child: map(snapshot.data),
+                    )
+                  ])),
+                  Positioned(
+                    top: 37,
+                    right: 15,
+                    left: 15,
+                    child: searchBar(snapshot.data.accessToken),
+                  ),
+                ],
+              );
             }
 
             return const Center(child: CircularProgressIndicator());
           }),
     );
+  }
+
+  Widget searchBar(String accessToken) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey[200]),
+      ),
+      child: Row(
+        children: <Widget>[
+          IconButton(
+            splashColor: Colors.grey,
+            icon: const Icon(Icons.menu),
+            onPressed: () {
+              _scaffoldKey.currentState.openDrawer();
+            },
+          ),
+          Expanded(
+            child: TextField(
+              cursorColor: Colors.black,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.go,
+              decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 15),
+                  hintText: 'Suche...'),
+              onSubmitted: (String query) {
+                final Future<LatLng> moveToLoc = Navigator.push(
+                  context,
+                  MaterialPageRoute<LatLng>(
+                      builder: (BuildContext context) => SearchPage(
+                            result: MapboxGeocoding.get(query, accessToken),
+                          )),
+                );
+                moveToLoc.then((LatLng value) {
+                  if (value == null) {
+                    return;
+                  }
+                  mapController.move(value, 14.0);
+                });
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(
+              splashColor: Colors.grey,
+              icon: const Icon(Icons.layers),
+              onPressed: () {
+                if (mapboxStyle == MabboxTileset.satellite) {
+                  setState(() {
+                    mapboxStyle = MabboxTileset.outdoor;
+                  });
+                } else {
+                  setState(() {
+                    mapboxStyle = MabboxTileset.satellite;
+                  });
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget map(MapConfig config) {
+    return FlutterMap(
+        mapController: mapController,
+        options: MapOptions(
+          center: (config.lastLocation != null)
+              ? config.lastLocation
+              : LatLng(53.5519, 9.8682),
+          zoom: 14.0,
+          plugins: <MapPlugin>[
+            AttributionPlugin(),
+            MarkerClusterPlugin(),
+            LocationPlugin(),
+          ],
+          minZoom: 11, // zoom out
+          maxZoom: 18, // zoom in
+          onTap: (_) => _popupController.hidePopup(),
+          onPositionChanged: onPositionChanged,
+        ),
+        layers: <LayerOptions>[
+          TileLayerOptions(
+            urlTemplate:
+                'https://api.mapbox.com/styles/v1/${mapboxStyle.id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
+            additionalOptions: <String, String>{
+              'accessToken': config.accessToken,
+              // Use if https://github.com/fleaflet/flutter_map/pull/740/ is merged.
+              //'id': mapboxStyle,
+            },
+            tileProvider: const CachedNetworkTileProvider(),
+            overrideTilesWhenUrlChanges: true,
+          ),
+          // Before MarkerClusterLayerOptions. Otherwise the user location is on top of markers
+          // and especially on top of pop-ups.
+          MarkerLayerOptions(markers: userLocationMarkers),
+          MarkerClusterLayerOptions(
+            size: const Size(40, 40),
+            fitBoundsOptions: const FitBoundsOptions(
+              padding: EdgeInsets.all(100),
+            ),
+            markers: places,
+            builder: (BuildContext context, List<Marker> markers) {
+              // Avoid using a FloatingActionButton here.
+              // See https://github.com/lpongetti/flutter_map_marker_cluster/issues/18
+              return Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).accentColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    markers.length.toString(),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+              );
+            },
+            popupOptions: PopupOptions(
+                popupSnap: PopupSnap.top,
+                popupController: _popupController,
+                popupBuilder: (_, Marker marker) {
+                  final Place p = (marker as PlaceMarker).place;
+                  final TextStyle tx =
+                      TextStyle(color: Theme.of(context).accentColor);
+                  return Container(
+                    width: 300,
+                    child: Card(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          PlaceListTile(
+                            place: p,
+                          ),
+                          ButtonBar(
+                            children: <Widget>[
+                              FlatButton(
+                                child: Text('OK', style: tx),
+                                onPressed: () => _popupController.hidePopup(),
+                              ),
+                              FlatButton(
+                                child: Text('DETAILS', style: tx),
+                                onPressed: () {
+                                  if (p == null) {
+                                    log('no park found');
+                                    return;
+                                  }
+                                  Navigator.of(context)
+                                      .push<dynamic>(MaterialPageRoute<dynamic>(
+                                    builder: (BuildContext context) =>
+                                        DetailPage(
+                                      park: p,
+                                    ),
+                                  ));
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+          ),
+          LocationOptions(
+            markers: userLocationMarkers,
+            onLocationUpdate: (LatLngData ld) {
+              if (ld == null) {
+                return;
+              }
+              SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, ld.location);
+            },
+            onLocationRequested: (LatLngData ld) {
+              final LatLng loca = ld?.location;
+              if (loca == null) {
+                Scaffold.of(context).showSnackBar(
+                    const SnackBar(content: Text('Keine Position gefunden')));
+              } else {
+                mapController.move(loca, 15.0);
+              }
+            },
+            buttonBuilder: (BuildContext context,
+                ValueNotifier<LocationServiceStatus> status,
+                Function onPressed) {
+              return Align(
+                // The "right" has not really an affect here.
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0, right: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        FloatingActionButton(
+                            child:
+                                ValueListenableBuilder<LocationServiceStatus>(
+                                    valueListenable: status,
+                                    builder: (BuildContext context,
+                                        LocationServiceStatus value,
+                                        Widget child) {
+                                      switch (value) {
+                                        case LocationServiceStatus.disabled:
+                                        case LocationServiceStatus
+                                            .permissionDenied:
+                                        case LocationServiceStatus.unsubscribed:
+                                          return const Icon(
+                                            Icons.location_disabled,
+                                            color: Colors.white,
+                                          );
+                                          break;
+                                        case LocationServiceStatus.subscribed:
+                                        default:
+                                          return const Icon(
+                                            Icons.location_searching,
+                                            color: Colors.white,
+                                          );
+                                          break;
+                                      }
+                                    }),
+                            onPressed: () => onPressed()),
+                      ],
+                    )),
+              );
+            },
+          ),
+          AttributionOptions(
+              logoAssetName: 'assets/mapbox-logo.svg',
+              // Use white for satellite layer it's better visible.
+              color: mapboxStyle == MabboxTileset.satellite
+                  ? Colors.white
+                  : Colors.blueGrey,
+              satelliteLayer: mapboxStyle == MabboxTileset.satellite),
+        ]);
   }
 }
