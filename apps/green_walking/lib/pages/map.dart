@@ -63,6 +63,7 @@ class _MapPageState extends State<MapPage> {
   List<Marker> userLocationMarkers = <Marker>[];
   GeoHash _lastGeohash;
   MabboxTileset mapboxStyle = MabboxTileset.outdoor;
+  LatLng _lastLoc;
 
   @override
   void initState() {
@@ -168,7 +169,8 @@ class _MapPageState extends State<MapPage> {
                   context,
                   MaterialPageRoute<LatLng>(
                       builder: (BuildContext context) => SearchPage(
-                            result: MapboxGeocoding.get(query, accessToken),
+                            result: MapboxGeocoding.get(
+                                query, accessToken, _lastLoc),
                           )),
                 );
                 moveToLoc.then((LatLng value) {
@@ -308,8 +310,10 @@ class _MapPageState extends State<MapPage> {
             markers: userLocationMarkers,
             onLocationUpdate: (LatLngData ld) {
               if (ld == null) {
+                _lastLoc = null;
                 return;
               }
+              _lastLoc = ld.location;
               SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, ld.location);
             },
             onLocationRequested: (LatLngData ld) {
