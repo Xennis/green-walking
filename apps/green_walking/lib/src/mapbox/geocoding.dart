@@ -55,14 +55,15 @@ class MapboxGeocodingService implements Exception {
 }
 
 class MapboxGeocoding {
-  static Future<MapboxGeocodingResult> get(String query, String token) async {
+  static Future<MapboxGeocodingResult> get(
+      String query, String token, LatLng loc) async {
     final Uri url = Uri.https('api.mapbox.com',
         '/geocoding/v5/mapbox.places/$query.json', <String, String>{
       'access_token': token,
       'country': 'DE',
       'language': 'de',
       'limit': '5',
-      //proximity: longitude,latitude
+      'proximity': loc != null ? '${loc.longitude},${loc.latitude}' : ''
     });
     try {
       final http.Response response = await http.get(url);
