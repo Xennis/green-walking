@@ -19,19 +19,19 @@ class NavigationDrawer extends StatelessWidget {
               color: Theme.of(context).accentColor,
             ),
             child: Column(children: <Widget>[
-              Row(children: const <Widget>[
+              Row(children: <Widget>[
                 Text(
-                  'Green Walking',
-                  style: TextStyle(
+                  AppLocalizations.of(context).title,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 22,
                   ),
                 ),
               ]),
               Row(
-                children: const <Widget>[
-                  Text('Entdecke deine grüne Stadt!',
-                      style: TextStyle(
+                children: <Widget>[
+                  Text(AppLocalizations.of(context).slogan,
+                      style: const TextStyle(
                         color: Colors.white70,
                       )),
                 ],
@@ -40,12 +40,12 @@ class NavigationDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.feedback),
-            title: const Text('Feedback senden'),
+            title: Text(AppLocalizations.of(context).feedbackPage),
             onTap: () => Navigator.of(context).pushNamed(Routes.feedback),
           ),
           ListTile(
             leading: const Icon(Icons.settings),
-            title: const Text('Einstellungen'),
+            title: Text(AppLocalizations.of(context).settingsPage),
             onTap: () => Navigator.of(context).pushNamed(Routes.settings),
           ),
           const Divider(),
@@ -57,7 +57,7 @@ class NavigationDrawer extends StatelessWidget {
               width: 65,
               height: 65,
             ),
-            applicationName: 'Green Walking',
+            applicationName: AppLocalizations.of(context).title,
             applicationVersion:
                 AppLocalizations.of(context).aboutVersion('1.4.0'),
             applicationLegalese:

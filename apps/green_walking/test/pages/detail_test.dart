@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:green_walking/intl.dart';
 
 import 'package:green_walking/pages/detail.dart';
 import 'package:green_walking/types/place.dart';
@@ -13,8 +14,11 @@ void main() {
         url: '');
     final Place p = Place(wikidataId: '1234', image: i, categories: <String>[]);
     await tester.pumpWidget(MaterialApp(
+        localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+          AppLocalizationsDelegate()
+        ],
         home: DetailPage(
-      park: p,
-    )));
+          park: p,
+        )));
   });
 }

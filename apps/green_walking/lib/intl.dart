@@ -24,6 +24,78 @@ class AppLocalizations {
 
   final String localeName;
 
+  String get title {
+    return Intl.message(
+      'Green Walking',
+      name: 'title',
+      desc: 'Title of the application',
+      locale: localeName,
+    );
+  }
+
+  String get slogan {
+    return Intl.message(
+      'Discover your green city!',
+      name: 'slogan',
+      desc: 'Slogan of the application',
+      locale: localeName,
+    );
+  }
+
+  String get website {
+    return Intl.message(
+      'Website',
+      name: 'website',
+      desc: 'Website label',
+      locale: localeName,
+    );
+  }
+
+  String get maps {
+    return Intl.message(
+      'Maps',
+      name: 'maps',
+      desc: 'Maps label',
+      locale: localeName,
+    );
+  }
+
+  String get nameless {
+    return Intl.message(
+      'Nameless',
+      name: 'nameless',
+      desc: 'Places without a name',
+      locale: localeName,
+    );
+  }
+
+  String get missingDescription {
+    return Intl.message(
+      'The park has no description yet.',
+      name: 'missingDescription',
+      desc: 'Places without a description',
+      locale: localeName,
+    );
+  }
+
+  String get settingsPage {
+    return Intl.message(
+      'Settings',
+      name: 'settingsPage',
+      desc: 'Label for settings page',
+      locale: localeName,
+    );
+  }
+
+  String get feedbackPage {
+    return Intl.message(
+      'Send feedback',
+      name: 'feedbackPage',
+      desc: 'Label for feedback page',
+      locale: localeName,
+    );
+  }
+
   String get aboutPage {
     return Intl.message(
       'About the app',

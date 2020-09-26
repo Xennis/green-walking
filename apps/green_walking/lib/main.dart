@@ -20,7 +20,8 @@ class GreenWalkingApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Green Walking',
+      onGenerateTitle: (BuildContext context) =>
+          AppLocalizations.of(context).title,
       theme: ThemeData(
         primarySwatch: Colors.green,
         accentColor: Colors.blue,
