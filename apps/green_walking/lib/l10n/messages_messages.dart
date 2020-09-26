@@ -27,6 +27,14 @@ class MessageLookup extends MessageLookupByLibrary {
   static _notInlinedMessages(_) => <String, Function> {
     "aboutLegalese" : m0,
     "aboutPage" : MessageLookupByLibrary.simpleMessage("About the app"),
-    "aboutVersion" : m1
+    "aboutVersion" : m1,
+    "feedbackPage" : MessageLookupByLibrary.simpleMessage("Send feedback"),
+    "maps" : MessageLookupByLibrary.simpleMessage("Maps"),
+    "missingDescription" : MessageLookupByLibrary.simpleMessage("The park has no description yet."),
+    "nameless" : MessageLookupByLibrary.simpleMessage("Nameless"),
+    "settingsPage" : MessageLookupByLibrary.simpleMessage("Settings"),
+    "slogan" : MessageLookupByLibrary.simpleMessage("Discover your green city!"),
+    "title" : MessageLookupByLibrary.simpleMessage("Green Walking"),
+    "website" : MessageLookupByLibrary.simpleMessage("Website")
   };
 }

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import '../core.dart';
+import '../intl.dart';
 import '../types/place.dart';
 import '../widgets/place_list_tile.dart';
 import 'detail_footer.dart';
@@ -17,23 +18,6 @@ class DetailPage extends StatelessWidget {
 
   final Place park;
 
-  Widget _description(PlaceExtract extract, String description) {
-    String text;
-    if (extract?.text != null) {
-      text = extract.text;
-    } else if (description != null) {
-      // Use Wikidata description as fallback.
-      text = description;
-    } else {
-      text = 'Der Ort hat bisher keine Beschreibung.';
-    }
-    return RichText(
-        textScaleFactor: 1.1,
-        text: TextSpan(
-            text: text,
-            style: const TextStyle(color: Colors.black, height: 1.5)));
-  }
-
   // FIXME: Rework this and the functions below.
   Widget _location(String location) {
     if (location == null) {
@@ -42,17 +26,6 @@ class DetailPage extends StatelessWidget {
     return Text(
       truncateString(location, 80),
       style: const TextStyle(color: Colors.grey),
-    );
-  }
-
-  Widget _title(BuildContext context, String name) {
-    String text = 'Namenlos';
-    if (name != null) {
-      text = name;
-    }
-    return Text(
-      truncateString(text, 50),
-      style: Theme.of(context).textTheme.headline4,
     );
   }
 
@@ -96,13 +69,14 @@ class DetailPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  _title(context, park.name),
+                  _Name(name: park.name),
                   _location(park.location),
                   CategoryChips(
                     categories: park.categories,
                     truncateCutoff: 25,
                   ),
-                  _description(park.extract, park.description),
+                  _Description(
+                      extract: park.extract, description: park.description),
                 ],
               ),
             ),
@@ -153,7 +127,7 @@ class _DetailSpeedDial extends StatelessWidget {
           }
           launch(uri);
         },
-        label: 'Maps',
+        label: AppLocalizations.of(context).maps,
         child: const Icon(Icons.map),
         backgroundColor: Colors.pinkAccent,
       ),
@@ -177,7 +151,7 @@ class _DetailSpeedDial extends StatelessWidget {
     if (park.officialWebsite != null) {
       children.add(SpeedDialChild(
         onTap: () => launch(park.officialWebsite),
-        label: 'Webseite',
+        label: AppLocalizations.of(context).website,
         child: const Icon(Icons.web),
         backgroundColor: Colors.blueAccent,
       ));
@@ -186,5 +160,49 @@ class _DetailSpeedDial extends StatelessWidget {
         animatedIcon: AnimatedIcons.menu_close,
         backgroundColor: Theme.of(context).accentColor,
         children: children);
+  }
+}
+
+class _Name extends StatelessWidget {
+  const _Name({Key key, this.name}) : super(key: key);
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    String text = AppLocalizations.of(context).nameless;
+    if (name != null) {
+      text = name;
+    }
+    return Text(
+      truncateString(text, 50),
+      style: Theme.of(context).textTheme.headline4,
+    );
+  }
+}
+
+class _Description extends StatelessWidget {
+  const _Description({Key key, this.extract, this.description})
+      : super(key: key);
+
+  final PlaceExtract extract;
+  final String description;
+
+  @override
+  Widget build(BuildContext context) {
+    String text;
+    if (extract?.text != null) {
+      text = extract.text;
+    } else if (description != null) {
+      // Use Wikidata description as fallback.
+      text = description;
+    } else {
+      text = AppLocalizations.of(context).website;
+    }
+    return RichText(
+        textScaleFactor: 1.1,
+        text: TextSpan(
+            text: text,
+            style: const TextStyle(color: Colors.black, height: 1.5)));
   }
 }
