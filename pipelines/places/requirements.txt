@@ -1,9 +1,9 @@
-apache-beam==2.22.0
-beautifulsoup4==4.9.1
-google-cloud-firestore==1.8.1
+apache-beam==2.24.0
+beautifulsoup4==4.9.2
+google-cloud-firestore==1.9.0
 sparqlwrapper==1.8.5
-sqlitedict==1.6.0
+sqlitedict==1.7.0
 # CI only:
 black==19.10b0  # Code format
-pylint==2.5.3  # Lint
+pylint==2.6.0  # Lint
 mypy==0.782  # Type check
