@@ -1,3 +1,5 @@
+.PHONY: check test format-check format mypy
+
 check: format-check mypy test
 
 test:
