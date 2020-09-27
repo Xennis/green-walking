@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:green_walking/types/language.dart';
 import 'package:latlong/latlong.dart';
 
 class PlaceExtract {
@@ -69,8 +70,8 @@ class Place {
       this.wikipediaUrl})
       : assert(wikidataId != null);
 
-  factory Place.fromFirestore(Map<dynamic, dynamic> j) {
-    const String lang = 'de';
+  factory Place.fromFirestore(Map<dynamic, dynamic> j, Language language) {
+    final String lang = language.code.toLowerCase();
     String location = j['location'][lang]['location'] as String;
     final String locAdministrative =
         j['location'][lang]['administrative'] as String;
