@@ -22,10 +22,6 @@ class FeedbackPage extends StatelessWidget {
                 style: const TextStyle(color: Colors.black),
                 children: <InlineSpan>[
                   TextSpan(
-                    text: '${locale.feedbackSendLabel}\n\n',
-                    style: Theme.of(context).textTheme.headline5,
-                  ),
-                  TextSpan(
                     text: '${locale.feedbackPageText}\n',
                   ),
                 ],
