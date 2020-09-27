@@ -23,10 +23,6 @@ class ImprintPage extends StatelessWidget {
                 style: const TextStyle(color: Colors.black),
                 children: <InlineSpan>[
                   TextSpan(
-                    text: '${locale.imprint}\n\n',
-                    style: Theme.of(context).textTheme.headline5,
-                  ),
-                  TextSpan(
                     text: '${locale.imprintTmgText('5')}:\n\n',
                   ),
                   const TextSpan(
