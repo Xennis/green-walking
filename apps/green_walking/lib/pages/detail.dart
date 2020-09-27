@@ -52,9 +52,11 @@ class DetailPage extends StatelessWidget {
               pinned: false,
               automaticallyImplyLeading: true,
               leading: IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.arrow_back,
                   color: Colors.white,
+                  semanticLabel:
+                      MaterialLocalizations.of(context).backButtonTooltip,
                 ),
                 onPressed: () => Navigator.pop(context, false),
               ),

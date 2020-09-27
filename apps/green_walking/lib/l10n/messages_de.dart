@@ -21,20 +21,67 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(name) => "Entwickelt von ${name}";
 
-  static m1(version) => "Version ${version}";
+  static m1(name) => "${name} Repository";
+
+  static m2(version) => "Version ${version}";
+
+  static m3(appName) => "${appName} Feedback";
+
+  static m4(mail) => "Mail an ${mail} senden";
+
+  static m5(paragraphNumber) => "Angaben gemäß § ${paragraphNumber} TMG";
+
+  static m6(name) => "${name} Karte";
+
+  static m7(name) => "Powered by ${name}";
+
+  static m8(dots) => "Suche${dots}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
     "aboutLegalese" : m0,
     "aboutPage" : MessageLookupByLibrary.simpleMessage("Über die App"),
-    "aboutVersion" : m1,
+    "aboutRepository" : m1,
+    "aboutSourceCodeText" : MessageLookupByLibrary.simpleMessage("Um den Quellcode der App zu sehen, besuche bitte das"),
+    "aboutVersion" : m2,
+    "appSlogan" : MessageLookupByLibrary.simpleMessage("Entdecke deine grüne Stadt!"),
+    "appTitle" : MessageLookupByLibrary.simpleMessage("Green Walking"),
+    "attributionInfoSemanticLabel" : MessageLookupByLibrary.simpleMessage("Copyright-Informationen anzeigen"),
+    "dataPrivacyNavigationLabel" : MessageLookupByLibrary.simpleMessage("Datenschutz"),
+    "details" : MessageLookupByLibrary.simpleMessage("Details"),
+    "errorNoConnectionToSearchServer" : MessageLookupByLibrary.simpleMessage("Keine Verbindung zum Suchserver"),
+    "errorNoPositionFound" : MessageLookupByLibrary.simpleMessage("Keine Position gefunden"),
+    "feedbackMailSubject" : m3,
     "feedbackPage" : MessageLookupByLibrary.simpleMessage("Feedback senden"),
+    "feedbackPageText" : MessageLookupByLibrary.simpleMessage("Du hast Feedback für die App? Zögere nicht und sende es uns zu, um damit die App zu verbessern.\n\nDu kannst zum Beispiel Feedback geben zu dem Design und der Bedienbarkeit der App, nicht angezeigten Grünanlagen, wünschenswerten Funktionen, Fehlern oder Funktionen, die dir besonders gut gefallen."),
+    "feedbackSendLabel" : MessageLookupByLibrary.simpleMessage("Feedback senden"),
+    "feedbackSendMailToLabel" : m4,
+    "gdprAgree" : MessageLookupByLibrary.simpleMessage("Einverstanden"),
+    "gdprDialogText" : MessageLookupByLibrary.simpleMessage("Für das beste Erlebnis aktiviert die App Tracking. Weiter Infos erhälst du in der"),
+    "gdprDisagree" : MessageLookupByLibrary.simpleMessage("Nein danke"),
+    "gdprPrivacyPolicy" : MessageLookupByLibrary.simpleMessage("Datenschutzerklärung"),
+    "image" : MessageLookupByLibrary.simpleMessage("Foto"),
+    "imprint" : MessageLookupByLibrary.simpleMessage("Impressum"),
+    "imprintDisclaimerLabel" : MessageLookupByLibrary.simpleMessage("Haftungshinweis"),
+    "imprintDisclaimerText" : MessageLookupByLibrary.simpleMessage("Wir übernehmen keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich."),
+    "imprintGdprApplyText" : MessageLookupByLibrary.simpleMessage("Es gilt die"),
+    "imprintTmgText" : m5,
+    "improveData" : MessageLookupByLibrary.simpleMessage("Verbessere diese Daten"),
+    "mapAttributionTitle" : m6,
+    "mapSwitchLayerSemanticLabel" : MessageLookupByLibrary.simpleMessage("Kartenansicht wechseln"),
     "maps" : MessageLookupByLibrary.simpleMessage("Maps"),
-    "missingDescription" : MessageLookupByLibrary.simpleMessage("Der Park hat bisher keine Beschreibung."),
+    "metaDataAttributionTitle" : MessageLookupByLibrary.simpleMessage("Daten"),
+    "missingDescription" : MessageLookupByLibrary.simpleMessage("Der Ort hat bisher keine Beschreibung."),
     "nameless" : MessageLookupByLibrary.simpleMessage("Namenlos"),
+    "ok" : MessageLookupByLibrary.simpleMessage("Ok"),
+    "openInBrowserSemanticLabel" : MessageLookupByLibrary.simpleMessage("Im Browser öffnen"),
+    "poweredBy" : m7,
+    "searchBoxHintLabel" : m8,
+    "searchNoResultsText" : MessageLookupByLibrary.simpleMessage("Keine Treffer gefunden"),
+    "searchResults" : MessageLookupByLibrary.simpleMessage("Ergebnisse"),
     "settingsPage" : MessageLookupByLibrary.simpleMessage("Einstellungen"),
-    "slogan" : MessageLookupByLibrary.simpleMessage("Entdecke deine grüne Stadt!"),
-    "title" : MessageLookupByLibrary.simpleMessage("Green Walking"),
+    "settingsTrackingDescription" : MessageLookupByLibrary.simpleMessage("Trackingdienst aktivieren"),
+    "text" : MessageLookupByLibrary.simpleMessage("Text"),
     "website" : MessageLookupByLibrary.simpleMessage("Webseite")
   };
 }

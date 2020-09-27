@@ -21,20 +21,67 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(name) => "Developed by ${name}";
 
-  static m1(version) => "Version ${version}";
+  static m1(name) => "${name} repository";
+
+  static m2(version) => "Version ${version}";
+
+  static m3(appName) => "${appName} Feedback";
+
+  static m4(mail) => "Send mail to ${mail}";
+
+  static m5(paragraphNumber) => "Information in accordance with § ${paragraphNumber} TMG";
+
+  static m6(name) => "${name} map";
+
+  static m7(name) => "Powered by ${name}";
+
+  static m8(dots) => "Search${dots}";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
     "aboutLegalese" : m0,
     "aboutPage" : MessageLookupByLibrary.simpleMessage("About the app"),
-    "aboutVersion" : m1,
+    "aboutRepository" : m1,
+    "aboutSourceCodeText" : MessageLookupByLibrary.simpleMessage("To see the source code of this app, please visit the"),
+    "aboutVersion" : m2,
+    "appSlogan" : MessageLookupByLibrary.simpleMessage("Discover your green city!"),
+    "appTitle" : MessageLookupByLibrary.simpleMessage("Green Walking"),
+    "attributionInfoSemanticLabel" : MessageLookupByLibrary.simpleMessage("Display attribution"),
+    "dataPrivacyNavigationLabel" : MessageLookupByLibrary.simpleMessage("Data privacy"),
+    "details" : MessageLookupByLibrary.simpleMessage("details"),
+    "errorNoConnectionToSearchServer" : MessageLookupByLibrary.simpleMessage("No connection to search server"),
+    "errorNoPositionFound" : MessageLookupByLibrary.simpleMessage("No position found"),
+    "feedbackMailSubject" : m3,
     "feedbackPage" : MessageLookupByLibrary.simpleMessage("Send feedback"),
+    "feedbackPageText" : MessageLookupByLibrary.simpleMessage("Don\'t hesitate to send your feedback and help to improve the app. Tell us what is good, bad or missing."),
+    "feedbackSendLabel" : MessageLookupByLibrary.simpleMessage("Send feedback"),
+    "feedbackSendMailToLabel" : m4,
+    "gdprAgree" : MessageLookupByLibrary.simpleMessage("Agreed"),
+    "gdprDialogText" : MessageLookupByLibrary.simpleMessage("For the best experiance the app enables tracking. Further information can be found in the"),
+    "gdprDisagree" : MessageLookupByLibrary.simpleMessage("No thanks"),
+    "gdprPrivacyPolicy" : MessageLookupByLibrary.simpleMessage("privacy policy"),
+    "image" : MessageLookupByLibrary.simpleMessage("Image"),
+    "imprint" : MessageLookupByLibrary.simpleMessage("Imprint"),
+    "imprintDisclaimerLabel" : MessageLookupByLibrary.simpleMessage("Disclaimer"),
+    "imprintDisclaimerText" : MessageLookupByLibrary.simpleMessage("We decline any liability for the contents of external links, for which only the respective webmasters are responsible."),
+    "imprintGdprApplyText" : MessageLookupByLibrary.simpleMessage("The following policy is applied:"),
+    "imprintTmgText" : m5,
+    "improveData" : MessageLookupByLibrary.simpleMessage("Improve the data"),
+    "mapAttributionTitle" : m6,
+    "mapSwitchLayerSemanticLabel" : MessageLookupByLibrary.simpleMessage("Switch map layer"),
     "maps" : MessageLookupByLibrary.simpleMessage("Maps"),
+    "metaDataAttributionTitle" : MessageLookupByLibrary.simpleMessage("Data"),
     "missingDescription" : MessageLookupByLibrary.simpleMessage("The park has no description yet."),
     "nameless" : MessageLookupByLibrary.simpleMessage("Nameless"),
+    "ok" : MessageLookupByLibrary.simpleMessage("ok"),
+    "openInBrowserSemanticLabel" : MessageLookupByLibrary.simpleMessage("Open in browser"),
+    "poweredBy" : m7,
+    "searchBoxHintLabel" : m8,
+    "searchNoResultsText" : MessageLookupByLibrary.simpleMessage("No hits found"),
+    "searchResults" : MessageLookupByLibrary.simpleMessage("Results"),
     "settingsPage" : MessageLookupByLibrary.simpleMessage("Settings"),
-    "slogan" : MessageLookupByLibrary.simpleMessage("Discover your green city!"),
-    "title" : MessageLookupByLibrary.simpleMessage("Green Walking"),
+    "settingsTrackingDescription" : MessageLookupByLibrary.simpleMessage("Enable tracking service"),
+    "text" : MessageLookupByLibrary.simpleMessage("Text"),
     "website" : MessageLookupByLibrary.simpleMessage("Website")
   };
 }

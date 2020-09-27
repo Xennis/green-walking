@@ -71,10 +71,10 @@ class MapboxGeocoding {
             json.decode(response.body) as Map<String, dynamic>);
       } else {
         throw MapboxGeocodingService(
-            'Keine Verbindung zum Suchserver (Code: ${response.statusCode})');
+            'Invalid ${response.statusCode} response from API');
       }
     } on SocketException catch (_) {
-      throw MapboxGeocodingService('Keine Internetverbindung');
+      throw MapboxGeocodingService('No internet connection');
     }
   }
 }

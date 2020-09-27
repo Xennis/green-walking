@@ -20,6 +20,7 @@ import 'package:green_walking/widgets/place_list_tile.dart';
 import 'package:latlong/latlong.dart';
 
 import '../core.dart';
+import '../intl.dart';
 import '../types/place.dart';
 import '../widgets/map/attribution.dart';
 import 'detail.dart';
@@ -118,14 +119,14 @@ class _MapPageState extends State<MapPage> {
                   Center(
                       child: Row(children: <Widget>[
                     Flexible(
-                      child: map(snapshot.data),
+                      child: map(context, snapshot.data),
                     )
                   ])),
                   Positioned(
                     top: 37,
                     right: 15,
                     left: 15,
-                    child: searchBar(snapshot.data.accessToken),
+                    child: searchBar(context, snapshot.data.accessToken),
                   ),
                 ],
               );
@@ -136,7 +137,8 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Widget searchBar(String accessToken) {
+  Widget searchBar(BuildContext context, String accessToken) {
+    final AppLocalizations locale = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -146,7 +148,9 @@ class _MapPageState extends State<MapPage> {
         children: <Widget>[
           IconButton(
             splashColor: Colors.grey,
-            icon: const Icon(Icons.menu),
+            icon: Icon(Icons.menu,
+                semanticLabel:
+                    MaterialLocalizations.of(context).openAppDrawerTooltip),
             onPressed: () {
               _scaffoldKey.currentState.openDrawer();
             },
@@ -156,10 +160,10 @@ class _MapPageState extends State<MapPage> {
               cursorColor: Colors.black,
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.go,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 15),
-                  hintText: 'Suche...'),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+                  hintText: locale.searchBoxHintLabel('...')),
               onSubmitted: (String query) {
                 final Future<LatLng> moveToLoc = Navigator.push(
                   context,
@@ -182,7 +186,10 @@ class _MapPageState extends State<MapPage> {
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
               splashColor: Colors.grey,
-              icon: const Icon(Icons.layers),
+              icon: Icon(
+                Icons.layers,
+                semanticLabel: locale.mapSwitchLayerSemanticLabel,
+              ),
               onPressed: () {
                 if (mapboxStyle == MabboxTileset.satellite) {
                   setState(() {
@@ -201,7 +208,8 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Widget map(MapConfig config) {
+  Widget map(BuildContext context, MapConfig config) {
+    final AppLocalizations locale = AppLocalizations.of(context);
     return FlutterMap(
         mapController: mapController,
         options: MapOptions(
@@ -275,11 +283,12 @@ class _MapPageState extends State<MapPage> {
                           ButtonBar(
                             children: <Widget>[
                               FlatButton(
-                                child: Text('OK', style: tx),
+                                child: Text(locale.ok.toUpperCase(), style: tx),
                                 onPressed: () => _popupController.hidePopup(),
                               ),
                               FlatButton(
-                                child: Text('DETAILS', style: tx),
+                                child: Text(locale.details.toUpperCase(),
+                                    style: tx),
                                 onPressed: () {
                                   if (p == null) {
                                     log('no park found');
@@ -316,7 +325,7 @@ class _MapPageState extends State<MapPage> {
               final LatLng loca = ld?.location;
               if (loca == null) {
                 Scaffold.of(context).showSnackBar(
-                    const SnackBar(content: Text('Keine Position gefunden')));
+                    SnackBar(content: Text(locale.errorNoPositionFound)));
               } else {
                 mapController.move(loca, 15.0);
               }

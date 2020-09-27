@@ -3,6 +3,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:green_walking/services/shared_prefs.dart';
 
+import '../intl.dart';
+
 class SettingsPage extends StatefulWidget {
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -13,9 +15,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations locale = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Einstellungen'),
+        title: Text(locale.settingsPage),
       ),
       body: Center(
         child: Column(
@@ -28,12 +31,12 @@ class _SettingsPageState extends State<SettingsPage> {
                 children: <Widget>[
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const <Widget>[
-                      Text('Google Analytics',
+                    children: <Widget>[
+                      const Text('Google Analytics',
                           style: TextStyle(fontSize: 16.0)),
                       Text(
-                        'Trackingdienst aktivieren',
-                        style: TextStyle(color: Colors.grey),
+                        locale.settingsTrackingDescription,
+                        style: const TextStyle(color: Colors.grey),
                       ),
                     ],
                   ),
