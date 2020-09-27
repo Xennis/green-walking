@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:green_walking/src/mapbox/geocoding.dart';
+import 'package:green_walking/services/mapbox_geocoding.dart';
 
 import '../core.dart';
 import '../intl.dart';
@@ -45,7 +45,7 @@ class SearchPage extends StatelessWidget {
                 child: ListView.builder(
               itemCount: snapshot.data.features.length,
               itemBuilder: (BuildContext context, int index) {
-                final MaboxGeocordingPlace elem = snapshot.data.features[index];
+                final MaboxGeocodingPlace elem = snapshot.data.features[index];
                 final String subtitle = truncateString(
                     elem.placeName.replaceFirst(elem.text + ', ', ''), 65);
                 return Card(

@@ -8,22 +8,22 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_location/flutter_map_location.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
+import 'package:green_walking/pages/map/tileset.dart';
 import 'package:green_walking/pages/search.dart';
+import 'package:green_walking/services/mapbox_geocoding.dart';
 import 'package:green_walking/services/places.dart';
 import 'package:green_walking/services/shared_prefs.dart';
-import 'package:green_walking/src/mapbox.dart';
-import 'package:green_walking/src/mapbox/geocoding.dart';
 import 'package:green_walking/types/marker.dart';
 import 'package:green_walking/widgets/gdpr_dialog.dart';
 import 'package:green_walking/widgets/navigation_drawer.dart';
 import 'package:green_walking/widgets/place_list_tile.dart';
 import 'package:latlong/latlong.dart';
 
-import '../core.dart';
-import '../intl.dart';
-import '../types/place.dart';
-import '../widgets/map/attribution.dart';
-import 'detail.dart';
+import '../../core.dart';
+import '../../intl.dart';
+import '../../types/place.dart';
+import '../detail/detail.dart';
+import 'attribution.dart';
 
 class MapConfig {
   MapConfig({this.accessToken, this.lastLocation});

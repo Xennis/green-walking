@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:green_walking/intl.dart';
 
-import 'package:green_walking/pages/detail.dart';
+import 'package:green_walking/pages/detail/detail.dart';
 import 'package:green_walking/types/place.dart';
 
 void main() {

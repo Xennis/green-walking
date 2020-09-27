@@ -1,13 +1,15 @@
+library mapbox_geocoding;
+
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:latlong/latlong.dart';
 
-class MaboxGeocordingPlace {
-  MaboxGeocordingPlace({this.text, this.placeName, this.center});
+class MaboxGeocodingPlace {
+  MaboxGeocodingPlace({this.text, this.placeName, this.center});
 
-  factory MaboxGeocordingPlace.fromJson(Map<String, dynamic> raw) {
+  factory MaboxGeocodingPlace.fromJson(Map<String, dynamic> raw) {
     final List<dynamic> rawCenter = raw['center'] as List<dynamic>;
     LatLng center;
     if (rawCenter.length == 2) {
@@ -16,7 +18,7 @@ class MaboxGeocordingPlace {
       center = LatLng(rawLat is int ? rawLat.toDouble() : rawLat as double,
           rawLng is int ? rawLng.toDouble() : rawLng as double);
     }
-    return MaboxGeocordingPlace(
+    return MaboxGeocodingPlace(
       text: raw['text_de'] as String,
       placeName: raw['place_name_de'] as String,
       center: center,
@@ -36,8 +38,8 @@ class MapboxGeocodingResult {
     return MapboxGeocodingResult(
         features: features
             .map((dynamic e) => e as Map<String, dynamic>)
-            .map((Map<String, dynamic> e) => MaboxGeocordingPlace.fromJson(e))
-            .where((MaboxGeocordingPlace element) =>
+            .map((Map<String, dynamic> e) => MaboxGeocodingPlace.fromJson(e))
+            .where((MaboxGeocodingPlace element) =>
                 element.text != null &&
                 element.placeName != null &&
                 element.center != null)
@@ -45,7 +47,7 @@ class MapboxGeocodingResult {
         attribution: raw['attribution'] as String);
   }
 
-  final List<MaboxGeocordingPlace> features;
+  final List<MaboxGeocodingPlace> features;
   final String attribution;
 }
 
