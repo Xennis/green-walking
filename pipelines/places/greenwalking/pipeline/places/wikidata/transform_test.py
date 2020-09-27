@@ -33,7 +33,7 @@ class TestCacheFetch(unittest.TestCase):
                 actual = (
                     p
                     | Create([("Q1234", "park"), ("Q54321", "park")])
-                    | ParDo(_CachedFetch(cache_file, user_agent="some-agent")).with_outputs(
+                    | ParDo(_CachedFetch(languages=[], cache_file=cache_file, user_agent="some-agent")).with_outputs(
                         Transform._TAG_COMMONS, main=Transform._TAG_MAIN
                     )
                 )

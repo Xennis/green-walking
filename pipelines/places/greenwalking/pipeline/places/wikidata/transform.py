@@ -17,8 +17,9 @@ class _CachedFetch(DoFn):
     _CACHE_KEY_MAIN = "main"
     _CACHE_KEY_COMMONS = "commons"
 
-    def __init__(self, cache_file: str, user_agent: str):
+    def __init__(self, languages: List[language.Language], cache_file: str, user_agent: str):
         super().__init__()
+        self._languages = languages
         self._cache_file = cache_file
         self._user_agent = user_agent
         self._client = None
@@ -78,7 +79,7 @@ class _CachedFetch(DoFn):
         # Limit to a few fields to reduce the memory consumption of the cache and the amount of data in the output. For
         # example the entity Germany of the property country is a really large entity.
         data = {
-            "labels": {language.GERMAN: labels.get(language.GERMAN, {}), language.ENGLISH: labels.get(language.ENGLISH, {})},
+            "labels": {lang: labels.get(lang, {}) for lang in self._languages},
             "claims": {"instance of": resp.get("claims", {}).get("P31")},
         }
         self._cache_entities[entity_id] = data
@@ -115,6 +116,10 @@ class _CachedFetch(DoFn):
 
 
 class _Process(DoFn):
+    def __init__(self, languages: List[language.Language]):
+        super().__init__()
+        self._languages = languages
+
     def process(
         self, element: Tuple[Tuple[Any, Tuple[country.Country, Typ]], Dict[str, Any]], *args, **kwargs
     ) -> Generator[Tuple[str, Dict[str, Any]], None, None]:
@@ -136,52 +141,33 @@ class _Process(DoFn):
 
         try:
             yield wikidata_id, {
-                "aliases": {
-                    language.GERMAN: [e.get("value") for e in aliases.get(language.GERMAN, [])],
-                    language.ENGLISH: [e.get("value") for e in aliases.get(language.ENGLISH, [])],
-                },
-                "categories": {
-                    language.GERMAN: self._create_categories(
-                        language.GERMAN, instance_of, heritage_designation=heritage_designation
-                    ),
-                    language.ENGLISH: self._create_categories(
-                        language.ENGLISH, instance_of, heritage_designation=heritage_designation
-                    ),
+                fields.ALIASES: {lang: [e.get("value") for e in aliases.get(lang, [])] for lang in self._languages},
+                fields.CATEGORIES: {
+                    lang: self._create_categories(lang, instance_of, heritage_designation=heritage_designation)
+                    for lang in self._languages
                 },
                 fields.GEOPOINT: {
                     fields.LATITUDE: coordinate_location[0].get("latitude") if coordinate_location else None,
                     fields.LONGITUDE: coordinate_location[0].get("longitude") if coordinate_location else None,
                 },
                 "commonsUrl": sitelinks.get("commonswiki", {}).get("url"),
-                "descriptions": {
-                    language.GERMAN: descriptions.get(language.GERMAN, {}).get("value"),
-                    language.ENGLISH: descriptions.get(language.ENGLISH, {}).get("value"),
+                fields.DESCRIPTION: {lang: descriptions.get(lang, {}).get("value") for lang in self._languages},
+                fields.LOCATION: {
+                    lang: {
+                        "location": location[0].get(lang, {}).get("value") if location else None,
+                        "administrative": administrative[0].get(lang, {}).get("value") if administrative else None,
+                    }
+                    for lang in self._languages
                 },
-                "location": {
-                    language.GERMAN: {
-                        "location": location[0].get(language.GERMAN, {}).get("value") if location else None,
-                        "administrative": administrative[0].get(language.GERMAN, {}).get("value") if administrative else None,
-                    },
-                    language.ENGLISH: {
-                        "location": location[0].get(language.ENGLISH, {}).get("value") if location else None,
-                        "administrative": administrative[0].get(language.ENGLISH, {}).get("value") if administrative else None,
-                    },
-                },
-                "name": {
-                    language.GERMAN: labels.get(language.GERMAN, {}).get("value"),
-                    language.ENGLISH: labels.get(language.ENGLISH, {}).get("value"),
-                },
+                fields.NAME: {lang: labels.get(lang, {}).get("value") for lang in self._languages},
                 "officialWebsite": officialWebsite[0] if officialWebsite else None,
                 fields.WIKIDATA_ID: wikidata_id,
                 fields.WIKIPEDIA: {
-                    language.GERMAN: {
-                        fields.TITLE: sitelinks.get("dewiki", {}).get("title"),
-                        fields.URL: sitelinks.get("dewiki", {}).get("url"),
-                    },
-                    language.ENGLISH: {
-                        fields.TITLE: sitelinks.get("enwiki", {}).get("title"),
-                        fields.URL: sitelinks.get("enwiki", {}).get("url"),
-                    },
+                    lang: {
+                        fields.TITLE: sitelinks.get("{}wiki".format(lang.lower()), {}).get("title"),
+                        fields.URL: sitelinks.get("{}wiki".format(lang.lower()), {}).get("url"),
+                    }
+                    for lang in self._languages
                 },
                 fields.COUNTRY: country,
                 fields.TYP: typ,
@@ -216,7 +202,9 @@ class _Process(DoFn):
         return res
 
     @staticmethod
-    def _create_categories(lang: str, instance_of: List[Dict[str, Any]], heritage_designation: List[Dict[str, Any]]) -> List[str]:
+    def _create_categories(
+        lang: language.Language, instance_of: List[Dict[str, Any]], heritage_designation: List[Dict[str, Any]]
+    ) -> List[str]:
         res = []
         for category in instance_of + heritage_designation:
             label: Optional[str] = category.get(lang, {}).get("value")
@@ -239,8 +227,9 @@ class Transform(PTransform):
     _TAG_MAIN = "main"
     _TAG_COMMONS = "commons"
 
-    def __init__(self, cache_file: str, user_agent: str, **kwargs):
+    def __init__(self, languages: List[language.Language], cache_file: str, user_agent: str, **kwargs):
         super().__init__(**kwargs)
+        self._languages = languages
         self._cache_file = cache_file
         self._user_agent = user_agent
 
@@ -249,9 +238,9 @@ class Transform(PTransform):
             input_or_inputs
             # FIXME: Avoid ParDo here to not do parallel requests
             | "fetch"
-            >> ParDo(_CachedFetch(self._cache_file, user_agent=self._user_agent)).with_outputs(
+            >> ParDo(_CachedFetch(self._languages, cache_file=self._cache_file, user_agent=self._user_agent)).with_outputs(
                 self._TAG_COMMONS, main=self._TAG_MAIN
             )
         )
-        wikidata_data = wikidata_commons_data[self._TAG_MAIN] | "process" >> ParDo(_Process())
+        wikidata_data = wikidata_commons_data[self._TAG_MAIN] | "process" >> ParDo(_Process(self._languages))
         return wikidata_data, wikidata_commons_data[self._TAG_COMMONS]
