@@ -34,7 +34,7 @@ class _CachedFetch(DoFn):
 
         key, title_per_lang = element
         if key in self._cache:
-            logging.info("wikipedia qached %s", key)
+            logging.info("wikipedia cached %s", key)
             yield key, self._cache[key]
             return
 

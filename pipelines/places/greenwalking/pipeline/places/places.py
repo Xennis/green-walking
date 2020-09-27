@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass
 from typing import Tuple, Dict, Iterable, Any, TypeVar, Generator, Optional, List
 
-from apache_beam import Pipeline, ParDo, CoGroupByKey, DoFn, copy, Flatten, MapTuple, Map
+from apache_beam import Pipeline, ParDo, CoGroupByKey, DoFn, copy, Flatten, MapTuple, Map, Create
 from apache_beam.io.filesystems import FileSystems
 from apache_beam.options.pipeline_options import PipelineOptions, SetupOptions
 from google.cloud import firestore
@@ -237,47 +237,25 @@ def run(argv=None):
     # the serialization. Details see https://cloud.google.com/dataflow/docs/resources/faq#how_do_i_handle_nameerrors
     pipeline_options.view_as(SetupOptions).save_main_session = options.save_session
     with Pipeline(options=pipeline_options) as p:
-        park_ids = (
+        place_ids = (
             p
-            | "park/query"
-            >> wikidata.Query(
-                query=options.wd_query_park(),
-                state_file=FileSystems.join(options.base_path, "park-wikidata-ids.txt"),
-                user_agent=options.user_agent,
+            | "wikidata_query/queries"
+            >> Create(
+                [
+                    ("park", options.wd_query_park()),
+                    ("monument", options.wd_query_monument()),
+                    ("nature", options.wd_query_nature()),
+                ]
             )
-            | "park/add_type" >> Map(lambda id: (id, "park"))
+            | "wikidata_query/query"
+            >> wikidata.Query(FileSystems.join(options.base_path, "wikidata_query_cache.sqlite"), user_agent=options.user_agent,)
         )
 
-        monument_ids = (
-            p
-            | "monument/query"
-            >> wikidata.Query(
-                query=options.wd_query_monument(),
-                state_file=FileSystems.join(options.base_path, "monument-wikidata-ids.txt"),
-                user_agent=options.user_agent,
-            )
-            | "monument/add_type" >> Map(lambda id: (id, "monument"))
+        wikidata_data, commons_ids = place_ids | "wikidata" >> wikidata.Transform(
+            FileSystems.join(options.base_path, "wikidata_cache.sqlite"), user_agent=options.user_agent
         )
 
-        nature_ids = (
-            p
-            | "nature/query"
-            >> wikidata.Query(
-                query=options.wd_query_nature(),
-                state_file=FileSystems.join(options.base_path, "nature-wikidata-ids.txt"),
-                user_agent=options.user_agent,
-            )
-            | "nature/add_type" >> Map(lambda id: (id, "nature"))
-        )
-
-        wikidata_data, commons_ids = (
-            [park_ids, monument_ids, nature_ids]
-            | "wikidata/flatten" >> Flatten()
-            | "wikidata/transform"
-            >> wikidata.Transform(FileSystems.join(options.base_path, "wikidata_cache.sqlite"), user_agent=options.user_agent)
-        )
-
-        commons_data = commons_ids | "commons_fetch" >> commons.Transform(
+        commons_data = commons_ids | "commons" >> commons.Transform(
             FileSystems.join(options.base_path, "commons_cache.sqlite"), user_agent=options.user_agent
         )
 

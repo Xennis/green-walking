@@ -1,58 +1,59 @@
 import logging
-import os
-from typing import Any, Generator, Optional
+from typing import Any, Generator, Optional, Tuple, TypeVar
 
-from apache_beam import PTransform, Create, ParDo, DoFn, pvalue, Flatten
-from apache_beam.io import WriteToText, ReadFromText
-from apache_beam.transforms.combiners import Count
+from apache_beam import PTransform, ParDo, DoFn
+from sqlitedict import SqliteDict
 
 from greenwalking.core.clients import WikidataQueryClient
 
 
-class _QueryDoFn(DoFn):
-    def __init__(self, query: str, user_agent: str):
+K = TypeVar("K")
+
+
+class _CachedFetch(DoFn):
+    def __init__(self, cache_file: str, user_agent: str):
         super().__init__()
-        self._query = query
+        self._cache_file = cache_file
         self._user_agent = user_agent
-        self._client: Optional[WikidataQueryClient] = None
+        self._client = None
+        self._cache = None
 
     def start_bundle(self):
         self._client = WikidataQueryClient(self._user_agent)
+        self._cache = SqliteDict(self._cache_file, autocommit=True)
 
-    def process(self, element: Any, *args, **kwargs) -> Generator[str, None, None]:  # type: ignore  # missing return statement
-        known_count: Optional[int] = kwargs.get("known_count")
-        if isinstance(known_count, int) and known_count > 0:
-            return  # type: ignore  # return value expected
+    def finish_bundle(self):
+        self._cache.close()
+
+    def process(self, element: Tuple[K, str], *args, **kwargs) -> Generator[Tuple[str, K], None, None]:
+        # Make the type checker happy
+        assert isinstance(self._client, WikidataQueryClient)
+        assert isinstance(self._cache, SqliteDict)
+
+        (key, query) = element
+        if key in self._cache:
+            logging.info("wikidata query cached %s", key)
+            for wikidata_id in self._cache[key]:
+                yield wikidata_id, key
+            return
 
         try:
-            return self._client.sparql(self._query)  # type: ignore  # _client is not optional here
+            res = []
+            logging.info("wikidata query request %s", key)
+            for wikidata_id in self._client.sparql(query):  # type: ignore  # _client is not optional here
+                yield wikidata_id, key
+                res.append(wikidata_id)
+
+            self._cache[key] = res
         except Exception as e:
             logging.warning(f"{self.__class__.__name__} error {type(e).__name__}: {e}")
 
 
 class Query(PTransform):
-    def __init__(self, query: str, state_file: str, user_agent: str, **kwargs):
+    def __init__(self, cache_file: str, user_agent: str, **kwargs):
         super().__init__(**kwargs)
-        self._query = query
-        self._state_file = state_file
+        self._cache_file = cache_file
         self._user_agent = user_agent
 
     def expand(self, input_or_inputs):
-        state_filename, state_file_ext = os.path.splitext(self._state_file)
-
-        known = input_or_inputs | "read" >> ReadFromText(self._state_file, validate=False)
-        known_count = known | "known_count" >> Count.Globally()
-
-        new = (
-            input_or_inputs
-            | "new/create" >> Create([None])
-            | "new/parse"
-            >> ParDo(_QueryDoFn(query=self._query, user_agent=self._user_agent), known_count=pvalue.AsSingleton(known_count))
-        )
-
-        data = [known, new] | "known_new_flatten" >> Flatten()
-        data | "new_write" >> WriteToText(
-            state_filename, file_name_suffix=state_file_ext, shard_name_template="",
-        )
-
-        return data
+        return input_or_inputs | "fetch" >> ParDo(_CachedFetch(cache_file=self._cache_file, user_agent=self._user_agent))
