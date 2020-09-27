@@ -7,6 +7,8 @@ from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that, equal_to
 from sqlitedict import SqliteDict
 
+from greenwalking.core import country
+from greenwalking.pipeline.places.ctypes import TYP_MONUMENT
 from greenwalking.pipeline.places.wikidata import Query
 
 
@@ -15,11 +17,11 @@ class TestQuery(unittest.TestCase):
         with tempfile.TemporaryDirectory() as base_path:
             cache_file = os.path.join(base_path, "cache.json")
             cache = SqliteDict(cache_file, autocommit=True)
-            cache["monument"] = ["Q1234", "Q54321"]
+            cache["{}#{}".format(country.GERMANY, TYP_MONUMENT)] = ["Q1234", "Q54321"]
             cache.close()
 
-            data = [("monument", "query-does-not-matter")]
-            expected = [("Q1234", "monument"), ("Q54321", "monument")]
+            data = [((country.GERMANY, TYP_MONUMENT), "query-does-not-matter")]
+            expected = [("Q1234", (country.GERMANY, TYP_MONUMENT)), ("Q54321", (country.GERMANY, TYP_MONUMENT))]
 
             with TestPipeline() as p:
                 actual = p | Create(data) | Query(cache_file, user_agent="some-agent")

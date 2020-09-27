@@ -4,8 +4,9 @@ from typing import Any, Generator, Optional, Tuple, TypeVar
 from apache_beam import PTransform, ParDo, DoFn
 from sqlitedict import SqliteDict
 
+from greenwalking.core import country
 from greenwalking.core.clients import WikidataQueryClient
-
+from greenwalking.pipeline.places.ctypes import Typ
 
 K = TypeVar("K")
 
@@ -25,26 +26,29 @@ class _CachedFetch(DoFn):
     def finish_bundle(self):
         self._cache.close()
 
-    def process(self, element: Tuple[K, str], *args, **kwargs) -> Generator[Tuple[str, K], None, None]:
+    def process(
+        self, element: Tuple[Tuple[country.Country, Typ], str], *args, **kwargs
+    ) -> Generator[Tuple[str, Tuple[country.Country, Typ]], None, None]:
         # Make the type checker happy
         assert isinstance(self._client, WikidataQueryClient)
         assert isinstance(self._cache, SqliteDict)
 
-        (key, query) = element
-        if key in self._cache:
-            logging.info("wikidata query cached %s", key)
-            for wikidata_id in self._cache[key]:
-                yield wikidata_id, key
+        ((country, typ), query) = element
+        cache_key = "{country}#{typ}".format(country=country, typ=typ)
+        if cache_key in self._cache:
+            logging.info("wikidata query cached %s", cache_key)
+            for wikidata_id in self._cache[cache_key]:
+                yield wikidata_id, (country, typ)
             return
 
         try:
             res = []
-            logging.info("wikidata query request %s", key)
+            logging.info("wikidata query request %s", cache_key)
             for wikidata_id in self._client.sparql(query):  # type: ignore  # _client is not optional here
-                yield wikidata_id, key
+                yield wikidata_id, (country, typ)
                 res.append(wikidata_id)
 
-            self._cache[key] = res
+            self._cache[cache_key] = res
         except Exception as e:
             logging.warning(f"{self.__class__.__name__} error {type(e).__name__}: {e}")
 
