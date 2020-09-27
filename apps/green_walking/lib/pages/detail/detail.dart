@@ -5,11 +5,11 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import '../core.dart';
-import '../intl.dart';
-import '../types/place.dart';
-import '../widgets/place_list_tile.dart';
-import 'detail_footer.dart';
+import '../../core.dart';
+import '../../intl.dart';
+import '../../types/place.dart';
+import '../../widgets/place_list_tile.dart';
+import 'footer.dart';
 
 class DetailPage extends StatelessWidget {
   const DetailPage({Key key, @required this.park})

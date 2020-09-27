@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../intl.dart';
-import '../types/place.dart';
+import '../../intl.dart';
+import '../../types/place.dart';
 
 class DetailFooter extends StatelessWidget {
   const DetailFooter(

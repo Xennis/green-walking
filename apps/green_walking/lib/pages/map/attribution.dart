@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/plugin_api.dart';
-import 'package:green_walking/src/svg.dart';
+import 'package:green_walking/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../intl.dart';

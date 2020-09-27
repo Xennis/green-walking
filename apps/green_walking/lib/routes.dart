@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:green_walking/pages/feedback.dart';
 import 'package:green_walking/pages/imprint.dart';
 import 'package:green_walking/pages/settings.dart';
-import 'pages/map.dart';
+import 'pages/map/map.dart';
 
 class Routes {
   static const String feedback = 'feedback';
