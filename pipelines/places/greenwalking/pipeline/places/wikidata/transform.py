@@ -4,9 +4,10 @@ from typing import Dict, Any, Iterable, Generator, Tuple, List, Optional, TypeVa
 from apache_beam import PTransform, ParDo, pvalue, DoFn
 from sqlitedict import SqliteDict
 
-from greenwalking.core import language
+from greenwalking.core import language, country
 from greenwalking.core.clients import WikidataEntityClient
 from greenwalking.pipeline.places import fields
+from greenwalking.pipeline.places.ctypes import Typ
 
 T = TypeVar("T")
 
@@ -115,9 +116,9 @@ class _CachedFetch(DoFn):
 
 class _Process(DoFn):
     def process(
-        self, element: Tuple[Tuple[Any, str], Dict[str, Any]], *args, **kwargs
+        self, element: Tuple[Tuple[Any, Tuple[country.Country, Typ]], Dict[str, Any]], *args, **kwargs
     ) -> Generator[Tuple[str, Dict[str, Any]], None, None]:
-        (_, typ), value = element
+        (_, (country, typ)), value = element
         aliases = value.get("aliases", {})
         descriptions = value.get("descriptions", {})
         labels = value.get("labels", {})
@@ -182,6 +183,7 @@ class _Process(DoFn):
                         fields.URL: sitelinks.get("enwiki", {}).get("url"),
                     },
                 },
+                fields.COUNTRY: country,
                 fields.TYP: typ,
             }
         except Exception as e:

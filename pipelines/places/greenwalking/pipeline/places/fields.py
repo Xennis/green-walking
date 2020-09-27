@@ -1,6 +1,7 @@
 ARTICLES = "articles"
 ARTIST = "artist"
 CLAIMS = "claims"
+COUNTRY = "country"
 GEOPOINT = "geopoint"
 COPYRIGHTED = "copyrighted"
 DESCRIPTION_URL = "descriptionUrl"

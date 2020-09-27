@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass
 from typing import Tuple, Dict, Iterable, Any, TypeVar, Generator, Optional, List
 
-from apache_beam import Pipeline, ParDo, CoGroupByKey, DoFn, copy, Flatten, MapTuple, Map, Create
+from apache_beam import Pipeline, ParDo, CoGroupByKey, DoFn, copy, MapTuple, Create
 from apache_beam.io.filesystems import FileSystems
 from apache_beam.options.pipeline_options import PipelineOptions, SetupOptions
 from google.cloud import firestore
@@ -10,6 +10,7 @@ from google.oauth2 import service_account
 
 from greenwalking.core import language, geohash
 from greenwalking.pipeline.places import wikidata, wikipedia, fields, commons
+from greenwalking.pipeline.places.queries import wd_queries
 
 K = TypeVar("K")
 
@@ -182,53 +183,6 @@ class ParkdataPipelineOptions(PipelineOptions):
             ),
         )
 
-    @staticmethod
-    def wd_query_park() -> str:
-        return """\
-SELECT ?item WHERE {
-    # item (instance of) p
-    ?item wdt:P31 ?p;
-        # item (country) Germany
-        wdt:P17 wd:Q183 .
-    # p in (park, botanical garden, green space, urban park, recreation area, landscape garden)
-    FILTER (?p IN (wd:Q22698, wd:Q167346, wd:Q22652, wd:Q22746, wd:Q2063507, wd:Q15077303 ) )
-}"""
-
-    @staticmethod
-    def wd_query_monument() -> str:
-        # For coordinate examples see https://en.wikibooks.org/wiki/SPARQL/WIKIDATA_Precision,_Units_and_Coordinates#Coordinates
-        return """\
-SELECT DISTINCT ?item WHERE {
-    # item (instance of) p
-    ?item wdt:P31 ?p;
-        # item (country) Germany
-        wdt:P17 wd:Q183;
-        # item (coordinate location) coordinate
-        wdt:P625 ?coordinate.
-    # item "has site links"
-    ?article schema:about ?item;
-        schema:isPartOf ?sitelink.
-    # p in (natural monument in Germany)
-    FILTER(?p IN(wd:Q21573182))
-}"""
-
-    @staticmethod
-    def wd_query_nature() -> str:
-        return """\
-SELECT DISTINCT ?item WHERE {
-    # item (instance of) p
-    ?item wdt:P31 ?p;
-        # item (country) Germany
-        wdt:P17 wd:Q183;
-        # item (coordinate location) coordinate
-        wdt:P625 ?coordinate.
-    # item "has site links"
-    ?article schema:about ?item;
-        schema:isPartOf ?sitelink.
-    # p in (nature reserve in Germany)
-    FILTER(?p IN(wd:Q759421))
-}"""
-
 
 def run(argv=None):
     pipeline_options = PipelineOptions(argv)
@@ -237,22 +191,13 @@ def run(argv=None):
     # the serialization. Details see https://cloud.google.com/dataflow/docs/resources/faq#how_do_i_handle_nameerrors
     pipeline_options.view_as(SetupOptions).save_main_session = options.save_session
     with Pipeline(options=pipeline_options) as p:
-        place_ids = (
+        wikidata_data, commons_ids = (
             p
-            | "wikidata_query/queries"
-            >> Create(
-                [
-                    ("park", options.wd_query_park()),
-                    ("monument", options.wd_query_monument()),
-                    ("nature", options.wd_query_nature()),
-                ]
-            )
-            | "wikidata_query/query"
+            | "wikidata_query/create" >> Create(wd_queries())
+            | "wikidata/query"
             >> wikidata.Query(FileSystems.join(options.base_path, "wikidata_query_cache.sqlite"), user_agent=options.user_agent,)
-        )
-
-        wikidata_data, commons_ids = place_ids | "wikidata" >> wikidata.Transform(
-            FileSystems.join(options.base_path, "wikidata_cache.sqlite"), user_agent=options.user_agent
+            | "wikidata/fetch"
+            >> wikidata.Transform(FileSystems.join(options.base_path, "wikidata_cache.sqlite"), user_agent=options.user_agent)
         )
 
         commons_data = commons_ids | "commons" >> commons.Transform(
