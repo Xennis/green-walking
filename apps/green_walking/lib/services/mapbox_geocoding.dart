@@ -19,8 +19,8 @@ class MaboxGeocodingPlace {
           rawLng is int ? rawLng.toDouble() : rawLng as double);
     }
     return MaboxGeocodingPlace(
-      text: raw['text_de'] as String,
-      placeName: raw['place_name_de'] as String,
+      text: raw['text'] as String,
+      placeName: raw['place_name'] as String,
       center: center,
     );
   }
@@ -62,7 +62,6 @@ class MapboxGeocoding {
     final Uri url = Uri.https('api.mapbox.com',
         '/geocoding/v5/mapbox.places/$query.json', <String, String>{
       'access_token': token,
-      'language': 'de',
       'limit': '5',
       'proximity': loc != null ? '${loc.longitude},${loc.latitude}' : ''
     });
