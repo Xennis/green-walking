@@ -1,9 +1,11 @@
 import 'dart:ui';
 
-import 'package:flutter/widgets.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../intl.dart';
 import '../types/place.dart';
 
 class DetailFooter extends StatelessWidget {
@@ -23,35 +25,36 @@ class DetailFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations locale = AppLocalizations.of(context);
     final List<Widget> children = <Widget>[
       _Attribution(
-        headline: 'Daten',
-        text: 'Powered by Wikidata',
+        headline: locale.metaDataAttributionTitle,
+        text: locale.poweredBy('Wikidata'),
         links: <String, String>{
-          'Powered by Wikidata\n': 'https://www.wikidata.org',
-          'Verbessere diese Daten': 'https://www.wikidata.org/wiki/$wikidataId',
+          '${locale.poweredBy('Wikidata')}\n': 'https://www.wikidata.org',
+          locale.improveData: 'https://www.wikidata.org/wiki/$wikidataId',
         },
       )
     ];
     if (image?.descriptionUrl != null) {
       children.add(_Attribution(
-        headline: 'Foto',
-        text: 'Foto: ${image.artist} / ${image.licenseShortName}',
+        headline: locale.image,
+        text: '${locale.image}: ${image.artist} / ${image.licenseShortName}',
         links: <String, String>{
           '${image.artist}\n': image.descriptionUrl,
           '${image.licenseShortName}\n': image.licenseUrl,
-          'Verbessere diese Daten': image.descriptionUrl
+          locale.improveData: image.descriptionUrl
         },
       ));
     }
     if (extract?.text != null) {
       children.add(_Attribution(
-        headline: 'Text',
-        text: 'Text: Wikipedia / ${extract.licenseShortName}',
+        headline: locale.text,
+        text: '${locale.text}: Wikipedia / ${extract.licenseShortName}',
         links: <String, String>{
           'Wikipedia\n': wikipediaUrl,
           '${extract.licenseShortName}\n': extract.licenseUrl,
-          'Verbessere diese Daten': wikipediaUrl
+          locale.improveData: wikipediaUrl
         },
       ));
     }
@@ -102,6 +105,7 @@ class _Attribution extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations locale = AppLocalizations.of(context);
     return GestureDetector(
       onTap: () {
         showDialog<dynamic>(
@@ -115,7 +119,7 @@ class _Attribution extends StatelessWidget {
                   ),
                   actions: <Widget>[
                     FlatButton(
-                        child: const Text('OK'),
+                        child: Text(locale.ok.toUpperCase()),
                         onPressed: () => Navigator.of(context).pop()),
                   ],
                 ));
@@ -133,6 +137,7 @@ class _Attribution extends StatelessWidget {
                     Icons.info,
                     size: 15,
                     color: textColor,
+                    semanticLabel: locale.attributionInfoSemanticLabel,
                   ))
                 ]),
           ),

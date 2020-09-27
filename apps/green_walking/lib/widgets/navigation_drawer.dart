@@ -9,6 +9,7 @@ import '../intl.dart';
 class NavigationDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations locale = AppLocalizations.of(context);
     final TextStyle textStyle = Theme.of(context).textTheme.bodyText2;
     return Drawer(
       child: ListView(
@@ -21,7 +22,7 @@ class NavigationDrawer extends StatelessWidget {
             child: Column(children: <Widget>[
               Row(children: <Widget>[
                 Text(
-                  AppLocalizations.of(context).title,
+                  locale.appTitle,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 22,
@@ -30,7 +31,7 @@ class NavigationDrawer extends StatelessWidget {
               ]),
               Row(
                 children: <Widget>[
-                  Text(AppLocalizations.of(context).slogan,
+                  Text(locale.appSlogan,
                       style: const TextStyle(
                         color: Colors.white70,
                       )),
@@ -40,40 +41,37 @@ class NavigationDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.feedback),
-            title: Text(AppLocalizations.of(context).feedbackPage),
+            title: Text(locale.feedbackPage),
             onTap: () => Navigator.of(context).pushNamed(Routes.feedback),
           ),
           ListTile(
             leading: const Icon(Icons.settings),
-            title: Text(AppLocalizations.of(context).settingsPage),
+            title: Text(locale.settingsPage),
             onTap: () => Navigator.of(context).pushNamed(Routes.settings),
           ),
           const Divider(),
           AboutListTile(
-            child: Text(AppLocalizations.of(context).aboutPage),
+            child: Text(locale.aboutPage),
             icon: const Icon(Icons.explore),
             applicationIcon: Image.asset(
               'assets/app-icon.png',
               width: 65,
               height: 65,
             ),
-            applicationName: AppLocalizations.of(context).title,
-            applicationVersion:
-                AppLocalizations.of(context).aboutVersion('1.4.0'),
-            applicationLegalese:
-                AppLocalizations.of(context).aboutLegalese('Xennis'),
+            applicationName: locale.appTitle,
+            applicationVersion: locale.aboutVersion('1.4.0'),
+            applicationLegalese: locale.aboutLegalese('Xennis'),
             aboutBoxChildren: <Widget>[
               const SizedBox(height: 24),
               RichText(
                 text: TextSpan(
                   children: <TextSpan>[
                     TextSpan(
-                        style: textStyle,
-                        // To see the source code of this app, please visit the
-                        text:
-                            'Um den Quellcode der App zu sehen, besuche bitte das '),
+                      style: textStyle,
+                      text: '${locale.aboutSourceCodeText} ',
+                    ),
                     TextSpan(
-                      text: 'GitHub Repository',
+                      text: locale.aboutRepository('GitHub'),
                       style: TextStyle(color: Theme.of(context).accentColor),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
@@ -88,14 +86,17 @@ class NavigationDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.lock),
-            title: const Text('Datenschutz'),
+            title: Text(locale.dataPrivacyNavigationLabel),
             onTap: () => launch(
                 'https://raw.githubusercontent.com/Xennis/green-walking/master/web/privacy/privacy-de.md'),
-            trailing: const Icon(Icons.open_in_new),
+            trailing: Icon(
+              Icons.open_in_new,
+              semanticLabel: locale.openInBrowserSemanticLabel,
+            ),
           ),
           ListTile(
             leading: const Icon(Icons.info),
-            title: const Text('Impressum'),
+            title: Text(locale.imprint),
             onTap: () => Navigator.of(context).pushNamed(Routes.imprint),
           ),
         ],

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:green_walking/src/mapbox/geocoding.dart';
 
 import '../core.dart';
+import '../intl.dart';
 
 class SearchPage extends StatelessWidget {
   const SearchPage({Key key, @required this.result})
@@ -13,30 +14,32 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations locale = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ergebnisse'),
+        title: Text(locale.searchResults),
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(5, 25, 5, 25),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            _resultList(),
+            _resultList(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _resultList() {
+  Widget _resultList(BuildContext context) {
+    final AppLocalizations locale = AppLocalizations.of(context);
     return FutureBuilder<MapboxGeocodingResult>(
         future: result,
         builder: (BuildContext context,
             AsyncSnapshot<MapboxGeocodingResult> snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data.features.isEmpty) {
-              return const Text('Keine Treffer gefunden');
+              return Text(locale.searchNoResultsText);
             }
             return Expanded(
                 child: ListView.builder(
@@ -64,7 +67,7 @@ class SearchPage extends StatelessWidget {
               },
             ));
           } else if (snapshot.hasError) {
-            return const Text('Keine Verbindung zum Suchserver');
+            return Text(locale.errorNoConnectionToSearchServer);
           }
           return const Center(child: CircularProgressIndicator());
         });

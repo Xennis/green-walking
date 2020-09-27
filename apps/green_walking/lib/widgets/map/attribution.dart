@@ -5,6 +5,8 @@ import 'package:flutter_map/plugin_api.dart';
 import 'package:green_walking/src/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../intl.dart';
+
 class AttributionOptions extends LayerOptions {
   AttributionOptions({
     @required this.logoAssetName,
@@ -32,6 +34,7 @@ class AttributionLayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations locale = AppLocalizations.of(context);
     final AttributionOptions attrOptions = options as AttributionOptions;
     final List<Widget> links = <Widget>[
       RichText(
@@ -56,7 +59,7 @@ class AttributionLayer extends StatelessWidget {
       ),
       RichText(
         text: TextSpan(
-          text: 'Verbessere diese Daten',
+          text: locale.improveData,
           style: const TextStyle(color: Colors.blue),
           recognizer: TapGestureRecognizer()
             ..onTap = () {
@@ -92,12 +95,13 @@ class AttributionLayer extends StatelessWidget {
               icon: Icon(
                 Icons.info,
                 color: attrOptions.color,
+                semanticLabel: locale.attributionInfoSemanticLabel,
               ),
               onPressed: () {
                 showDialog<dynamic>(
                     context: context,
                     builder: (BuildContext context) => AlertDialog(
-                          title: const Text('Mapbox Karte'),
+                          title: Text(locale.mapAttributionTitle('Mapbox')),
                           content: SingleChildScrollView(
                             child: ListBody(
                               children: links,
@@ -105,7 +109,7 @@ class AttributionLayer extends StatelessWidget {
                           ),
                           actions: <Widget>[
                             FlatButton(
-                                child: const Text('OK'),
+                                child: Text(locale.ok.toUpperCase()),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 }),

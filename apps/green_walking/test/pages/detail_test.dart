@@ -14,11 +14,11 @@ void main() {
         url: '');
     final Place p = Place(wikidataId: '1234', image: i, categories: <String>[]);
     await tester.pumpWidget(MaterialApp(
-        localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
-          AppLocalizationsDelegate()
-        ],
         home: DetailPage(
           park: p,
-        )));
+        ),
+        localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+          AppLocalizationsDelegate()
+        ]));
   });
 }

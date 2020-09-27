@@ -1,13 +1,13 @@
 {
   "@@locale": "de",
-  "title": "Green Walking",
-  "@title": {
+  "appTitle": "Green Walking",
+  "@appTitle": {
     "description": "Title of the application",
     "type": "text",
     "placeholders": {}
   },
-  "slogan": "Entdecke deine grüne Stadt!",
-  "@slogan": {
+  "appSlogan": "Entdecke deine grüne Stadt!",
+  "@appSlogan": {
     "description": "Slogan of the application",
     "type": "text",
     "placeholders": {}
@@ -38,15 +38,53 @@
   },
   "settingsPage": "Einstellungen",
   "@settingsPage": {
-    "description": "Label for settings page",
+    "description": "Navigation label and title for settings page",
+    "type": "text",
+    "placeholders": {}
+  },
+  "settingsTrackingDescription": "Trackingdienst aktivieren",
+  "@settingsTrackingDescription": {
+    "description": "Description for enable/disable tracking setting",
     "type": "text",
     "placeholders": {}
   },
   "feedbackPage": "Feedback senden",
   "@feedbackPage": {
-    "description": "Label for feedback page",
+    "description": "Navigation label and title for feedback page",
     "type": "text",
     "placeholders": {}
+  },
+  "feedbackSendLabel": "Feedback senden",
+  "@feedbackSendLabel": {
+    "description": "Label for sending feedback",
+    "type": "text",
+    "placeholders": {}
+  },
+  "feedbackPageText": "Du hast Feedback für die App? Zögere nicht und sende es uns zu, um damit die App zu verbessern.\n\nDu kannst zum Beispiel Feedback geben zu dem Design und der Bedienbarkeit der App, nicht angezeigten Grünanlagen, wünschenswerten Funktionen, Fehlern oder Funktionen, die dir besonders gut gefallen.",
+  "@feedbackPageText": {
+    "description": "Text for the feedback page",
+    "type": "text",
+    "placeholders": {}
+  },
+  "feedbackSendMailToLabel": "Mail an {mail} senden",
+  "@feedbackSendMailToLabel": {
+    "description": "Send feedback mail button label",
+    "type": "text",
+    "placeholders": {
+      "mail": {
+        "example": "contact@example.org"
+      }
+    }
+  },
+  "feedbackMailSubject": "{appName} Feedback",
+  "@feedbackMailSubject": {
+    "description": "Feedback mail subject",
+    "type": "text",
+    "placeholders": {
+      "appName": {
+        "example": "Green Walking"
+      }
+    }
   },
   "aboutPage": "Über die App",
   "@aboutPage": {
@@ -60,7 +98,7 @@
     "type": "text",
     "placeholders": {
       "version": {
-        "example": "1.0.0"
+        "example": "1.4.0"
       }
     }
   },
@@ -73,5 +111,193 @@
         "example": "Xennis"
       }
     }
+  },
+  "aboutSourceCodeText": "Um den Quellcode der App zu sehen, besuche bitte das",
+  "@aboutSourceCodeText": {
+    "description": "Text for mentioning the source code",
+    "type": "text",
+    "placeholders": {}
+  },
+  "aboutRepository": "{name} Repository",
+  "@aboutRepository": {
+    "description": "Link for code repository",
+    "type": "text",
+    "placeholders": {
+      "name": {
+        "example": "GitHub"
+      }
+    }
+  },
+  "dataPrivacyNavigationLabel": "Datenschutz",
+  "@dataPrivacyNavigationLabel": {
+    "description": "Label for data privacy link",
+    "type": "text",
+    "placeholders": {}
+  },
+  "imprint": "Impressum",
+  "@imprint": {
+    "description": "Noun for imprint",
+    "type": "text",
+    "placeholders": {}
+  },
+  "imprintTmgText": "Angaben gemäß § {paragraphNumber} TMG",
+  "@imprintTmgText": {
+    "description": "Disclaimer headline on the imprint page",
+    "type": "text",
+    "placeholders": {
+      "paragraphNumber": {
+        "example": "5"
+      }
+    }
+  },
+  "imprintDisclaimerLabel": "Haftungshinweis",
+  "@imprintDisclaimerLabel": {
+    "description": "Disclaimer headline on the imprint page",
+    "type": "text",
+    "placeholders": {}
+  },
+  "imprintDisclaimerText": "Wir übernehmen keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.",
+  "@imprintDisclaimerText": {
+    "description": "Disclaimer text on the imprint page",
+    "type": "text",
+    "placeholders": {}
+  },
+  "imprintGdprApplyText": "Es gilt die",
+  "@imprintGdprApplyText": {
+    "description": "Imprint GDPR text",
+    "type": "text",
+    "placeholders": {}
+  },
+  "openInBrowserSemanticLabel": "Im Browser öffnen",
+  "@openInBrowserSemanticLabel": {
+    "description": "Semantic label for icon to open link in browser",
+    "type": "text",
+    "placeholders": {}
+  },
+  "gdprDialogText": "Für das beste Erlebnis aktiviert die App Tracking. Weiter Infos erhälst du in der",
+  "@gdprDialogText": {
+    "description": "Text for privacy policy link",
+    "type": "text",
+    "placeholders": {}
+  },
+  "gdprPrivacyPolicy": "Datenschutzerklärung",
+  "@gdprPrivacyPolicy": {
+    "description": "Privacy policy link text",
+    "type": "text",
+    "placeholders": {}
+  },
+  "gdprAgree": "Einverstanden",
+  "@gdprAgree": {
+    "description": "GDRP agree button label",
+    "type": "text",
+    "placeholders": {}
+  },
+  "gdprDisagree": "Nein danke",
+  "@gdprDisagree": {
+    "description": "GDRP disagree button label",
+    "type": "text",
+    "placeholders": {}
+  },
+  "improveData": "Verbessere diese Daten",
+  "@improveData": {
+    "description": "Link text for improving the data",
+    "type": "text",
+    "placeholders": {}
+  },
+  "attributionInfoSemanticLabel": "Copyright-Informationen anzeigen",
+  "@attributionInfoSemanticLabel": {
+    "description": "Semantic label for opening attributions (e.g. map, text, image)",
+    "type": "text",
+    "placeholders": {}
+  },
+  "mapAttributionTitle": "{name} Karte",
+  "@mapAttributionTitle": {
+    "description": "Title for the map attribution",
+    "type": "text",
+    "placeholders": {
+      "name": {
+        "example": "Mapbox"
+      }
+    }
+  },
+  "metaDataAttributionTitle": "Daten",
+  "@metaDataAttributionTitle": {
+    "description": "Title for the meta data (e.g. Wikidata) attribution",
+    "type": "text",
+    "placeholders": {}
+  },
+  "poweredBy": "Powered by {name}",
+  "@poweredBy": {
+    "description": "Powered by text",
+    "type": "text",
+    "placeholders": {
+      "name": {
+        "example": "Wikidata"
+      }
+    }
+  },
+  "ok": "Ok",
+  "@ok": {
+    "description": "Label for okay",
+    "type": "text",
+    "placeholders": {}
+  },
+  "details": "Details",
+  "@details": {
+    "description": "Label for details",
+    "type": "text",
+    "placeholders": {}
+  },
+  "image": "Foto",
+  "@image": {
+    "description": "Noun for an image / photo",
+    "type": "text",
+    "placeholders": {}
+  },
+  "text": "Text",
+  "@text": {
+    "description": "Noun for a text",
+    "type": "text",
+    "placeholders": {}
+  },
+  "errorNoPositionFound": "Keine Position gefunden",
+  "@errorNoPositionFound": {
+    "description": "Error message displayed to user if no (GPS) location could be found",
+    "type": "text",
+    "placeholders": {}
+  },
+  "errorNoConnectionToSearchServer": "Keine Verbindung zum Suchserver",
+  "@errorNoConnectionToSearchServer": {
+    "description": "Error message displayed to user if no geocoding search results can be received from search server",
+    "type": "text",
+    "placeholders": {}
+  },
+  "searchBoxHintLabel": "Suche{dots}",
+  "@searchBoxHintLabel": {
+    "description": "Hint text for the search box on the map page",
+    "type": "text",
+    "placeholders": {
+      "dots": {
+        "example": "..."
+      }
+    }
+  },
+  "searchResults": "Ergebnisse",
+  "@searchResults": {
+    "description": "Search results",
+    "type": "text",
+    "placeholders": {}
+  },
+  "searchNoResultsText": "Keine Treffer gefunden",
+  "@searchNoResultsText": {
+    "description": "Message shown if not search results were found",
+    "type": "text",
+    "placeholders": {}
+  },
+  "mapSwitchLayerSemanticLabel": "Kartenansicht wechseln",
+  "@mapSwitchLayerSemanticLabel": {
+    "description": "Semantic label for switching the map layer (e.g. to satellite view)",
+    "type": "text",
+    "placeholders": {}
   }
 }

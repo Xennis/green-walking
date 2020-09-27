@@ -2,12 +2,15 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../intl.dart';
+
 class FeedbackPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations locale = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Feedback'),
+        title: Text(locale.feedbackPage),
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(15, 25, 15, 25),
@@ -19,12 +22,11 @@ class FeedbackPage extends StatelessWidget {
                 style: const TextStyle(color: Colors.black),
                 children: <InlineSpan>[
                   TextSpan(
-                    text: 'Feedback senden\n\n',
+                    text: '${locale.feedbackSendLabel}\n\n',
                     style: Theme.of(context).textTheme.headline5,
                   ),
-                  const TextSpan(
-                    text:
-                        'Du hast Feedback für die App? Zögere nicht und sende es uns zu, um damit die App zu verbessern.\n\nDu kannst zum Beispiel Feedback geben zu dem Design und der Bedienbarkeit der App, nicht angezeigten Grünanlagen, wünschenswerten Funktionen, Fehlern oder Funktionen, die dir besonders gut gefallen.\n',
+                  TextSpan(
+                    text: '${locale.feedbackPageText}\n',
                   ),
                 ],
               ),
@@ -38,7 +40,7 @@ class FeedbackPage extends StatelessWidget {
                       scheme: 'mailto',
                       path: 'code@xennis.org',
                       queryParameters: <String, String>{
-                        'subject': 'Green Walking Feedback',
+                        'subject': locale.feedbackMailSubject(locale.appTitle),
                         //'body': 'App Version xx',
                       },
                     );
@@ -46,7 +48,8 @@ class FeedbackPage extends StatelessWidget {
                   },
                   color: Theme.of(context).accentColor,
                   textColor: Colors.white,
-                  child: const Text('Mail an code@xennis.org senden'),
+                  child:
+                      Text(locale.feedbackSendMailToLabel('code@xennis.org')),
                 ),
               ],
             ),
