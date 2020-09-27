@@ -1,3 +1,5 @@
+.PHONY: check format-check lint test launcher-icon release i10n
+
 check: lint test
 
 format-check:
@@ -7,11 +9,11 @@ format-check:
 
 lint:
 	@echo ">>> Flutter analyze"
-	flutter analyze
+	flutter analyze .
 
 test:
 	@echo ">>> Flutter test"
-	flutter test
+	flutter test .
 
 launcher-icon:
 	flutter pub run flutter_launcher_icons:main
