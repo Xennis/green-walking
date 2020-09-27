@@ -89,31 +89,6 @@ class Combine(DoFn):
         return None
 
 
-class FilterLanguage(DoFn):
-
-    _LANG_TO_DELETE = language.ENGLISH
-
-    def process(self, element: Tuple[K, Dict[str, Any]], *args, **kwargs) -> Generator[Tuple[K, Dict[str, Any]], None, None]:
-        key, entry = element
-        entry = copy.copy(entry)
-        self._delete_non_german(entry)
-        yield key, entry
-
-    @staticmethod
-    def _delete_non_german(element: Any):
-        if isinstance(element, dict):
-            if FilterLanguage._LANG_TO_DELETE in element:
-                del element[FilterLanguage._LANG_TO_DELETE]
-                return
-            for _, value in element.items():
-                FilterLanguage._delete_non_german(value)
-            return
-
-        if not isinstance(element, (str, dict)) and isinstance(element, Iterable):
-            for e in element:
-                FilterLanguage._delete_non_german(e)
-
-
 class FirestoreWrite(DoFn):
 
     # The total maximimum is 500. Source: https://firebase.google.com/docs/firestore/manage-data/transactions
@@ -183,6 +158,10 @@ class ParkdataPipelineOptions(PipelineOptions):
             ),
         )
 
+    @staticmethod
+    def supported_languages():
+        return [language.ENGLISH, language.GERMAN]
+
 
 def run(argv=None):
     pipeline_options = PipelineOptions(argv)
@@ -197,7 +176,11 @@ def run(argv=None):
             | "wikidata/query"
             >> wikidata.Query(FileSystems.join(options.base_path, "wikidata_query_cache.sqlite"), user_agent=options.user_agent,)
             | "wikidata/fetch"
-            >> wikidata.Transform(FileSystems.join(options.base_path, "wikidata_cache.sqlite"), user_agent=options.user_agent)
+            >> wikidata.Transform(
+                options.supported_languages(),
+                cache_file=FileSystems.join(options.base_path, "wikidata_cache.sqlite"),
+                user_agent=options.user_agent,
+            )
         )
 
         commons_data = commons_ids | "commons" >> commons.Transform(
@@ -212,7 +195,6 @@ def run(argv=None):
             {Combine.TAG_COMMONS: commons_data, Combine.TAG_WIKIDATA: wikidata_data, Combine.TAG_WIKIPEDIA: wikipedia_data,}
             | "combine/group_by_key" >> CoGroupByKey()
             | "combine/combine" >> ParDo(Combine())
-            | "combine/filter_lang" >> ParDo(FilterLanguage())
         )
 
         (
