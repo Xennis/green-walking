@@ -13,6 +13,7 @@ import 'package:green_walking/pages/search.dart';
 import 'package:green_walking/services/mapbox_geocoding.dart';
 import 'package:green_walking/services/places.dart';
 import 'package:green_walking/services/shared_prefs.dart';
+import 'package:green_walking/types/language.dart';
 import 'package:green_walking/types/marker.dart';
 import 'package:green_walking/widgets/gdpr_dialog.dart';
 import 'package:green_walking/widgets/navigation_drawer.dart';
@@ -81,10 +82,13 @@ class _MapPageState extends State<MapPage> {
     if (_lastGeohash != null && _lastGeohash.contains(_newGeohash.geohash)) {
       return;
     }
-    //log("${hasGesture} lat ${_lastGeohash?.geohash} new ${_newGeohash.geohash}");
     _lastGeohash = _newGeohash;
 
-    PlaceService.nearby(_newGeohash).then((List<Place> value) {
+    // Use language
+    //final Language lang =
+    //    languageFromString(AppLocalizations.of(context).localeName);
+
+    PlaceService.nearby(_newGeohash, Language.de).then((List<Place> value) {
       setState(() {
         places = value
             .map((Place p) => PlaceMarker(

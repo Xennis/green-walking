@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:green_walking/types/language.dart';
 
 import 'intl.dart';
 import 'routes.dart';
@@ -41,9 +42,9 @@ class GreenWalkingApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const <Locale>[
-        Locale('en', ''), // first element is the fallback
-        Locale('de', ''),
+      supportedLocales: <Locale>[
+        Locale(Language.en.code, ''), // first element is the fallback
+        Locale(Language.de.code, ''),
       ],
     );
   }

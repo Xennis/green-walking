@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:dart_geohash/dart_geohash.dart';
+import 'package:green_walking/types/language.dart';
 import 'package:latlong/latlong.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:async/async.dart' show FutureGroup;
@@ -9,7 +10,7 @@ import '../types/place.dart';
 Map<LatLng, Place> places = <LatLng, Place>{};
 
 class PlaceService {
-  static Future<List<Place>> nearby(GeoHash centerHash) {
+  static Future<List<Place>> nearby(GeoHash centerHash, Language lang) {
     final Iterable<String> area = centerHash.neighbors.values.toList()
       ..add(centerHash.toString());
 
@@ -20,7 +21,7 @@ class PlaceService {
           .startAt(<String>[hash]).endAt(<String>[hash + '~']);
       return query.get().then((QuerySnapshot value) {
         return value.docs
-            .map((DocumentSnapshot e) => Place.fromFirestore(e.data()));
+            .map((DocumentSnapshot e) => Place.fromFirestore(e.data(), lang));
       });
     });
 
