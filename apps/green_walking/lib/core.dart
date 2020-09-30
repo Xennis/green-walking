@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:green_walking/types/place.dart';
 
+const String privacyPolicyUrl =
+    'https://raw.githubusercontent.com/Xennis/green-walking/master/web/privacy/privacy-de.md';
+
 String truncateString(String myString, int cutoff) {
   if (myString == null) {
     return null;
