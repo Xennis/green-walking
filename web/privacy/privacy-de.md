@@ -42,9 +42,11 @@ Darüber hinaus ist der Anbieter dazu verpflichtet, alle Empfänger, denen gegen
 **Ebenfalls haben die Nutzer und Betroffenen nach Art. 21 DSGVO das Recht auf Widerspruch gegen die künftige Verarbeitung der sie betreffenden Daten, sofern die Daten durch den Anbieter nach Maßgabe von Art. 6 Abs. 1 lit. f) DSGVO verarbeitet werden. Insbesondere ist ein Widerspruch gegen die Datenverarbeitung zum Zwecke der Direktwerbung statthaft.**
 
 ## III. Informationen zur Datenverarbeitung
+
 Ihre bei Nutzung unserer App verarbeiteten Daten werden gelöscht oder gesperrt, sobald der Zweck der Speicherung entfällt, der Löschung der Daten keine gesetzlichen Aufbewahrungspflichten entgegenstehen und nachfolgend keine anderslautenden Angaben zu einzelnen Verarbeitungsverfahren gemacht werden.
 
 ### Google Analytics
+
 In unserer App setzen wir Google Analytics ein. Hierbei handelt es sich um einen Webanalysedienst der Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland, nachfolgend nur „Google“ genannt.
 
 Durch die Zertifizierung nach dem EU-US-Datenschutzschild („EU-US Privacy Shield“)
