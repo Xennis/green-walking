@@ -2,9 +2,11 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:green_walking/intl.dart';
-import 'package:green_walking/services/shared_prefs.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../core.dart';
+import '../intl.dart';
+import '../services/shared_prefs.dart';
 
 void enableAnalyticsOrConsent(BuildContext context) {
   SharedPrefs.getBool(SharedPrefs.ANALYTICS_ENABLED).then((bool enabled) {
@@ -38,8 +40,7 @@ class GdprDialog extends StatelessWidget {
                       style: const TextStyle(color: Colors.blue),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          launch(
-                              'https://raw.githubusercontent.com/Xennis/green-walking/master/web/privacy/privacy-de.md');
+                          launch(privacyPolicyUrl);
                         },
                     ),
                     const TextSpan(

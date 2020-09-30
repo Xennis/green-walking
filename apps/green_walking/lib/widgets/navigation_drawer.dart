@@ -1,10 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:green_walking/routes.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../core.dart';
 import '../intl.dart';
+import '../routes.dart';
 
 class NavigationDrawer extends StatelessWidget {
   @override
@@ -87,8 +88,7 @@ class NavigationDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.lock),
             title: Text(locale.dataPrivacyNavigationLabel),
-            onTap: () => launch(
-                'https://raw.githubusercontent.com/Xennis/green-walking/master/web/privacy/privacy-de.md'),
+            onTap: () => launch(privacyPolicyUrl),
             trailing: Icon(
               Icons.open_in_new,
               semanticLabel: locale.openInBrowserSemanticLabel,
