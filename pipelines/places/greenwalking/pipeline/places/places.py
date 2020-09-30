@@ -50,6 +50,8 @@ class Combine(DoFn):
         wikidata["wikipediaUrl"] = urls_per_lang
 
         if wikipedia:
+            # TODO: Choose default country based on `wikidata.get(fields.COUNTRY)`.
+            wikipedia["_"] = wikipedia.get(language.GERMAN)
             wikidata["extract"] = wikipedia
 
         geopoint_dict = wikidata.get(fields.GEOPOINT)
