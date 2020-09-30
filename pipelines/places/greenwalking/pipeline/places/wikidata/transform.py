@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Any, Iterable, Generator, Tuple, List, Optional, TypeVar
+from typing import Dict, Any, Iterable, Generator, Tuple, List, Optional, TypeVar, Union
 
 from apache_beam import PTransform, ParDo, pvalue, DoFn
 from sqlitedict import SqliteDict
@@ -139,35 +139,39 @@ class _Process(DoFn):
 
         wikidata_id: str = value["title"]
 
+        languages: Dict[Union[language.Language, str], language.Language] = {lang: lang for lang in self._languages}
+        # TODO: Choose default country based on `country` that is part of the key.
+        languages["_"] = language.GERMAN
+
         try:
             yield wikidata_id, {
-                fields.ALIASES: {lang: [e.get("value") for e in aliases.get(lang, [])] for lang in self._languages},
+                fields.ALIASES: {key: [e.get("value") for e in aliases.get(lang, [])] for key, lang in languages.items()},
                 fields.CATEGORIES: {
-                    lang: self._create_categories(lang, instance_of, heritage_designation=heritage_designation)
-                    for lang in self._languages
+                    key: self._create_categories(lang, instance_of, heritage_designation=heritage_designation)
+                    for key, lang in languages.items()
                 },
                 fields.GEOPOINT: {
                     fields.LATITUDE: coordinate_location[0].get("latitude") if coordinate_location else None,
                     fields.LONGITUDE: coordinate_location[0].get("longitude") if coordinate_location else None,
                 },
                 "commonsUrl": sitelinks.get("commonswiki", {}).get("url"),
-                fields.DESCRIPTION: {lang: descriptions.get(lang, {}).get("value") for lang in self._languages},
+                fields.DESCRIPTION: {key: descriptions.get(lang, {}).get("value") for key, lang in languages.items()},
                 fields.LOCATION: {
-                    lang: {
+                    key: {
                         "location": location[0].get(lang, {}).get("value") if location else None,
                         "administrative": administrative[0].get(lang, {}).get("value") if administrative else None,
                     }
-                    for lang in self._languages
+                    for key, lang in languages.items()
                 },
-                fields.NAME: {lang: labels.get(lang, {}).get("value") for lang in self._languages},
+                fields.NAME: {key: labels.get(lang, {}).get("value") for key, lang in languages.items()},
                 "officialWebsite": officialWebsite[0] if officialWebsite else None,
                 fields.WIKIDATA_ID: wikidata_id,
                 fields.WIKIPEDIA: {
-                    lang: {
+                    key: {
                         fields.TITLE: sitelinks.get("{}wiki".format(lang.lower()), {}).get("title"),
                         fields.URL: sitelinks.get("{}wiki".format(lang.lower()), {}).get("url"),
                     }
-                    for lang in self._languages
+                    for key, lang in languages.items()
                 },
                 fields.COUNTRY: country,
                 fields.TYP: typ,
