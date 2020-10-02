@@ -84,11 +84,10 @@ class _MapPageState extends State<MapPage> {
     }
     _lastGeohash = _newGeohash;
 
-    // Use language
-    //final Language lang =
-    //    languageFromString(AppLocalizations.of(context).localeName);
+    final Language lang =
+        languageFromString(AppLocalizations.of(context).localeName);
 
-    PlaceService.nearby(_newGeohash, Language.de).then((List<Place> value) {
+    PlaceService.nearby(_newGeohash, lang).then((List<Place> value) {
       setState(() {
         places = value
             .map((Place p) => PlaceMarker(

@@ -10,18 +10,13 @@ import '../../types/place.dart';
 
 class DetailFooter extends StatelessWidget {
   const DetailFooter(
-      {Key key,
-      @required this.wikidataId,
-      this.image,
-      this.extract,
-      this.wikipediaUrl})
+      {Key key, @required this.wikidataId, this.image, this.extract})
       : assert(wikidataId != null),
         super(key: key);
 
   final String wikidataId;
   final PlaceImage image;
   final PlaceExtract extract;
-  final String wikipediaUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +47,9 @@ class DetailFooter extends StatelessWidget {
         headline: locale.text,
         text: '${locale.text}: Wikipedia / ${extract.licenseShortName}',
         links: <String, String>{
-          'Wikipedia\n': wikipediaUrl,
+          'Wikipedia\n': extract.url,
           '${extract.licenseShortName}\n': extract.licenseUrl,
-          locale.improveData: wikipediaUrl
+          locale.improveData: extract.url
         },
       ));
     }

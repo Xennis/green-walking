@@ -32,7 +32,13 @@
   },
   "missingDescription": "Der Ort hat bisher keine Beschreibung.",
   "@missingDescription": {
-    "description": "Places without a description",
+    "description": "Hint for a places without a description",
+    "type": "text",
+    "placeholders": {}
+  },
+  "fallbackDescription": "Die Beschreibung ist nur in der lokalen Sprache verfügbar.",
+  "@fallbackDescription": {
+    "description": "Hint if a place description is not available in the users language but in the language of the country the place is located in.",
     "type": "text",
     "placeholders": {}
   },

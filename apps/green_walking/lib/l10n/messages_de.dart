@@ -51,6 +51,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "details" : MessageLookupByLibrary.simpleMessage("Details"),
     "errorNoConnectionToSearchServer" : MessageLookupByLibrary.simpleMessage("Keine Verbindung zum Suchserver"),
     "errorNoPositionFound" : MessageLookupByLibrary.simpleMessage("Keine Position gefunden"),
+    "fallbackDescription" : MessageLookupByLibrary.simpleMessage("Die Beschreibung ist nur in der lokalen Sprache verfügbar."),
     "feedbackMailSubject" : m3,
     "feedbackPage" : MessageLookupByLibrary.simpleMessage("Feedback senden"),
     "feedbackPageText" : MessageLookupByLibrary.simpleMessage("Du hast Feedback für die App? Zögere nicht und sende es uns zu, um damit die App zu verbessern.\n\nDu kannst zum Beispiel Feedback geben zu dem Design und der Bedienbarkeit der App, nicht angezeigten Grünanlagen, wünschenswerten Funktionen, Fehlern oder Funktionen, die dir besonders gut gefallen."),

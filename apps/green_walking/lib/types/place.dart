@@ -4,24 +4,29 @@ import 'package:green_walking/types/language.dart';
 import 'package:latlong/latlong.dart';
 
 class PlaceExtract {
-  PlaceExtract(
-      {@required this.text,
-      @required this.licenseShortName,
-      this.licenseUrl // e.g. public domain has no url
-      })
-      : assert(text != null && licenseShortName != null);
+  PlaceExtract({
+    @required this.text,
+    @required this.url,
+    @required this.licenseShortName,
+    this.licenseUrl, // e.g. public domain has no url
+    this.fallbackLang,
+  }) : assert(text != null && url != null && licenseShortName != null);
 
-  factory PlaceExtract.fromJson(Map<dynamic, dynamic> j) {
+  factory PlaceExtract.fromJson(
+      Map<dynamic, dynamic> j, String url, Language fallbackLang) {
     return PlaceExtract(
-      text: j['text'] as String,
-      licenseShortName: j['licenseShortName'] as String,
-      licenseUrl: j['licenseUrl'] as String,
-    );
+        text: j['text'] as String,
+        url: url,
+        licenseShortName: j['licenseShortName'] as String,
+        licenseUrl: j['licenseUrl'] as String,
+        fallbackLang: fallbackLang);
   }
 
   final String text;
+  final String url;
   final String licenseShortName;
   final String licenseUrl;
+  final Language fallbackLang;
 }
 
 class PlaceImage {
@@ -55,8 +60,7 @@ class PlaceImage {
 
 class Place {
   Place(
-      {this.aliases,
-      this.categories,
+      {this.categories,
       this.geopoint,
       this.commonsUrl,
       this.description,
@@ -71,10 +75,15 @@ class Place {
       : assert(wikidataId != null);
 
   factory Place.fromFirestore(Map<dynamic, dynamic> j, Language language) {
-    final String lang = language.code.toLowerCase();
-    String location = j['location'][lang]['location'] as String;
+    final String langStr = language.code.toLowerCase();
+    final Language fallbackLang = (j['countryLanguage'] as List<dynamic>)
+        .map((dynamic e) => languageFromString(e as String))
+        .first;
+    final String fallbackLangStr = fallbackLang.code.toLowerCase();
+
+    String location = j['location'][langStr]['location'] as String;
     final String locAdministrative =
-        j['location'][lang]['administrative'] as String;
+        j['location'][langStr]['administrative'] as String;
     if (locAdministrative != null) {
       if (location == null) {
         location = locAdministrative;
@@ -88,6 +97,7 @@ class Place {
       geopoint = LatLng(g.latitude, g.longitude);
     }
 
+    final String wikipediaUrl = j['wikipediaUrl'][langStr] as String;
     PlaceImage image;
     if (j['image'] != null) {
       image = PlaceImage.fromJson(j['image'] as Map<dynamic, dynamic>);
@@ -95,32 +105,44 @@ class Place {
     PlaceExtract extract;
     if (j['extract'] != null) {
       final Map<dynamic, dynamic> rawExtractLang =
-          j['extract'][lang] as Map<dynamic, dynamic>;
+          j['extract'][langStr] as Map<dynamic, dynamic>;
       if (rawExtractLang != null) {
-        extract = PlaceExtract.fromJson(rawExtractLang);
+        extract = PlaceExtract.fromJson(rawExtractLang, wikipediaUrl, null);
+      } else if (language != fallbackLang) {
+        final Map<dynamic, dynamic> rawFallbackExtractLang =
+            j['extract'][fallbackLangStr] as Map<dynamic, dynamic>;
+
+        extract = PlaceExtract.fromJson(rawFallbackExtractLang,
+            j['wikipediaUrl'][fallbackLangStr] as String, fallbackLang);
       }
     }
 
+    String name = j['name'][langStr] as String;
+    if (name == null && language != fallbackLang) {
+      name = j['name'][fallbackLangStr] as String;
+    }
+
     return Place(
-        aliases: List<String>.from(j['aliases'][lang] as List<dynamic>),
-        categories: List<String>.from(j['categories'][lang] as List<dynamic>),
+        //aliases: List<String>.from(j['aliases'][lang] as List<dynamic>),
+        categories:
+            List<String>.from(j['categories'][langStr] as List<dynamic>),
         geopoint: geopoint,
         commonsUrl: j['commonsUrl'] as String,
         description: j['description'] as String,
         extract: extract,
         image: image,
         location: location,
-        name: j['name'][lang] as String,
+        name: name,
         officialWebsite: j['officialWebsite'] as String,
         type: j['type'] as String,
         wikidataId: j['wikidataId'] as String,
-        wikipediaUrl: j['wikipediaUrl'][lang] as String);
+        wikipediaUrl: wikipediaUrl);
   }
 
   static const String TypeMonument = 'monument';
   static const String TypeNature = 'nature';
 
-  final List<String> aliases;
+  //final List<String> aliases;
   final List<String> categories;
   final LatLng geopoint;
   final String commonsUrl;
