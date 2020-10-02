@@ -24,12 +24,8 @@ class PlaceListTile extends StatelessWidget {
     if (place.categories != null) {
       children.add(CategoryChips(categories: place.categories));
     }
-    String name;
-    if (place.name == null) {
-      name = AppLocalizations.of(context).nameless;
-    }
     return ListTile(
-      title: Text(name),
+      title: Text(place.name ?? AppLocalizations.of(context).nameless),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: children,
