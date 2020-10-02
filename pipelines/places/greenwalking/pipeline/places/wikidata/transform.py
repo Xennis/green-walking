@@ -170,6 +170,8 @@ class _Process(DoFn):
                     for lang in self._languages
                 },
                 fields.COUNTRY: country,
+                # TODO: Set language based on country.
+                fields.COUNTRY_LANGUAGE: [language.GERMAN],
                 fields.TYP: typ,
             }
         except Exception as e:
