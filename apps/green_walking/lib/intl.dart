@@ -72,9 +72,19 @@ class AppLocalizations {
 
   String get missingDescription {
     return Intl.message(
-      'The park has no description yet.',
+      'The place has no description yet.',
       name: 'missingDescription',
-      desc: 'Places without a description',
+      desc: 'Hint for a places without a description',
+      locale: localeName,
+    );
+  }
+
+  String get fallbackDescription {
+    return Intl.message(
+      'The description is only available in the locale language.',
+      name: 'fallbackDescription',
+      desc:
+          'Hint if a place description is not available in the users language but in the language of the country the place is located in.',
       locale: localeName,
     );
   }

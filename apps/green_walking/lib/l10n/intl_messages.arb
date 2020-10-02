@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2020-09-27T15:56:49.263847",
+  "@@last_modified": "2020-10-02T19:42:07.280947",
   "appTitle": "Green Walking",
   "@appTitle": {
     "description": "Title of the application",
@@ -30,9 +30,15 @@
     "type": "text",
     "placeholders": {}
   },
-  "missingDescription": "The park has no description yet.",
+  "missingDescription": "The place has no description yet.",
   "@missingDescription": {
-    "description": "Places without a description",
+    "description": "Hint for a places without a description",
+    "type": "text",
+    "placeholders": {}
+  },
+  "fallbackDescription": "The description is only available in the locale language.",
+  "@fallbackDescription": {
+    "description": "Hint if a place description is not available in the users language but in the language of the country the place is located in.",
     "type": "text",
     "placeholders": {}
   },

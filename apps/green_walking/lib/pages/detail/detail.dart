@@ -97,7 +97,6 @@ class DetailPage extends StatelessWidget {
                       wikidataId: park.wikidataId,
                       image: park.image,
                       extract: park.extract,
-                      wikipediaUrl: park.wikipediaUrl,
                     ),
                   ],
                 ),
@@ -192,19 +191,29 @@ class _Description extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations locale = AppLocalizations.of(context);
+
+    final List<InlineSpan> spans = <InlineSpan>[];
     String text;
     if (extract?.text != null) {
       text = extract.text;
+
+      if (extract?.fallbackLang != null) {
+        spans.add(TextSpan(
+            text: '${locale.fallbackDescription}\n\n',
+            style: const TextStyle(
+                color: Colors.black, fontStyle: FontStyle.italic)));
+      }
     } else if (description != null) {
       // Use Wikidata description as fallback.
       text = description;
     } else {
-      text = AppLocalizations.of(context).website;
+      text = locale.missingDescription;
     }
-    return RichText(
-        textScaleFactor: 1.1,
-        text: TextSpan(
-            text: text,
-            style: const TextStyle(color: Colors.black, height: 1.5)));
+
+    spans.add(TextSpan(
+        text: text, style: const TextStyle(color: Colors.black, height: 1.5)));
+
+    return RichText(textScaleFactor: 1.1, text: TextSpan(children: spans));
   }
 }

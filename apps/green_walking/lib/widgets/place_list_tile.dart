@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import '../core.dart';
+import '../intl.dart';
 import '../types/place.dart';
 
 class PlaceListTile extends StatelessWidget {
@@ -23,8 +24,12 @@ class PlaceListTile extends StatelessWidget {
     if (place.categories != null) {
       children.add(CategoryChips(categories: place.categories));
     }
+    String name;
+    if (place.name == null) {
+      name = AppLocalizations.of(context).nameless;
+    }
     return ListTile(
-      title: Text(place.name),
+      title: Text(name),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: children,
