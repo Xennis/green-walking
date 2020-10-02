@@ -60,7 +60,7 @@ class NavigationDrawer extends StatelessWidget {
               height: 65,
             ),
             applicationName: locale.appTitle,
-            applicationVersion: locale.aboutVersion('1.4.0'),
+            applicationVersion: locale.aboutVersion('1.5.0'),
             applicationLegalese: locale.aboutLegalese('Xennis'),
             aboutBoxChildren: <Widget>[
               const SizedBox(height: 24),
