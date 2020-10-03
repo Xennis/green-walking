@@ -1,0 +1,65 @@
+name: Flutter Release
+on: workflow_dispatch
+jobs:
+  deploy-ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '12.x'
+    - name: Install git-crypt
+      run: sudo apt-get install --yes git-crypt
+    - name: Unlock git-crypt
+      run: echo "$GIT_CRYPT_KEY" | base64 --decode > ./git-crypt-key && git-crypt unlock ./git-crypt-key && rm ./git-crypt-key
+      env:
+        GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v1
+      with:
+        channel: 'beta'
+    - name: Install dependencies
+      run: flutter pub get
+      working-directory: apps/green_walking
+    - name: Check format
+      run: dart format --set-exit-if-changed .
+      working-directory: apps/green_walking
+    - name: Run linter
+      run: flutter analyze .
+      working-directory: apps/green_walking
+    - name: Run tests
+      run: flutter test .
+      working-directory: apps/green_walking
+    - name: Build release
+      run: flutter build appbundle
+      working-directory: apps/green_walking
+      env:
+        ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/21.3.6528147
+  deploy-macos:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v1
+      with:
+        channel: 'beta'
+    - name: Install git-crypt
+      run: HOMEBREW_NO_AUTO_UPDATE=1 brew install git-crypt
+    - name: Unlock git-crypt
+      run: echo "$GIT_CRYPT_KEY" | base64 --decode > ./git-crypt-key && git-crypt unlock ./git-crypt-key && rm ./git-crypt-key
+      env:
+        GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
+    - name: Install dependencies
+      run: flutter pub get
+      working-directory: apps/green_walking
+    - name: Run linter
+      run: flutter analyze .
+      working-directory: apps/green_walking
+    - name: Run tests
+      run: flutter test .
+      working-directory: apps/green_walking
+    - name: Build release
+      run: flutter build ios --release --no-codesign
+      working-directory: apps/green_walking
