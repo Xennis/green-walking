@@ -7,10 +7,8 @@ workflows:
       xcode: latest
       cocoapods: default
       vars:
-        TEST_ENV: Encrypted(Z0FBQUFBQmZkOEhWSVl0b3BNdnZZbHdyRVdSdmFvbTFYdUFzaF91blpiSnVXRlRfV256MXdtTThvVGM2ZXFEMzhrajBHTEZMZTFvejZ5Tm1ZUXMwSFV1eE1TWVcya0xnUlE9PQ==)
         GIT_CRYPT_KEY: Encrypted(Z0FBQUFBQmZlaVhQS2hRNXAzNWIxbzcwSENkdzl1d081bDNpcXEtU2VsSXBsX3hkblNTOFZROVBhQ2ZiM283ZlBRX2xKM0lrM2ljMWtiVlJ4ZW9peEk4YW16UUR6cW8xZGVVZkZqQlpFSk9NZW5McTFGRXlaSkl5bjdVZjNBNzJPRmRycUl6TjZfRElhRXJDUUFNYk4xMVBxaklURlR3RGJBNjhLOE0zcjlDT3M4TEZKekVYMWpuTkF1VmdXeEFHclo2bVBHV1VCNmQ3WmxEc016eGhKTTBuVnpDX1prOFdtNkVLMFVrU0FjZ2JXUGpQcVhnQnNwVkR1RHY0T09TalRkdVVwcjI5X016OHRMWWR0VGEtbnFHdEl6aWZldk8yTjIyY2lvN0V0ZnRJTzNFNWIweWowMk5WZEx0bDNPQlVMNWl4LW9qU1dFZkVnR25IWlpLRzFNa3VXOU1kMW9EV29BPT0=)
     scripts:
-      - echo $TEST_ENV
       - HOMEBREW_NO_AUTO_UPDATE=1 brew install git-crypt
       - echo "$GIT_CRYPT_KEY" | base64 --decode > ./git-crypt-key && git-crypt unlock ./git-crypt-key && rm ./git-crypt-key
       - |
@@ -29,11 +27,17 @@ workflows:
         # set up local properties
         echo "flutter.sdk=$HOME/programs/flutter" > "$FCI_BUILD_DIR/apps/green_walking/android/local.properties"
       - cd apps/green_walking && flutter packages pub get
-      - cd apps/green_walking && flutter build apk --debug
+      - cd apps/green_walking && flutter analyze
+      - cd apps/green_walking && flutter test
+      - cd apps/green_walking && flutter build appbundle --debug
+      - find . -name "Podfile" -execdir pod install \;
+      - cd apps/green_walking && flutter build ios --debug --no-codesign
     artifacts:
       - apps/green_walking/build/**/outputs/**/*.apk
       - apps/green_walking/build/**/outputs/**/*.aab
       - apps/green_walking/build/**/outputs/**/mapping.txt
+      - apps/green_walking/build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
       - apps/green_walking/flutter_drive.log
     publishing:
       email:
