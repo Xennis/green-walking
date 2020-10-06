@@ -1,5 +1,5 @@
 {
-  "@@last_modified": "2020-10-02T19:42:07.280947",
+  "@@last_modified": "2020-10-06T22:53:53.294352",
   "appTitle": "Green Walking",
   "@appTitle": {
     "description": "Title of the application",
@@ -54,7 +54,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "feedbackPage": "Send feedback",
+  "feedbackPage": "Submit feedback",
   "@feedbackPage": {
     "description": "Navigation label and title for feedback page",
     "type": "text",
@@ -66,7 +66,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "feedbackPageText": "Don't hesitate to send your feedback and help to improve the app. Tell us what is good, bad or missing.",
+  "feedbackPageText": "You have feedback for the app? Do not hesitate to send it to us to help us improving the app. You can give us feedback on the design and usability of the app, green areas that are not displayed, desirable features, bugs or features that you particularly like.",
   "@feedbackPageText": {
     "description": "Text for the feedback page",
     "type": "text",
@@ -140,9 +140,9 @@
     "type": "text",
     "placeholders": {}
   },
-  "imprint": "Imprint",
+  "imprint": "Legal notice",
   "@imprint": {
-    "description": "Noun for imprint",
+    "description": "Legal notice. The required \"Impressum\" due to German law.",
     "type": "text",
     "placeholders": {}
   },
@@ -180,7 +180,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "gdprDialogText": "For the best experiance the app enables tracking. Further information can be found in the",
+  "gdprDialogText": "For the best experience the app enables tracking. Further information can be found in the",
   "@gdprDialogText": {
     "description": "Text for privacy policy link",
     "type": "text",
@@ -192,7 +192,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "gdprAgree": "Agreed",
+  "gdprAgree": "I agree",
   "@gdprAgree": {
     "description": "GDRP agree button label",
     "type": "text",
@@ -210,7 +210,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "attributionInfoSemanticLabel": "Display attribution",
+  "attributionInfoSemanticLabel": "Show copyright information",
   "@attributionInfoSemanticLabel": {
     "description": "Semantic label for opening attributions (e.g. map, text, image)",
     "type": "text",
@@ -272,7 +272,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "errorNoConnectionToSearchServer": "No connection to search server",
+  "errorNoConnectionToSearchServer": "No connection to the search server",
   "@errorNoConnectionToSearchServer": {
     "description": "Error message displayed to user if no geocoding search results can be received from search server",
     "type": "text",
@@ -294,9 +294,9 @@
     "type": "text",
     "placeholders": {}
   },
-  "searchNoResultsText": "No hits found",
+  "searchNoResultsText": "No results found",
   "@searchNoResultsText": {
-    "description": "Message shown if not search results were found",
+    "description": "Message shown if no search results were found",
     "type": "text",
     "placeholders": {}
   },

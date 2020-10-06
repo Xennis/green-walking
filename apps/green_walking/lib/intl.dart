@@ -109,7 +109,7 @@ class AppLocalizations {
 
   String get feedbackPage {
     return Intl.message(
-      'Send feedback',
+      'Submit feedback',
       name: 'feedbackPage',
       desc: 'Navigation label and title for feedback page',
       locale: localeName,
@@ -127,7 +127,7 @@ class AppLocalizations {
 
   String get feedbackPageText {
     return Intl.message(
-      "Don't hesitate to send your feedback and help to improve the app. Tell us what is good, bad or missing.",
+      'You have feedback for the app? Do not hesitate to send it to us to help us improving the app. You can give us feedback on the design and usability of the app, green areas that are not displayed, desirable features, bugs or features that you particularly like.',
       name: 'feedbackPageText',
       desc: 'Text for the feedback page',
       locale: localeName,
@@ -208,9 +208,9 @@ class AppLocalizations {
 
   String get imprint {
     return Intl.message(
-      'Imprint',
+      'Legal notice',
       name: 'imprint',
-      desc: 'Noun for imprint',
+      desc: 'Legal notice. The required "Impressum" due to German law.',
       locale: localeName,
     );
   }
@@ -262,7 +262,7 @@ class AppLocalizations {
 
   String get gdprDialogText {
     return Intl.message(
-      'For the best experiance the app enables tracking. Further information can be found in the',
+      'For the best experience the app enables tracking. Further information can be found in the',
       name: 'gdprDialogText',
       desc: 'Text for privacy policy link',
       locale: localeName,
@@ -280,7 +280,7 @@ class AppLocalizations {
 
   String get gdprAgree {
     return Intl.message(
-      'Agreed',
+      'I agree',
       name: 'gdprAgree',
       desc: 'GDRP agree button label',
       locale: localeName,
@@ -307,7 +307,7 @@ class AppLocalizations {
 
   String get attributionInfoSemanticLabel {
     return Intl.message(
-      'Display attribution',
+      'Show copyright information',
       name: 'attributionInfoSemanticLabel',
       desc: 'Semantic label for opening attributions (e.g. map, text, image)',
       locale: localeName,
@@ -389,7 +389,7 @@ class AppLocalizations {
 
   String get errorNoConnectionToSearchServer {
     return Intl.message(
-      'No connection to search server',
+      'No connection to the search server',
       name: 'errorNoConnectionToSearchServer',
       desc:
           'Error message displayed to user if no geocoding search results can be received from search server',
@@ -417,9 +417,9 @@ class AppLocalizations {
 
   String get searchNoResultsText {
     return Intl.message(
-      'No hits found',
+      'No results found',
       name: 'searchNoResultsText',
-      desc: 'Message shown if not search results were found',
+      desc: 'Message shown if no search results were found',
       locale: localeName,
     );
   }
