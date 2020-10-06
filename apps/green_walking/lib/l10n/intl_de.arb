@@ -66,7 +66,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "feedbackPageText": "Du hast Feedback für die App? Zögere nicht und sende es uns zu, um damit die App zu verbessern.\n\nDu kannst zum Beispiel Feedback geben zu dem Design und der Bedienbarkeit der App, nicht angezeigten Grünanlagen, wünschenswerten Funktionen, Fehlern oder Funktionen, die dir besonders gut gefallen.",
+  "feedbackPageText": "Du hast Feedback für die App? Zögere nicht, es uns zuzusenden und damit die App zu verbessern.\n\nDu kannst zum Beispiel Feedback geben zu dem Design und der Bedienbarkeit der App, nicht angezeigten Grünanlagen, wünschenswerten Funktionen, Fehlern oder Funktionen, die dir besonders gut gefallen.",
   "@feedbackPageText": {
     "description": "Text for the feedback page",
     "type": "text",
@@ -142,7 +142,7 @@
   },
   "imprint": "Impressum",
   "@imprint": {
-    "description": "Noun for imprint",
+    "description": "Legal notice. The required \"Impressum\" due to German law.",
     "type": "text",
     "placeholders": {}
   },
@@ -156,7 +156,7 @@
       }
     }
   },
-  "imprintDisclaimerLabel": "Haftungshinweis",
+  "imprintDisclaimerLabel": "Haftungsausschluss",
   "@imprintDisclaimerLabel": {
     "description": "Disclaimer headline on the imprint page",
     "type": "text",
@@ -180,7 +180,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "gdprDialogText": "Für das beste Erlebnis aktiviert die App Tracking. Weiter Infos erhälst du in der",
+  "gdprDialogText": "Für das beste Erlebnis aktiviert die App Tracking. Weitere Infos erhälst du in der",
   "@gdprDialogText": {
     "description": "Text for privacy policy link",
     "type": "text",
@@ -294,9 +294,9 @@
     "type": "text",
     "placeholders": {}
   },
-  "searchNoResultsText": "Keine Treffer gefunden",
+  "searchNoResultsText": "Keine Ergebnisse gefunden",
   "@searchNoResultsText": {
-    "description": "Message shown if not search results were found",
+    "description": "Message shown if no search results were found",
     "type": "text",
     "placeholders": {}
   },
