@@ -39,11 +39,7 @@ class SharedPrefs {
 
   static Future<bool> getBool(String key) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final bool raw = prefs.getBool(key);
-    if (raw == null) {
-      return false;
-    }
-    return raw;
+    return prefs.getBool(key);
   }
 
   static void setBool(String key, bool val) {
