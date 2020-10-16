@@ -10,10 +10,10 @@ import '../services/shared_prefs.dart';
 
 void enableAnalyticsOrConsent(BuildContext context) {
   SharedPrefs.getBool(SharedPrefs.ANALYTICS_ENABLED).then((bool enabled) {
-    if (enabled) {
+    if (enabled == true) {
       // Privacy: Only enable analytics if it is set to enabled.
       FirebaseAnalytics().setAnalyticsCollectionEnabled(true);
-    } else {
+    } else if (enabled == null) {
       showDialog<dynamic>(
           context: context, builder: (BuildContext context) => GdprDialog());
     }

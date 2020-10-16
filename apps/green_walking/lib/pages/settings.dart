@@ -47,7 +47,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       builder:
                           (BuildContext context, AsyncSnapshot<bool> snapshot) {
                         return Switch(
-                          value: snapshot.data,
+                          value: snapshot.data ?? false,
                           onChanged: (bool value) {
                             if (value == null) {
                               return;
