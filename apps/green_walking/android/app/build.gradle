@@ -80,5 +80,8 @@ dependencies {
     // That's default for minSdkVersion >= 21.
     implementation 'androidx.multidex:multidex:2.0.1'
 
-    implementation 'com.google.firebase:firebase-analytics:17.5.0'
+    // https://firebase.google.com/docs/android/learn-more#bom
+    // When using the BoM, you don't specify versions in Firebase library dependencies.
+    implementation platform('com.google.firebase:firebase-bom:25.12.0')
+    implementation 'com.google.firebase:firebase-analytics'
 }
