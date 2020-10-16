@@ -201,5 +201,5 @@ def run(argv=None):
             places
             | "firestore_output/convert_types" >> MapTuple(use_firestore_types)
             | "firestore_output/write"
-            >> ParDo(FirestoreWrite(project=options.project_id, collection="places", credentials="gcp-service-account.json"))
+            >> ParDo(FirestoreWrite(project=options.project_id, collection="places_v2", credentials="gcp-service-account.json"))
         )
