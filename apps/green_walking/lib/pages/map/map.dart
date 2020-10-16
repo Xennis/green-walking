@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:dart_geohash/dart_geohash.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -33,6 +34,7 @@ class MapConfig {
   LatLng lastLocation;
 
   static Future<MapConfig> create(AssetBundle assetBundle) async {
+    await FirebaseAuth.instance.signInAnonymously();
     final String accessToken =
         await assetBundle.loadString('assets/mapbox-access-token.txt');
     LatLng lastLocation =
@@ -133,6 +135,9 @@ class _MapPageState extends State<MapPage> {
                   ),
                 ],
               );
+            }
+            if (snapshot.hasError) {
+              log(snapshot.error.toString());
             }
 
             return const Center(child: CircularProgressIndicator());
