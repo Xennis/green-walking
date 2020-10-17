@@ -1,0 +1,5 @@
+Discover parks, natural monuments and other green places in your area. The app shows you these places in your immediate neighborhood. Just click on a place to find out more about it.
+
+Use the app from home to find a place to go for a walk, or just on the go to explore your surrounding.
+
+Currently only places within Germany are displayed.
