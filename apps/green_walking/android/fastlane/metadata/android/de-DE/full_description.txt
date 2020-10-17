@@ -1,0 +1,5 @@
+Entdecke Parks und andere grüne Orte in deiner Umgebung. Die App zeigt dir diese Orte in deiner direkten Umgebung an. Klick einfach auf einen Ort, um mehr über diesen zu erfahren.
+
+Verwende die App von Zuhause aus, um dir ein Ziel zum Spazieren gehen zu suchen, oder einfach unterwegs, um deine Umgebung zu erkunden.
+
+Aktuell werden nur Parks innerhalb von Deutschland angezeigt.

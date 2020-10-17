@@ -1,4 +1,4 @@
-.PHONY: check format-check lint test launcher-icon release i10n
+.PHONY: check format-check lint test launcher-icon release-android release-web i10n
 
 check: lint test
 
@@ -18,11 +18,15 @@ test:
 launcher-icon:
 	flutter pub run flutter_launcher_icons:main
 
-release:
-	@echo ">>> Flutter release web"
-	flutter build web
-	@echo ">>> Flutter release Android"
+release-android:
+	@echo ">>> [Android] Flutter build release"
 	flutter build appbundle
+	@echo ">>> [Android] Fastlane upload to Play Store"
+	cd android && fastlane beta
+
+release-web:
+	@echo ">>> [Web] Flutter build release"
+	flutter build web
 
 i10n:
 	@echo ">>> intl generate intl_messages.arb"
