@@ -1,7 +1,8 @@
 import logging
 from typing import Dict, Any, Iterable, Generator, Tuple, List, Optional, TypeVar
 
-from apache_beam import PTransform, ParDo, pvalue, DoFn
+import apache_beam as beam
+from apache_beam import pvalue
 from sqlitedict import SqliteDict
 
 from greenwalking.core import language, country
@@ -12,7 +13,7 @@ from greenwalking.pipeline.places.ctypes import Typ, EntryId
 T = TypeVar("T")
 
 
-class _CachedFetch(DoFn):
+class _CachedFetch(beam.DoFn):
 
     _CACHE_KEY_MAIN = "main"
     _CACHE_KEY_COMMONS = "commons"
@@ -117,7 +118,7 @@ class _CachedFetch(DoFn):
         return res, commons_media
 
 
-class _Process(DoFn):
+class _Process(beam.DoFn):
     def __init__(self, languages: List[language.Language]):
         super().__init__()
         self._languages = languages
@@ -240,7 +241,7 @@ class _Process(DoFn):
         return countries, types
 
 
-class Transform(PTransform):
+class Transform(beam.PTransform):
     _TAG_MAIN = "main"
     _TAG_COMMONS = "commons"
 
@@ -255,9 +256,9 @@ class Transform(PTransform):
             input_or_inputs
             # FIXME: Avoid ParDo here to not do parallel requests
             | "fetch"
-            >> ParDo(_CachedFetch(self._languages, cache_file=self._cache_file, user_agent=self._user_agent)).with_outputs(
+            >> beam.ParDo(_CachedFetch(self._languages, cache_file=self._cache_file, user_agent=self._user_agent)).with_outputs(
                 self._TAG_COMMONS, main=self._TAG_MAIN
             )
         )
-        wikidata_data = wikidata_commons_data[self._TAG_MAIN] | "process" >> ParDo(_Process(self._languages))
+        wikidata_data = wikidata_commons_data[self._TAG_MAIN] | "process" >> beam.ParDo(_Process(self._languages))
         return wikidata_data, wikidata_commons_data[self._TAG_COMMONS]
