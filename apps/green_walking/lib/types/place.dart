@@ -141,6 +141,7 @@ class Place {
 
   static const String TypeMonument = 'monument';
   static const String TypeNature = 'nature';
+  static const String TypeHeritage = 'heritage';
 
   //final List<String> aliases;
   final List<String> categories;
