@@ -18,6 +18,7 @@ String truncateString(String myString, int cutoff) {
 
 MaterialColor placeTypeToColor(String type) {
   switch (type) {
+    case Place.TypeHeritage:
     case Place.TypeMonument:
       return Colors.brown;
       break;
