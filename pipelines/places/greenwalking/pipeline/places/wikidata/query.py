@@ -1,7 +1,7 @@
 import logging
 from typing import Any, Generator, Optional, Tuple, TypeVar
 
-from apache_beam import PTransform, ParDo, DoFn
+import apache_beam as beam
 from sqlitedict import SqliteDict
 
 from greenwalking.core import country
@@ -11,7 +11,7 @@ from greenwalking.pipeline.places.ctypes import Typ, EntryId
 K = TypeVar("K")
 
 
-class _CachedFetch(DoFn):
+class _CachedFetch(beam.DoFn):
     def __init__(self, cache_file: str, user_agent: str):
         super().__init__()
         self._cache_file = cache_file
@@ -53,11 +53,11 @@ class _CachedFetch(DoFn):
             logging.warning(f"{self.__class__.__name__} error {type(e).__name__}: {e}")
 
 
-class Query(PTransform):
+class Query(beam.PTransform):
     def __init__(self, cache_file: str, user_agent: str, **kwargs):
         super().__init__(**kwargs)
         self._cache_file = cache_file
         self._user_agent = user_agent
 
     def expand(self, input_or_inputs):
-        return input_or_inputs | "fetch" >> ParDo(_CachedFetch(cache_file=self._cache_file, user_agent=self._user_agent))
+        return input_or_inputs | "fetch" >> beam.ParDo(_CachedFetch(cache_file=self._cache_file, user_agent=self._user_agent))

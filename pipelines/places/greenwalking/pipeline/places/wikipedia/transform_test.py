@@ -2,7 +2,7 @@ import os
 import tempfile
 import unittest
 
-from apache_beam import Create, ParDo
+import apache_beam as beam
 from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that, equal_to
 from sqlitedict import SqliteDict
@@ -28,5 +28,5 @@ class TestFetch(unittest.TestCase):
             expected = [("Q1234", {language.GERMAN: {"some": "json"}}), ("Q54321", {language.ENGLISH: {"another": "jsonx"}})]
 
             with TestPipeline() as p:
-                actual = p | Create(data) | ParDo(_CachedFetch(cache_file, user_agent="some-agent"))
+                actual = p | beam.Create(data) | beam.ParDo(_CachedFetch(cache_file, user_agent="some-agent"))
                 assert_that(actual, equal_to(expected))

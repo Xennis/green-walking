@@ -1,9 +1,8 @@
-import json
 import os
 import tempfile
 import unittest
 
-from apache_beam import Create, ParDo
+import apache_beam as beam
 from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that, equal_to
 from sqlitedict import SqliteDict
@@ -32,8 +31,8 @@ class TestCacheFetch(unittest.TestCase):
             with TestPipeline() as p:
                 actual = (
                     p
-                    | Create([("Q1234", "park"), ("Q54321", "park")])
-                    | ParDo(_CachedFetch(languages=[], cache_file=cache_file, user_agent="some-agent")).with_outputs(
+                    | beam.Create([("Q1234", "park"), ("Q54321", "park")])
+                    | beam.ParDo(_CachedFetch(languages=[], cache_file=cache_file, user_agent="some-agent")).with_outputs(
                         Transform._TAG_COMMONS, main=Transform._TAG_MAIN
                     )
                 )

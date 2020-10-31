@@ -1,8 +1,9 @@
+import copy
 import logging
 from dataclasses import dataclass
 from typing import Tuple, Dict, Iterable, Any, TypeVar, Generator, Optional, List
 
-from apache_beam import Pipeline, ParDo, CoGroupByKey, DoFn, copy, MapTuple, Create, GroupByKey
+import apache_beam as beam
 from apache_beam.io.filesystems import FileSystems
 from apache_beam.options.pipeline_options import PipelineOptions, SetupOptions
 from google.cloud import firestore
@@ -23,7 +24,7 @@ class GeoPoint:
     longitude: float
 
 
-class Combine(DoFn):
+class Combine(beam.DoFn):
 
     TAG_COMMONS = "commons"
     TAG_WIKIDATA = "wikidata"
@@ -107,7 +108,7 @@ class Combine(DoFn):
         return TYP_PARK
 
 
-class FirestoreWrite(DoFn):
+class FirestoreWrite(beam.DoFn):
 
     # The total maximimum is 500. Source: https://firebase.google.com/docs/firestore/manage-data/transactions
     _MAX_DOCUMENTS = 250
@@ -145,7 +146,7 @@ class FirestoreWrite(DoFn):
         self._mutations = {}
 
 
-class OutputNewOrChangedEntires(DoFn):
+class OutputNewOrChangedEntires(beam.DoFn):
     def __init__(self, cache_file: str):
         super().__init__()
         self._cache_file = cache_file
@@ -212,13 +213,13 @@ def run(argv=None):
     # Save the main session that defines global import, functions and variables. Otherwise they are not saved during
     # the serialization. Details see https://cloud.google.com/dataflow/docs/resources/faq#how_do_i_handle_nameerrors
     pipeline_options.view_as(SetupOptions).save_main_session = options.save_session
-    with Pipeline(options=pipeline_options) as p:
+    with beam.Pipeline(options=pipeline_options) as p:
         wikidata_data, commons_ids = (
             p
-            | "wikidata_query/create" >> Create(wd_queries())
+            | "wikidata_query/create" >> beam.Create(wd_queries())
             | "wikidata/query"
             >> wikidata.Query(FileSystems.join(options.base_path, "wikidata_query_cache.sqlite"), user_agent=options.user_agent,)
-            | "wikidata/group" >> GroupByKey()
+            | "wikidata/group" >> beam.GroupByKey()
             | "wikidata/fetch"
             >> wikidata.Transform(
                 options.supported_languages(),
@@ -237,14 +238,16 @@ def run(argv=None):
 
         changed_places = (
             {Combine.TAG_COMMONS: commons_data, Combine.TAG_WIKIDATA: wikidata_data, Combine.TAG_WIKIPEDIA: wikipedia_data,}
-            | "combine/group_by_key" >> CoGroupByKey()
-            | "combine/combine" >> ParDo(Combine())
-            | "combine/changed" >> ParDo(OutputNewOrChangedEntires(FileSystems.join(options.base_path, "output.sqlite")))
+            | "combine/group_by_key" >> beam.CoGroupByKey()
+            | "combine/combine" >> beam.ParDo(Combine())
+            | "combine/changed" >> beam.ParDo(OutputNewOrChangedEntires(FileSystems.join(options.base_path, "output.sqlite")))
         )
 
         (
             changed_places
-            | "firestore_output/convert_types" >> MapTuple(use_firestore_types)
+            | "firestore_output/convert_types" >> beam.MapTuple(use_firestore_types)
             | "firestore_output/write"
-            >> ParDo(FirestoreWrite(project=options.project_id, collection="places_v2", credentials="gcp-service-account.json"))
+            >> beam.ParDo(
+                FirestoreWrite(project=options.project_id, collection="places_v2", credentials="gcp-service-account.json")
+            )
         )

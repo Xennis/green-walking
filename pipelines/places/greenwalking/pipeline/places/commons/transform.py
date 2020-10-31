@@ -1,7 +1,7 @@
 import logging
 from typing import Tuple, Iterable, Generator, Dict, Any, Optional, List, TypeVar
 
-from apache_beam import PTransform, DoFn, ParDo
+import apache_beam as beam
 from bs4 import BeautifulSoup
 from sqlitedict import SqliteDict
 
@@ -12,7 +12,7 @@ from greenwalking.pipeline.places.ctypes import EntryId
 K = TypeVar("K")
 
 
-class _CachedFetch(DoFn):
+class _CachedFetch(beam.DoFn):
     def __init__(self, cache_file: str, user_agent: str):
         super().__init__()
         self._cache_file = cache_file
@@ -56,7 +56,7 @@ class _CachedFetch(DoFn):
             logging.warning(f"{self.__class__.__name__} error {type(e).__name__}: {e} ({element})")
 
 
-class _Process(DoFn):
+class _Process(beam.DoFn):
     def process(
         self, element: Tuple[K, Dict[str, Any]], *args, **kwargs
     ) -> Generator[Tuple[K, Iterable[Dict[str, Any]]], None, None]:
@@ -92,7 +92,7 @@ class _Process(DoFn):
         }
 
 
-class Transform(PTransform):
+class Transform(beam.PTransform):
     def __init__(self, cache_file: str, user_agent: str, **kwargs):
         super().__init__(**kwargs)
         self._cache_file = cache_file
@@ -102,6 +102,6 @@ class Transform(PTransform):
         return (
             input_or_inputs
             # FIXME: Avoid ParDo here to not do parallel requests
-            | "fetch" >> ParDo(_CachedFetch(cache_file=self._cache_file, user_agent=self._user_agent))
-            | "process" >> ParDo(_Process())
+            | "fetch" >> beam.ParDo(_CachedFetch(cache_file=self._cache_file, user_agent=self._user_agent))
+            | "process" >> beam.ParDo(_Process())
         )

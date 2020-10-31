@@ -1,7 +1,7 @@
 import logging
-from typing import Any, Tuple, Generator, TypeVar, Optional
+from typing import Any, Tuple, Generator, TypeVar, Optional, Dict
 
-from apache_beam import PTransform, DoFn, Dict, ParDo, MapTuple
+import apache_beam as beam
 from sqlitedict import SqliteDict
 
 from greenwalking.core.clients import WikipediaExtractClient
@@ -11,7 +11,7 @@ from greenwalking.pipeline.places.ctypes import EntryId
 K = TypeVar("K")
 
 
-class _CachedFetch(DoFn):
+class _CachedFetch(beam.DoFn):
     def __init__(self, cache_file: str, user_agent: str):
         super().__init__()
         self._cache_file = cache_file
@@ -53,7 +53,7 @@ class _CachedFetch(DoFn):
             logging.warning(f"{self.__class__.__name__} error {type(e).__name__}: {e} ({element})")
 
 
-class _Process(DoFn):
+class _Process(beam.DoFn):
     def process(
         self, element: Tuple[K, Dict[str, Dict[str, Any]]], *args, **kwargs
     ) -> Generator[Tuple[K, Dict[str, Dict[str, Any]]], None, None]:
@@ -105,7 +105,7 @@ class _Process(DoFn):
         }
 
 
-class Transform(PTransform):
+class Transform(beam.PTransform):
     def __init__(self, cache_file: str, user_agent: str, **kwargs):
         super().__init__(**kwargs)
         self._cache_file = cache_file
@@ -114,10 +114,10 @@ class Transform(PTransform):
     def expand(self, input_or_inputs):
         return (
             input_or_inputs
-            | "prepare" >> MapTuple(self._create_article_list)
+            | "prepare" >> beam.MapTuple(self._create_article_list)
             # FIXME: Avoid ParDo here to not do parallel requests
-            | "fetch" >> ParDo(_CachedFetch(cache_file=self._cache_file, user_agent=self._user_agent))
-            | "process" >> ParDo(_Process())
+            | "fetch" >> beam.ParDo(_CachedFetch(cache_file=self._cache_file, user_agent=self._user_agent))
+            | "process" >> beam.ParDo(_Process())
         )
 
     @staticmethod
