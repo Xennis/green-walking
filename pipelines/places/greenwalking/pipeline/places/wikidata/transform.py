@@ -7,7 +7,7 @@ from sqlitedict import SqliteDict
 from greenwalking.core import language, country
 from greenwalking.core.clients import WikidataEntityClient
 from greenwalking.pipeline.places import fields
-from greenwalking.pipeline.places.ctypes import Typ
+from greenwalking.pipeline.places.ctypes import Typ, EntryId
 
 T = TypeVar("T")
 
@@ -36,7 +36,9 @@ class _CachedFetch(DoFn):
         self._cache.close()
         self._cache_entities.close()
 
-    def process(self, element: Tuple[str, T], *args, **kwargs) -> Generator[Tuple[Tuple[str, T], Dict[str, Any]], None, None]:
+    def process(
+        self, element: Tuple[EntryId, T], *args, **kwargs
+    ) -> Generator[Tuple[Tuple[EntryId, T], Dict[str, Any]], None, None]:
         # Make the type checker happy
         assert isinstance(self._client, WikidataEntityClient)
         assert isinstance(self._cache, SqliteDict)
@@ -121,9 +123,9 @@ class _Process(DoFn):
         self._languages = languages
 
     def process(
-        self, element: Tuple[Tuple[Any, Tuple[country.Country, Typ]], Dict[str, Any]], *args, **kwargs
+        self, element: Tuple[Tuple[Any, Iterable[Tuple[country.Country, Typ]]], Dict[str, Any]], *args, **kwargs
     ) -> Generator[Tuple[str, Dict[str, Any]], None, None]:
-        (_, (country, typ)), value = element
+        (_, query_metadata), value = element
         aliases = value.get("aliases", {})
         descriptions = value.get("descriptions", {})
         labels = value.get("labels", {})
@@ -138,6 +140,7 @@ class _Process(DoFn):
         officialWebsite = claims.get("official website")
 
         wikidata_id: str = value["title"]
+        countries, types = self._query_metadata(query_metadata)
 
         try:
             yield wikidata_id, {
@@ -169,10 +172,10 @@ class _Process(DoFn):
                     }
                     for lang in self._languages
                 },
-                fields.COUNTRY: country,
-                # TODO: Set language based on country.
+                # TODO: Consider all countries and set language based on country.
+                fields.COUNTRY: countries[0],
                 fields.COUNTRY_LANGUAGE: [language.GERMAN],
-                fields.TYP: typ,
+                fields.TYPES: types,
             }
         except Exception as e:
             logging.warning(f"{self.__class__.__name__} error {type(e).__name__}: {e}")
@@ -223,6 +226,18 @@ class _Process(DoFn):
         # app anyway.
         res.sort(key=len)
         return res[0:5]
+
+    @staticmethod
+    def _query_metadata(entries: Iterable[Tuple[country.Country, Typ]]) -> Tuple[List[country.Country], List[Typ]]:
+        countries = []
+        types = []
+        for entry in entries:
+            (country, typ) = entry
+            if country not in countries:
+                countries.append(country)
+            if typ not in types:
+                types.append(typ)
+        return countries, types
 
 
 class Transform(PTransform):

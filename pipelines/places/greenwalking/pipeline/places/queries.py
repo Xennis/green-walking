@@ -1,7 +1,7 @@
 from typing import Tuple, List
 
 from greenwalking.core import country
-from greenwalking.pipeline.places.ctypes import Typ, TYP_PARK, TYP_MONUMENT, TYP_NATURE
+from greenwalking.pipeline.places.ctypes import Typ, TYP_PARK, TYP_MONUMENT, TYP_NATURE, TYP_HERITAGE
 
 
 def wd_queries() -> List[Tuple[Tuple[country.Country, Typ], str]]:
@@ -51,6 +51,21 @@ SELECT DISTINCT ?item WHERE {
         schema:isPartOf ?sitelink.
     # p in (nature reserve in Germany)
     FILTER(?p IN(wd:Q759421))
+}""",
+        ),
+        (
+            (country.GERMANY, TYP_HERITAGE),
+            """\
+SELECT DISTINCT ?item WHERE {
+    # item (heritage designation) heritage
+    ?item wdt:P1435 ?heritage;
+        # item (country) Germany
+        wdt:P17 wd:Q183;
+        # item (coordinate location) coordinate
+        wdt:P625 ?coordinate.
+    # item "has site links"
+    ?article schema:about ?item;
+        schema:isPartOf ?sitelink.
 }""",
         ),
     ]

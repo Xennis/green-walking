@@ -7,6 +7,7 @@ from sqlitedict import SqliteDict
 
 from greenwalking.core.clients import CommonsImageInfoClient
 from greenwalking.pipeline.places import fields
+from greenwalking.pipeline.places.ctypes import EntryId
 
 K = TypeVar("K")
 
@@ -26,7 +27,9 @@ class _CachedFetch(DoFn):
     def finish_bundle(self):
         self._cache.close()
 
-    def process(self, element: Tuple[str, Iterable[str]], *args, **kwargs) -> Generator[Tuple[str, Dict[str, Any]], None, None]:
+    def process(
+        self, element: Tuple[EntryId, Iterable[str]], *args, **kwargs
+    ) -> Generator[Tuple[EntryId, Dict[str, Any]], None, None]:
         # Make the type checker happy
         assert isinstance(self._client, CommonsImageInfoClient)
         assert isinstance(self._cache, SqliteDict)
