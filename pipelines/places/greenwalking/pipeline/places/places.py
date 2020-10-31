@@ -2,14 +2,16 @@ import logging
 from dataclasses import dataclass
 from typing import Tuple, Dict, Iterable, Any, TypeVar, Generator, Optional, List
 
-from apache_beam import Pipeline, ParDo, CoGroupByKey, DoFn, copy, MapTuple, Create
+from apache_beam import Pipeline, ParDo, CoGroupByKey, DoFn, copy, MapTuple, Create, GroupByKey
 from apache_beam.io.filesystems import FileSystems
 from apache_beam.options.pipeline_options import PipelineOptions, SetupOptions
 from google.cloud import firestore
 from google.oauth2 import service_account
+from sqlitedict import SqliteDict
 
 from greenwalking.core import language, geohash
 from greenwalking.pipeline.places import wikidata, wikipedia, fields, commons
+from greenwalking.pipeline.places.ctypes import EntryId, Typ, TYP_PARK, TYP_MONUMENT, TYP_NATURE, TYP_HERITAGE
 from greenwalking.pipeline.places.queries import wd_queries
 
 K = TypeVar("K")
@@ -52,7 +54,7 @@ class Combine(DoFn):
         if wikipedia:
             wikidata["extract"] = wikipedia
 
-        geopoint_dict = wikidata.get(fields.GEOPOINT)
+        geopoint_dict = wikidata[fields.GEOPOINT]
         latitude = geopoint_dict.get(fields.LATITUDE)
         longitude = geopoint_dict.get(fields.LONGITUDE)
         if not latitude or not longitude:
@@ -65,6 +67,9 @@ class Combine(DoFn):
         wikidata[fields.GEOHASH] = geohash.encode(latitude=geopoint.latitude, longitude=geopoint.longitude)
 
         wikidata[fields.IMAGE] = self._filter_images(commons_entries)
+
+        wikidata[fields.TYP] = self._main_type(wikidata[fields.TYPES])
+        del wikidata[fields.TYPES]
 
         yield key, wikidata
 
@@ -87,6 +92,19 @@ class Combine(DoFn):
             return image_info
 
         return None
+
+    @staticmethod
+    def _main_type(types: Iterable[Typ]) -> Typ:
+        types = list(types)
+        if TYP_PARK in types:
+            return TYP_PARK
+        if TYP_MONUMENT in types:
+            return TYP_MONUMENT
+        if TYP_NATURE in types:
+            return TYP_NATURE
+        if TYP_HERITAGE in types:
+            return TYP_HERITAGE
+        return TYP_PARK
 
 
 class FirestoreWrite(DoFn):
@@ -125,6 +143,31 @@ class FirestoreWrite(DoFn):
             batch.set(ref, doc)
         _ = batch.commit()
         self._mutations = {}
+
+
+class OutputNewOrChangedEntires(DoFn):
+    def __init__(self, cache_file: str):
+        super().__init__()
+        self._cache_file = cache_file
+        self._cache = None
+
+    def start_bundle(self):
+        self._cache = SqliteDict(self._cache_file, autocommit=True)
+
+    def finish_bundle(self):
+        self._cache.close()
+
+    def process(
+        self, element: Tuple[EntryId, Dict[str, Any]], *args, **kwargs
+    ) -> Generator[Tuple[EntryId, Dict[str, Any]], None, None]:
+        # Make the type checker happy
+        assert isinstance(self._cache, SqliteDict)
+
+        (wikidata_id, entry) = element
+        cached_entry = self._cache.get(wikidata_id)
+        if cached_entry is None or cached_entry != entry:
+            self._cache[wikidata_id] = entry
+            yield wikidata_id, entry
 
 
 def use_firestore_types(key: K, value: Dict[str, Any]) -> Tuple[K, Dict[str, Any]]:
@@ -175,6 +218,7 @@ def run(argv=None):
             | "wikidata_query/create" >> Create(wd_queries())
             | "wikidata/query"
             >> wikidata.Query(FileSystems.join(options.base_path, "wikidata_query_cache.sqlite"), user_agent=options.user_agent,)
+            | "wikidata/group" >> GroupByKey()
             | "wikidata/fetch"
             >> wikidata.Transform(
                 options.supported_languages(),
@@ -191,14 +235,15 @@ def run(argv=None):
             FileSystems.join(options.base_path, "wikipedia_qache.sqlite"), user_agent=options.user_agent
         )
 
-        places = (
+        changed_places = (
             {Combine.TAG_COMMONS: commons_data, Combine.TAG_WIKIDATA: wikidata_data, Combine.TAG_WIKIPEDIA: wikipedia_data,}
             | "combine/group_by_key" >> CoGroupByKey()
             | "combine/combine" >> ParDo(Combine())
+            | "combine/changed" >> ParDo(OutputNewOrChangedEntires(FileSystems.join(options.base_path, "output.sqlite")))
         )
 
         (
-            places
+            changed_places
             | "firestore_output/convert_types" >> MapTuple(use_firestore_types)
             | "firestore_output/write"
             >> ParDo(FirestoreWrite(project=options.project_id, collection="places_v2", credentials="gcp-service-account.json"))

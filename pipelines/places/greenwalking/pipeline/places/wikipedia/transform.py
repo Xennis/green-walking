@@ -6,6 +6,7 @@ from sqlitedict import SqliteDict
 
 from greenwalking.core.clients import WikipediaExtractClient
 from greenwalking.pipeline.places import fields
+from greenwalking.pipeline.places.ctypes import EntryId
 
 K = TypeVar("K")
 
@@ -26,8 +27,8 @@ class _CachedFetch(DoFn):
         self._cache.close()
 
     def process(
-        self, element: Tuple[str, Dict[str, Any]], *args, **kwargs
-    ) -> Generator[Tuple[str, Dict[str, Dict[str, Any]]], None, None]:
+        self, element: Tuple[EntryId, Dict[str, Any]], *args, **kwargs
+    ) -> Generator[Tuple[EntryId, Dict[str, Dict[str, Any]]], None, None]:
         # Make the type checker happy
         assert isinstance(self._client, WikipediaExtractClient)
         assert isinstance(self._cache, SqliteDict)
