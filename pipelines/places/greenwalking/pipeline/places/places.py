@@ -5,7 +5,7 @@ from typing import Tuple, Dict, Iterable, Any, TypeVar, Generator, Optional, Lis
 
 import apache_beam as beam
 from apache_beam.io.filesystems import FileSystems
-from apache_beam.options.pipeline_options import PipelineOptions, SetupOptions
+from apache_beam.options.pipeline_options import PipelineOptions, SetupOptions, GoogleCloudOptions
 from google.cloud import firestore
 from google.oauth2 import service_account
 from sqlitedict import SqliteDict
@@ -190,7 +190,7 @@ class ParkdataPipelineOptions(PipelineOptions):
         )
 
         parser.add_argument("--base_path", default=".", dest="base_path", type=str, help="Base path for all files")
-        parser.add_argument("--project-id", dest="project_id", type=str, help="GCP project ID", required=True)
+        #parser.add_argument("--project-id", dest="project_id", type=str, help="GCP project ID", required=False)
 
         parser.add_argument(
             "--no-save-session",
@@ -214,6 +214,9 @@ def run(argv=None):
     # the serialization. Details see https://cloud.google.com/dataflow/docs/resources/faq#how_do_i_handle_nameerrors
     pipeline_options.view_as(SetupOptions).save_main_session = options.save_session
     with beam.Pipeline(options=pipeline_options) as p:
+
+        project_id = options.project_id if hasattr(options, "project_id") else pipeline_options.view_as(GoogleCloudOptions).project
+
         wikidata_data, commons_ids = (
             p
             | "wikidata_query/create" >> beam.Create(wd_queries())
@@ -248,6 +251,6 @@ def run(argv=None):
             | "firestore_output/convert_types" >> beam.MapTuple(use_firestore_types)
             | "firestore_output/write"
             >> beam.ParDo(
-                FirestoreWrite(project=options.project_id, collection="places_v2", credentials="gcp-service-account.json")
+                FirestoreWrite(project=project_id, collection="places_v2", credentials="gcp-service-account.json")
             )
         )
