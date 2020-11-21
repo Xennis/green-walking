@@ -332,7 +332,7 @@ class _MapPageState extends State<MapPage> {
             onLocationRequested: (LatLngData ld) {
               final LatLng loca = ld?.location;
               if (loca == null) {
-                Scaffold.of(context).showSnackBar(
+                ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(locale.errorNoPositionFound)));
               } else {
                 mapController.move(loca, 15.0);
