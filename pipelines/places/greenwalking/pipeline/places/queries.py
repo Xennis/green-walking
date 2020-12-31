@@ -58,20 +58,20 @@ SELECT DISTINCT ?item WHERE {
     FILTER(?p IN(wd:Q759421))
 }""",
         ),
-        (
-            (country.GERMANY, TYP_HERITAGE),
-            # < 42.000
-            """\
-SELECT DISTINCT ?item WHERE {
-    # item (heritage designation) heritage
-    ?item wdt:P1435 ?heritage;
-        # item (country) Germany
-        wdt:P17 wd:Q183;
-        # item (coordinate location) coordinate
-        wdt:P625 ?coordinate.
-    # item "has site links"
-    ?article schema:about ?item;
-        schema:isPartOf <https://de.wikipedia.org/>.
-}""",
-        ),
+        #         (
+        #             (country.GERMANY, TYP_HERITAGE),
+        #             # < 42.000
+        #             """\
+        # SELECT DISTINCT ?item WHERE {
+        #     # item (heritage designation) heritage
+        #     ?item wdt:P1435 ?heritage;
+        #         # item (country) Germany
+        #         wdt:P17 wd:Q183;
+        #         # item (coordinate location) coordinate
+        #         wdt:P625 ?coordinate.
+        #     # item "has site links"
+        #     ?article schema:about ?item;
+        #         schema:isPartOf <https://de.wikipedia.org/>.
+        # }""",
+        #         ),
     ]
