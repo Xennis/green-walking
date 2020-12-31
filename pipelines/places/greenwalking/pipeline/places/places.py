@@ -248,6 +248,6 @@ def run(argv=None):
             | "firestore_output/convert_types" >> beam.MapTuple(use_firestore_types)
             | "firestore_output/write"
             >> beam.ParDo(
-                FirestoreWrite(project=options.project_id, collection="places_v3", credentials="gcp-service-account.json")
+                FirestoreWrite(project=options.project_id, collection="places_v4", credentials="gcp-service-account.json")
             )
         )

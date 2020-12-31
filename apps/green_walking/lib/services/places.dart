@@ -16,7 +16,7 @@ class PlaceService {
 
     final Iterable<Future<Iterable<Place>>> queries = area.map((String hash) {
       final Query query = FirebaseFirestore.instance
-          .collection('places_v3')
+          .collection('places_v4')
           .orderBy('geohash')
           .startAt(<String>[hash]).endAt(<String>[hash + '~']);
       return query.get().then((QuerySnapshot value) {
