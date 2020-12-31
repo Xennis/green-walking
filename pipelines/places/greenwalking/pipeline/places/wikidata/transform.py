@@ -13,6 +13,17 @@ from greenwalking.pipeline.places.ctypes import Typ, EntryId
 T = TypeVar("T")
 
 
+class Property:
+    ADMINISTRATIVE = "P131"  # located in the administrative territorial entity
+    COORDINATE_LOCATION = "P625"
+    HERITAGE_DESIGNATION = "P1435"
+    INSTANCE_OF = "P31"
+    LOCATION = "P276"
+    OFFICIAL_WEBSITE = "P856"
+
+    ALL = [ADMINISTRATIVE, COORDINATE_LOCATION, HERITAGE_DESIGNATION, INSTANCE_OF, LOCATION, OFFICIAL_WEBSITE]
+
+
 class _CachedFetch(beam.DoFn):
 
     _CACHE_KEY_MAIN = "main"
@@ -83,7 +94,7 @@ class _CachedFetch(beam.DoFn):
         # example the entity Germany of the property country is a really large entity.
         data = {
             "labels": {lang: labels.get(lang, {}) for lang in self._languages},
-            "claims": {"instance of": resp.get("claims", {}).get("P31")},
+            "claims": {"instance of": resp.get("claims", {}).get(Property.INSTANCE_OF)},
         }
         self._cache_entities[entity_id] = data
         return data
@@ -92,12 +103,7 @@ class _CachedFetch(beam.DoFn):
         res: Dict[str, Any] = {}
         commons_media: List[str] = []
         for prop_id, values in claims.items():
-            prop_name = self._do_request_cached(prop_id).get("labels", {}).get(language.ENGLISH, {}).get("value")
-            if not isinstance(prop_name, str):
-                logging.warning("type of property %s is %s, want str", prop_id, type(prop_id))
-                continue
-
-            res[prop_name] = []
+            res[prop_id] = []
             for value in values:
                 main_snak = value.get("mainsnak", {})
                 data_type = main_snak.get("datatype")
@@ -105,6 +111,10 @@ class _CachedFetch(beam.DoFn):
                 data_val_val = data_val.get("value", {})
 
                 if data_type == "wikibase-item":
+                    if prop_id not in Property.ALL:
+                        logging.info("skip: %s", prop_id)
+                        continue
+
                     entity_id = data_val_val.get("id")
                     if entity_id is None:
                         logging.warning("datalue.value has no ID: %s", data_val)
@@ -114,7 +124,7 @@ class _CachedFetch(beam.DoFn):
                 elif data_type == "commonsMedia":
                     commons_media.append(data_val_val)
 
-                res[prop_name].append(value)
+                res[prop_id].append(value)
         return res, commons_media
 
 
@@ -133,12 +143,12 @@ class _Process(beam.DoFn):
         sitelinks = value.get("sitelinks", {})
 
         claims = self._resolve_claims_by_type(value.get("claims", {}))
-        administrative = claims.get("located in the administrative territorial entity", [])
-        coordinate_location: List[Dict[str, Any]] = claims.get("coordinate location", [])
-        heritage_designation: List[Dict[str, Any]] = claims.get("heritage designation", [])
-        instance_of: List[Dict[str, Any]] = claims.get("instance of", [])
-        location = claims.get("location")
-        officialWebsite = claims.get("official website")
+        administrative = claims.get(Property.ADMINISTRATIVE, [])
+        coordinate_location: List[Dict[str, Any]] = claims.get(Property.COORDINATE_LOCATION, [])
+        heritage_designation: List[Dict[str, Any]] = claims.get(Property.HERITAGE_DESIGNATION, [])
+        instance_of: List[Dict[str, Any]] = claims.get(Property.INSTANCE_OF, [])
+        location = claims.get(Property.LOCATION)
+        officialWebsite = claims.get(Property.OFFICIAL_WEBSITE)
 
         wikidata_id: str = value["title"]
         countries, types = self._query_metadata(query_metadata)
