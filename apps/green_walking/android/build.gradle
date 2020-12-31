@@ -10,19 +10,19 @@ buildscript {
 
     dependencies {
         // version can be found here https://developer.android.com/studio/releases/gradle-plugin
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:4.1.1'
         // version can be found here https://mvnrepository.com/artifact/com.google.gms/google-services?repo=google
         classpath 'com.google.gms:google-services:4.3.4'
+        // details see https://firebase.google.com/docs/crashlytics/get-started?platform=android#java
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.4.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        // versions can be found here https://maven.fabric.io/public/io/fabric/tools/gradle/maven-metadata.xml
-        classpath 'io.fabric.tools:gradle:1.31.2' // required by firebase_crashlytics
     }
 }
 
 allprojects {
     repositories {
         google()
-        jcenter()
+        //jcenter()
     }
 }
 

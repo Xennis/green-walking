@@ -30,8 +30,8 @@ if (flutterVersionName == null) {
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
-apply plugin: 'io.fabric' // required by firebase_crashlytics
 apply plugin: 'com.google.gms.google-services' // required by firebase, firebase_crashlytics
+apply plugin: 'com.google.firebase.crashlytics'
 
 android {
     compileSdkVersion 30
@@ -83,5 +83,6 @@ dependencies {
     // https://firebase.google.com/docs/android/learn-more#bom
     // When using the BoM, you don't specify versions in Firebase library dependencies.
     implementation platform('com.google.firebase:firebase-bom:26.2.0')
+    implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
 }
