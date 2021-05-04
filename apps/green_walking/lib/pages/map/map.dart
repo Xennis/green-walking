@@ -244,7 +244,7 @@ class _MapPageState extends State<MapPage> {
               // Use if https://github.com/fleaflet/flutter_map/pull/740/ is merged.
               //'id': mapboxStyle,
             },
-            tileProvider: const CachedNetworkTileProvider(),
+            tileProvider: NetworkTileProvider(),
             overrideTilesWhenUrlChanges: true,
           ),
           // Before MarkerClusterLayerOptions. Otherwise the user location is on top of markers
@@ -273,7 +273,7 @@ class _MapPageState extends State<MapPage> {
               );
             },
             popupOptions: PopupOptions(
-                popupSnap: PopupSnap.top,
+                popupSnap: PopupSnap.markerTop,
                 popupController: _popupController,
                 popupBuilder: (_, Marker marker) {
                   final Place p = (marker as PlaceMarker).place;
@@ -290,11 +290,11 @@ class _MapPageState extends State<MapPage> {
                           ),
                           ButtonBar(
                             children: <Widget>[
-                              FlatButton(
+                              TextButton(
                                 child: Text(locale.ok.toUpperCase(), style: tx),
                                 onPressed: () => _popupController.hidePopup(),
                               ),
-                              FlatButton(
+                              TextButton(
                                 child: Text(locale.details.toUpperCase(),
                                     style: tx),
                                 onPressed: () {

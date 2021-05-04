@@ -53,14 +53,14 @@ class GdprDialog extends StatelessWidget {
         ),
       ),
       actions: <Widget>[
-        FlatButton(
+        TextButton(
             child: Text(locale.gdprDisagree.toUpperCase()),
             onPressed: () {
               SharedPrefs.setBool(SharedPrefs.ANALYTICS_ENABLED, false);
               FirebaseAnalytics().setAnalyticsCollectionEnabled(false);
               Navigator.of(context).pop();
             }),
-        FlatButton(
+        TextButton(
             child: Text(locale.gdprAgree.toUpperCase()),
             onPressed: () {
               SharedPrefs.setBool(SharedPrefs.ANALYTICS_ENABLED, true);
