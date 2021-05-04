@@ -30,7 +30,7 @@ class FeedbackPage extends StatelessWidget {
             ButtonBar(
               alignment: MainAxisAlignment.center,
               children: <Widget>[
-                FlatButton(
+                ElevatedButton(
                   onPressed: () {
                     final Uri mailTo = Uri(
                       scheme: 'mailto',
@@ -42,8 +42,6 @@ class FeedbackPage extends StatelessWidget {
                     );
                     launch(mailTo.toString());
                   },
-                  color: Theme.of(context).accentColor,
-                  textColor: Colors.white,
                   child:
                       Text(locale.feedbackSendMailToLabel('code@xennis.org')),
                 ),

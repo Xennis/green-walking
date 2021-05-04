@@ -108,7 +108,7 @@ class AttributionLayer extends StatelessWidget {
                             ),
                           ),
                           actions: <Widget>[
-                            FlatButton(
+                            TextButton(
                                 child: Text(locale.ok.toUpperCase()),
                                 onPressed: () {
                                   Navigator.of(context).pop();

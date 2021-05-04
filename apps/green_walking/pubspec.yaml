@@ -22,27 +22,27 @@ environment:
 
 dependencies:
   cached_network_image: ^2.5.0
-  cloud_firestore: ^0.14.4
+  cloud_firestore: ^0.16.0+1
   cupertino_icons: ^1.0.1+2
   dart_geohash: ^1.0.2
-  firebase_analytics: ^6.3.0
-  firebase_auth: ^0.18.4+1
-  firebase_core: ^0.5.3
-  firebase_crashlytics: ^0.2.4
+  firebase_analytics: ^7.0.1
+  firebase_auth: ^0.20.1
+  firebase_core: ^0.7.0
+  firebase_crashlytics: ^0.4.0+1
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  flutter_map: ^0.10.1+1
-  flutter_map_location: ^0.7.0+1
-  flutter_map_marker_cluster: ^0.3.1
-  flutter_speed_dial: ^1.2.5
+  flutter_map: ^0.12.0
+  flutter_map_location: ^0.7.1
+  flutter_map_marker_cluster: ^0.3.4
+  flutter_speed_dial: ^3.0.5
   flutter_svg: ^0.19.2+1
   intl: ^0.16.1
   intl_translation: ^0.17.10+1
   location: ^3.2.1
-  shared_preferences: ^0.5.12+4
-  url_launcher: ^5.7.10
+  shared_preferences: ^2.0.5
+  url_launcher: ^6.0.3
 dependency_overrides:
   # Required because of https://github.com/flutter/flutter/issues/49931
   intl: 0.17.0-nullsafety.2
