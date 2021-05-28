@@ -33,30 +33,3 @@ jobs:
       working-directory: apps/green_walking
       env:
         ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/21.3.6528147
-  deploy-macos:
-    runs-on: macos-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v1
-      with:
-        channel: 'beta'
-    - name: Install git-crypt
-      run: HOMEBREW_NO_AUTO_UPDATE=1 brew install git-crypt
-    - name: Unlock git-crypt
-      run: echo "$GIT_CRYPT_KEY" | base64 --decode > ./git-crypt-key && git-crypt unlock ./git-crypt-key && rm ./git-crypt-key
-      env:
-        GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
-    - name: Install dependencies
-      run: flutter pub get
-      working-directory: apps/green_walking
-    - name: Run linter
-      run: flutter analyze .
-      working-directory: apps/green_walking
-    - name: Run tests
-      run: flutter test .
-      working-directory: apps/green_walking
-    - name: Build release
-      run: flutter build ios --release --no-codesign
-      working-directory: apps/green_walking
