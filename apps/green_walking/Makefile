@@ -5,7 +5,7 @@ check: lint test
 format-check:
 	@echo ">>> Check Dart format"
 	# Exclude the auto-generated intl files
-	find . -name '*.dart' -not -name 'messages_*.dart' -exec dart format --set-exit-if-changed {} \;
+	find . -name '*.dart' -not -name 'messages_*.dart' -exec flutter format --set-exit-if-changed {} \;
 
 lint:
 	@echo ">>> Flutter analyze"
