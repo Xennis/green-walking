@@ -13,9 +13,9 @@ jobs:
     - name: Install dependencies
       run: flutter pub get
       working-directory: apps/green_walking
-    #- name: Check format
-    #  run: dart format --set-exit-if-changed .
-    #  working-directory: apps/green_walking
+    - name: Check format
+      run: find . -name '*.dart' -not -name 'messages_*.dart' -exec flutter format --set-exit-if-changed {} \;
+      working-directory: apps/green_walking
     - name: Run linter
       run: flutter analyze .
       working-directory: apps/green_walking
