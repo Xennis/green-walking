@@ -22,30 +22,35 @@ environment:
 
 dependencies:
   cached_network_image: ^2.5.0
-  cloud_firestore: ^0.16.0+1
-  cupertino_icons: ^1.0.1+2
+  cloud_firestore: ^2.2.0
+  cupertino_icons: ^1.0.3
   dart_geohash: ^1.0.2
-  firebase_analytics: ^7.0.1
-  firebase_auth: ^0.20.1
-  firebase_core: ^0.7.0
-  firebase_crashlytics: ^0.4.0+1
+  firebase_analytics: ^8.1.0
+  firebase_auth: ^1.2.0
+  firebase_core: ^1.2.0
+  firebase_crashlytics: ^2.0.4
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
   flutter_map: ^0.12.0
-  flutter_map_location: ^0.7.1
-  flutter_map_marker_cluster: ^0.3.4
+  flutter_map_location: ^0.10.0
+  flutter_map_marker_cluster: ^0.3.5
   flutter_speed_dial: ^3.0.5
-  flutter_svg: ^0.19.2+1
-  intl: ^0.16.1
+  flutter_svg: ^0.19.3
+  intl: ^0.17.0
   intl_translation: ^0.17.10+1
-  location: ^3.2.1
-  shared_preferences: ^2.0.5
-  url_launcher: ^6.0.3
+  location: ^4.1.1
+  shared_preferences: ^2.0.6
+  url_launcher: ^6.0.4
 dependency_overrides:
+  # Not uses rxdart
+  flutter_compass:
+    git:
+      url: https://github.com/mihu86/flutter_compass.git
+      ref: 0304e1e8666edb74b9c2c71b16c4c7880d047c2d
   # Required because of https://github.com/flutter/flutter/issues/49931
-  intl: 0.17.0-nullsafety.2
+  intl: 0.17.0
 
 dev_dependencies:
   #flutter_launcher_icons: ^0.8.1
