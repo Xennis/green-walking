@@ -15,13 +15,13 @@ class PlaceService {
       ..add(centerHash.toString());
 
     final Iterable<Future<Iterable<Place>>> queries = area.map((String hash) {
-      final Query query = FirebaseFirestore.instance
+      final Query<Map<String, dynamic>> query = FirebaseFirestore.instance
           .collection('places_v4')
           .orderBy('geohash')
           .startAt(<String>[hash]).endAt(<String>[hash + '~']);
-      return query.get().then((QuerySnapshot value) {
+      return query.get().then((QuerySnapshot<Map<String, dynamic>> value) {
         return value.docs
-            .map((DocumentSnapshot e) => Place.fromFirestore(e.data(), lang));
+            .map((DocumentSnapshot<Map<String, dynamic>> e) => Place.fromFirestore(e.data(), lang));
       });
     });
 

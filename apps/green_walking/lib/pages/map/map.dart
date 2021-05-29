@@ -60,7 +60,6 @@ class _MapPageState extends State<MapPage> {
   final PopupController _popupController = PopupController();
   // (south-west, north-east)
   List<PlaceMarker> places = <PlaceMarker>[];
-  List<Marker> userLocationMarkers = <Marker>[];
   GeoHash _lastGeohash;
   MabboxTileset mapboxStyle = MabboxTileset.outdoor;
   LatLng _lastLoc;
@@ -247,9 +246,6 @@ class _MapPageState extends State<MapPage> {
             tileProvider: NetworkTileProvider(),
             overrideTilesWhenUrlChanges: true,
           ),
-          // Before MarkerClusterLayerOptions. Otherwise the user location is on top of markers
-          // and especially on top of pop-ups.
-          MarkerLayerOptions(markers: userLocationMarkers),
           MarkerClusterLayerOptions(
             size: const Size(40, 40),
             fitBoundsOptions: const FitBoundsOptions(
@@ -320,7 +316,6 @@ class _MapPageState extends State<MapPage> {
                 }),
           ),
           LocationOptions(
-            markers: userLocationMarkers,
             onLocationUpdate: (LatLngData ld) {
               if (ld == null) {
                 _lastLoc = null;
