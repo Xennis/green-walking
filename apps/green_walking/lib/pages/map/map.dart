@@ -229,6 +229,8 @@ class _MapPageState extends State<MapPage> {
             MarkerClusterPlugin(),
             LocationPlugin(),
           ],
+          // Turn off rotation because in flutter_map 0.12.0 all elements rotate.
+          interactiveFlags: InteractiveFlag.all & ~InteractiveFlag.rotate,
           minZoom: 11, // zoom out
           maxZoom: 18, // zoom in
           onTap: (_) => _popupController.hidePopup(),
