@@ -248,6 +248,67 @@ class _MapPageState extends State<MapPage> {
             tileProvider: NetworkTileProvider(),
             overrideTilesWhenUrlChanges: true,
           ),
+          LocationOptions(
+            onLocationUpdate: (LatLngData ld) {
+              if (ld == null) {
+                _lastLoc = null;
+                return;
+              }
+              _lastLoc = ld.location;
+              SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, ld.location);
+            },
+            onLocationRequested: (LatLngData ld) {
+              final LatLng loca = ld?.location;
+              if (loca == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(locale.errorNoPositionFound)));
+              } else {
+                mapController.move(loca, 15.0);
+              }
+            },
+            buttonBuilder: (BuildContext context,
+                ValueNotifier<LocationServiceStatus> status,
+                Function onPressed) {
+              return Align(
+                // The "right" has not really an affect here.
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0, right: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        FloatingActionButton(
+                            child:
+                                ValueListenableBuilder<LocationServiceStatus>(
+                                    valueListenable: status,
+                                    builder: (BuildContext context,
+                                        LocationServiceStatus value,
+                                        Widget child) {
+                                      switch (value) {
+                                        case LocationServiceStatus.disabled:
+                                        case LocationServiceStatus
+                                            .permissionDenied:
+                                        case LocationServiceStatus.unsubscribed:
+                                          return const Icon(
+                                            Icons.location_disabled,
+                                            color: Colors.white,
+                                          );
+                                          break;
+                                        case LocationServiceStatus.subscribed:
+                                        default:
+                                          return const Icon(
+                                            Icons.location_searching,
+                                            color: Colors.white,
+                                          );
+                                          break;
+                                      }
+                                    }),
+                            onPressed: () => onPressed()),
+                      ],
+                    )),
+              );
+            },
+          ),
           MarkerClusterLayerOptions(
             size: const Size(40, 40),
             fitBoundsOptions: const FitBoundsOptions(
@@ -316,67 +377,6 @@ class _MapPageState extends State<MapPage> {
                     ),
                   );
                 }),
-          ),
-          LocationOptions(
-            onLocationUpdate: (LatLngData ld) {
-              if (ld == null) {
-                _lastLoc = null;
-                return;
-              }
-              _lastLoc = ld.location;
-              SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, ld.location);
-            },
-            onLocationRequested: (LatLngData ld) {
-              final LatLng loca = ld?.location;
-              if (loca == null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(locale.errorNoPositionFound)));
-              } else {
-                mapController.move(loca, 15.0);
-              }
-            },
-            buttonBuilder: (BuildContext context,
-                ValueNotifier<LocationServiceStatus> status,
-                Function onPressed) {
-              return Align(
-                // The "right" has not really an affect here.
-                alignment: Alignment.bottomRight,
-                child: Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0, right: 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        FloatingActionButton(
-                            child:
-                                ValueListenableBuilder<LocationServiceStatus>(
-                                    valueListenable: status,
-                                    builder: (BuildContext context,
-                                        LocationServiceStatus value,
-                                        Widget child) {
-                                      switch (value) {
-                                        case LocationServiceStatus.disabled:
-                                        case LocationServiceStatus
-                                            .permissionDenied:
-                                        case LocationServiceStatus.unsubscribed:
-                                          return const Icon(
-                                            Icons.location_disabled,
-                                            color: Colors.white,
-                                          );
-                                          break;
-                                        case LocationServiceStatus.subscribed:
-                                        default:
-                                          return const Icon(
-                                            Icons.location_searching,
-                                            color: Colors.white,
-                                          );
-                                          break;
-                                      }
-                                    }),
-                            onPressed: () => onPressed()),
-                      ],
-                    )),
-              );
-            },
           ),
           AttributionOptions(
               logoAssetName: 'assets/mapbox-logo.svg',
