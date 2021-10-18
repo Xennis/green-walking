@@ -1,6 +1,6 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:green_walking/services/shared_prefs.dart';
 
 import '../intl.dart';

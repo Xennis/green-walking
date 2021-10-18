@@ -1,8 +1,8 @@
 import 'dart:developer';
 
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:latlong/latlong.dart';
 import 'package:dart_geohash/dart_geohash.dart';
+import 'package:latlong/latlong.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefs {
   static const String KEY_LAST_LOCATION = 'last-location';

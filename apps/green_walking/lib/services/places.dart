@@ -1,9 +1,10 @@
 import 'dart:async';
+
+import 'package:async/async.dart' show FutureGroup;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dart_geohash/dart_geohash.dart';
 import 'package:green_walking/types/language.dart';
 import 'package:latlong/latlong.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:async/async.dart' show FutureGroup;
 
 import '../types/place.dart';
 
