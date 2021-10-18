@@ -10,13 +10,13 @@ class Routes {
   static const String map = 'map';
   static const String privacy = 'privacy';
   static const String settings = 'settings';
+}
 
-  static Map<String, WidgetBuilder> get(BuildContext context) {
-    return <String, WidgetBuilder>{
-      feedback: (_) => FeedbackPage(),
-      imprint: (_) => ImprintPage(),
-      map: (_) => const MapPage(),
-      settings: (_) => SettingsPage(),
-    };
-  }
+Map<String, WidgetBuilder> getRoutes(BuildContext context) {
+  return <String, WidgetBuilder>{
+    Routes.feedback: (_) => FeedbackPage(),
+    Routes.imprint: (_) => ImprintPage(),
+    Routes.map: (_) => const MapPage(),
+    Routes.settings: (_) => SettingsPage(),
+  };
 }

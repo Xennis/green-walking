@@ -33,7 +33,7 @@ class GreenWalkingApp extends StatelessWidget {
       ),
       initialRoute: Routes.map,
       routes: () {
-        final Map<String, WidgetBuilder> routes = Routes.get(context);
+        final Map<String, WidgetBuilder> routes = getRoutes(context);
         return routes;
       }(),
       localizationsDelegates: const <LocalizationsDelegate<dynamic>>[

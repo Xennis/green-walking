@@ -56,26 +56,24 @@ class MapboxGeocodingService implements Exception {
   String cause;
 }
 
-class MapboxGeocoding {
-  static Future<MapboxGeocodingResult> get(
-      String query, String token, LatLng loc) async {
-    final Uri url = Uri.https('api.mapbox.com',
-        '/geocoding/v5/mapbox.places/$query.json', <String, String>{
-      'access_token': token,
-      'limit': '5',
-      'proximity': loc != null ? '${loc.longitude},${loc.latitude}' : ''
-    });
-    try {
-      final http.Response response = await http.get(url);
-      if (response.statusCode == 200) {
-        return MapboxGeocodingResult.fromJson(
-            json.decode(response.body) as Map<String, dynamic>);
-      } else {
-        throw MapboxGeocodingService(
-            'Invalid ${response.statusCode} response from API');
-      }
-    } on SocketException catch (_) {
-      throw MapboxGeocodingService('No internet connection');
+Future<MapboxGeocodingResult> mapboxGeocodingGet(
+    String query, String token, LatLng loc) async {
+  final Uri url = Uri.https('api.mapbox.com',
+      '/geocoding/v5/mapbox.places/$query.json', <String, String>{
+    'access_token': token,
+    'limit': '5',
+    'proximity': loc != null ? '${loc.longitude},${loc.latitude}' : ''
+  });
+  try {
+    final http.Response response = await http.get(url);
+    if (response.statusCode == 200) {
+      return MapboxGeocodingResult.fromJson(
+          json.decode(response.body) as Map<String, dynamic>);
+    } else {
+      throw MapboxGeocodingService(
+          'Invalid ${response.statusCode} response from API');
     }
+  } on SocketException catch (_) {
+    throw MapboxGeocodingService('No internet connection');
   }
 }
