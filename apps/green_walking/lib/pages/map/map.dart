@@ -320,7 +320,7 @@ class _MapPageState extends State<MapPage> {
               // See https://github.com/lpongetti/flutter_map_marker_cluster/issues/18
               return Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).accentColor,
+                  color: Theme.of(context).colorScheme.secondary,
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -337,7 +337,7 @@ class _MapPageState extends State<MapPage> {
                 popupBuilder: (_, Marker marker) {
                   final Place p = (marker as PlaceMarker).place;
                   final TextStyle tx =
-                      TextStyle(color: Theme.of(context).accentColor);
+                      TextStyle(color: Theme.of(context).colorScheme.secondary);
                   return Container(
                     width: 300,
                     child: Card(
