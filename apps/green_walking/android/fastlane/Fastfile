@@ -21,12 +21,12 @@ platform :android do
     gradle(task: "test")
   end
 
-  desc "Upload a new version to beta track of the Play Store"
-  lane :beta do
+  desc "Upload a new version to alpha track of the Play Store"
+  lane :alpha do
     #gradle(task: "clean assembleRelease")
     #crashlytics
     #gradle(task: 'assemble', build_type: 'Release')
-    upload_to_play_store(track: 'beta', aab: '../build/app/outputs/bundle/release/app-release.aab')
+    upload_to_play_store(track: 'alpha', aab: '../build/app/outputs/bundle/release/app-release.aab')
   
     # sh "your_script.sh"
     # You can also use other beta testing services here
