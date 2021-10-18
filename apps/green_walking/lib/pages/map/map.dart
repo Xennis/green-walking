@@ -88,7 +88,7 @@ class _MapPageState extends State<MapPage> {
     final Language lang =
         languageFromString(AppLocalizations.of(context).localeName);
 
-    PlaceService.nearby(_newGeohash, lang).then((List<Place> value) {
+    nearbyPlaces(_newGeohash, lang).then((List<Place> value) {
       setState(() {
         places = value
             .map((Place p) => PlaceMarker(
@@ -176,7 +176,7 @@ class _MapPageState extends State<MapPage> {
                   context,
                   MaterialPageRoute<LatLng>(
                       builder: (BuildContext context) => SearchPage(
-                            result: MapboxGeocoding.get(
+                            result: mapboxGeocodingGet(
                                 query, accessToken, _lastLoc),
                           )),
                 );

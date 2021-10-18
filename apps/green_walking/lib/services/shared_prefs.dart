@@ -4,6 +4,7 @@ import 'package:dart_geohash/dart_geohash.dart';
 import 'package:latlong/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// ignore: avoid_classes_with_only_static_members
 class SharedPrefs {
   static const String KEY_LAST_LOCATION = 'last-location';
   static const String ANALYTICS_ENABLED = 'analytics-enabled';

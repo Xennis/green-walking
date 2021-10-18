@@ -85,7 +85,7 @@ class AttributionLayer extends StatelessWidget {
       child: Row(
         children: <Widget>[
           const Text('  '), // FIXME: Use proper spacing
-          PlatformSvgPicture.asset(
+          platformSvgPictureAsset(
             attrOptions.logoAssetName,
             semanticsLabel: 'Mapbox',
             width: 80,
