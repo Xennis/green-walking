@@ -1,6 +1,11 @@
-.PHONY: check format-check lint test launcher-icon release-android release-web i10n
+.PHONY: check format format-check lint test launcher-icon release-android release-web i10n
 
 check: lint test
+
+format:
+	@echo ">>> Flutter format"
+	# Exclude the auto-generated intl files
+	find . -name '*.dart' -not -name 'messages_*.dart' -exec flutter format {} \;
 
 format-check:
 	@echo ">>> Check Dart format"
