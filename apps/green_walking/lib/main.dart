@@ -20,12 +20,13 @@ void main() {
 class GreenWalkingApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = ThemeData();
     return MaterialApp(
       onGenerateTitle: (BuildContext context) =>
           AppLocalizations.of(context).appTitle,
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        accentColor: Colors.blue,
+      theme: theme.copyWith(
+        primaryColor: Colors.green,
+        colorScheme: theme.colorScheme.copyWith(secondary: Colors.blue),
         // This makes the visual density adapt to the platform that you run
         // the app on. For desktop platforms, the controls will be smaller and
         // closer together (more dense) than on mobile platforms.

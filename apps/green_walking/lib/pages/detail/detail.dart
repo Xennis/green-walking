@@ -160,7 +160,7 @@ class _DetailSpeedDial extends StatelessWidget {
     }
     return SpeedDial(
         animatedIcon: AnimatedIcons.menu_close,
-        backgroundColor: Theme.of(context).accentColor,
+        backgroundColor: Theme.of(context).colorScheme.secondary,
         children: children);
   }
 }

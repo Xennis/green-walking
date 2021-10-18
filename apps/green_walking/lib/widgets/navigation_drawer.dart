@@ -18,7 +18,7 @@ class NavigationDrawer extends StatelessWidget {
         children: <Widget>[
           DrawerHeader(
             decoration: BoxDecoration(
-              color: Theme.of(context).accentColor,
+              color: Theme.of(context).colorScheme.secondary,
             ),
             child: Column(children: <Widget>[
               Row(children: <Widget>[
@@ -73,7 +73,8 @@ class NavigationDrawer extends StatelessWidget {
                     ),
                     TextSpan(
                       text: locale.aboutRepository('GitHub'),
-                      style: TextStyle(color: Theme.of(context).accentColor),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.secondary),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
                           launch('https://github.com/Xennis/green-walking');
