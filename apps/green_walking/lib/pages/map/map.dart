@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:green_walking/pages/map/tileset.dart';
 import 'package:green_walking/pages/search.dart';
 import 'package:green_walking/services/mapbox_geocoding.dart';
@@ -110,6 +111,7 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations locale = AppLocalizations.of(context);
     return Scaffold(
       key: _scaffoldKey,
       drawer: NavigationDrawer(),
@@ -140,6 +142,29 @@ class _MapPageState extends State<MapPage> {
 
             return const Center(child: CircularProgressIndicator());
           }),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(context).colorScheme.secondary,
+        onPressed: () async {
+          if (await Geolocator.checkPermission() == LocationPermission.denied) {
+            if (<LocationPermission>[
+                  LocationPermission.always,
+                  LocationPermission.whileInUse
+                ].contains(await Geolocator.requestPermission()) ==
+                false) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(locale.errorNoPositionFound)));
+            }
+          }
+
+          mapController.moveCamera(CameraUpdate.newLatLngZoom(
+              await mapController.requestMyLocationLatLng(), 15.0));
+        },
+        // TODO(Xennis): Use Icons.location_disabled if location service is not avaiable.
+        child: const Icon(
+          Icons.location_searching,
+          color: Colors.white,
+        ),
+      ),
     );
   }
 
@@ -228,7 +253,7 @@ class _MapPageState extends State<MapPage> {
               ? config.lastLocation
               : const LatLng(53.5519, 9.8682),
           zoom: 11.0),
-      myLocationEnabled: false,
+      myLocationEnabled: true,
       rotateGesturesEnabled: false,
       minMaxZoomPreference: const MinMaxZoomPreference(11.0, 18.0),
       styleString: mapboxStyle.id,
@@ -240,70 +265,16 @@ class _MapPageState extends State<MapPage> {
         final Uint8List list = bytes.buffer.asUint8List();
         mapController.addImage('place-marker', list);
       },
+      onUserLocationUpdated: (UserLocation location) {
+        if (location == null || location.position == null) {
+          _lastLoc = null;
+          return;
+        }
+        SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, location.position);
+      },
     );
 
     /*
-          LocationOptions(
-            onLocationUpdate: (LatLngData ld) {
-              if (ld == null) {
-                _lastLoc = null;
-                return;
-              }
-              _lastLoc = ld.location;
-              SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, ld.location);
-            },
-            onLocationRequested: (LatLngData ld) {
-              final LatLng loca = ld?.location;
-              if (loca == null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(locale.errorNoPositionFound)));
-              } else {
-                mapController.move(loca, 15.0);
-              }
-            },
-            buttonBuilder: (BuildContext context,
-                ValueNotifier<LocationServiceStatus> status,
-                Function onPressed) {
-              return Align(
-                // The "right" has not really an affect here.
-                alignment: Alignment.bottomRight,
-                child: Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0, right: 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        FloatingActionButton(
-                            child:
-                                ValueListenableBuilder<LocationServiceStatus>(
-                                    valueListenable: status,
-                                    builder: (BuildContext context,
-                                        LocationServiceStatus value,
-                                        Widget child) {
-                                      switch (value) {
-                                        case LocationServiceStatus.disabled:
-                                        case LocationServiceStatus
-                                            .permissionDenied:
-                                        case LocationServiceStatus.unsubscribed:
-                                          return const Icon(
-                                            Icons.location_disabled,
-                                            color: Colors.white,
-                                          );
-                                          break;
-                                        case LocationServiceStatus.subscribed:
-                                        default:
-                                          return const Icon(
-                                            Icons.location_searching,
-                                            color: Colors.white,
-                                          );
-                                          break;
-                                      }
-                                    }),
-                            onPressed: () => onPressed()),
-                      ],
-                    )),
-              );
-            },
-          ),
           MarkerClusterLayerOptions(
             size: const Size(40, 40),
             fitBoundsOptions: const FitBoundsOptions(
