@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:typed_data';
 
+import 'package:dart_geohash/dart_geohash.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,7 +10,10 @@ import 'package:flutter/widgets.dart';
 import 'package:green_walking/pages/map/tileset.dart';
 import 'package:green_walking/pages/search.dart';
 import 'package:green_walking/services/mapbox_geocoding.dart';
+import 'package:green_walking/services/places.dart';
 import 'package:green_walking/services/shared_prefs.dart';
+import 'package:green_walking/types/language.dart';
+import 'package:green_walking/types/place.dart';
 import 'package:green_walking/widgets/gdpr_dialog.dart';
 import 'package:green_walking/widgets/navigation_drawer.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
@@ -45,7 +50,7 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   MapboxMapController mapController;
-  //GeoHash _lastGeohash;
+  GeoHash _lastGeohash;
   MabboxTileset mapboxStyle = MabboxTileset.outdoor;
   LatLng _lastLoc;
 
@@ -56,9 +61,18 @@ class _MapPageState extends State<MapPage> {
         .addPostFrameCallback((_) => enableAnalyticsOrConsent(context));
   }
 
-  /*
-  void onPositionChanged(MapPosition position, bool hasGesture) {
-    final LatLng center = position.center;
+  @override
+  void dispose() {
+    mapController?.onSymbolTapped?.remove(_onSymbolTapped);
+    super.dispose();
+  }
+
+  void _onSymbolTapped(Symbol symbol) {
+    mapController
+        ?.animateCamera(CameraUpdate.newLatLng(symbol.options.geometry));
+  }
+
+  void onPositionChanged(LatLng center) {
     if (center == null) {
       return;
     }
@@ -75,26 +89,24 @@ class _MapPageState extends State<MapPage> {
         languageFromString(AppLocalizations.of(context).localeName);
 
     nearbyPlaces(_newGeohash, lang).then((List<Place> value) {
+      final List<SymbolOptions> markers = value
+          .map((Place p) => SymbolOptions(
+                geometry: p.geopoint,
+                iconImage: 'place-marker',
+                iconSize: 0.5,
+                iconAnchor: 'top',
+                // TODO(Xennis): Use different colors
+                //iconColor: '#${placeTypeToColor(p.type).value.toRadixString(16)}'
+              ))
+          .toList();
+      mapController.clearSymbols();
+      mapController.addSymbols(markers);
+
       setState(() {
-        places = value
-            .map((Place p) => PlaceMarker(
-                  place: p,
-                  anchorPos: AnchorPos.align(AnchorAlign.top),
-                  height: 50,
-                  width: 50,
-                  point: p.geopoint,
-                  builder: (_) => Icon(
-                    Icons.location_on,
-                    color: placeTypeToColor(p.type),
-                    size: 50,
-                  ),
-                ))
-            .toList();
         _lastGeohash = _newGeohash;
       });
     });
   }
-  */
 
   @override
   Widget build(BuildContext context) {
@@ -206,21 +218,30 @@ class _MapPageState extends State<MapPage> {
   Widget map(BuildContext context, MapConfig config) {
     //final AppLocalizations locale = AppLocalizations.of(context);
     return MapboxMap(
-        accessToken: config.accessToken,
-        onMapCreated: (MapboxMapController controller) {
-          mapController = controller;
-        },
-        initialCameraPosition: CameraPosition(
-            target: (config.lastLocation != null)
-                ? config.lastLocation
-                : const LatLng(53.5519, 9.8682),
-            zoom: 11.0),
-        myLocationEnabled: false,
-        rotateGesturesEnabled: false,
-        minMaxZoomPreference: const MinMaxZoomPreference(11.0, 18.0),
-        styleString: mapboxStyle.id);
+      accessToken: config.accessToken,
+      onMapCreated: (MapboxMapController controller) {
+        mapController = controller;
+        mapController.onSymbolTapped.add(_onSymbolTapped);
+      },
+      initialCameraPosition: CameraPosition(
+          target: (config.lastLocation != null)
+              ? config.lastLocation
+              : const LatLng(53.5519, 9.8682),
+          zoom: 11.0),
+      myLocationEnabled: false,
+      rotateGesturesEnabled: false,
+      minMaxZoomPreference: const MinMaxZoomPreference(11.0, 18.0),
+      styleString: mapboxStyle.id,
+      onCameraIdle: () =>
+          onPositionChanged(mapController.cameraPosition.target),
+      onStyleLoadedCallback: () async {
+        // TODO(Xennis): Use Icons.location_pin
+        final ByteData bytes = await rootBundle.load('assets/place-icon.png');
+        final Uint8List list = bytes.buffer.asUint8List();
+        mapController.addImage('place-marker', list);
+      },
+    );
 
-    //onCameraIdle: () => onPositionChanged(mapController.cameraPosition.target),
     /*
           LocationOptions(
             onLocationUpdate: (LatLngData ld) {
