@@ -34,7 +34,7 @@ apply plugin: 'com.google.gms.google-services' // required by firebase, firebase
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -47,7 +47,7 @@ android {
     defaultConfig {
         // Unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "org.xennis.apps.green_walking"
-        minSdkVersion 16 // Version 4.1
+        minSdkVersion 20 // Version 4.4W (mapbox_gl requires >= 20)
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
