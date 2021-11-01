@@ -1,31 +1,19 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:dart_geohash/dart_geohash.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_map/plugin_api.dart';
-import 'package:flutter_map_location/flutter_map_location.dart';
-import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:green_walking/pages/map/tileset.dart';
 import 'package:green_walking/pages/search.dart';
 import 'package:green_walking/services/mapbox_geocoding.dart';
-import 'package:green_walking/services/places.dart';
 import 'package:green_walking/services/shared_prefs.dart';
-import 'package:green_walking/types/language.dart';
-import 'package:green_walking/types/marker.dart';
 import 'package:green_walking/widgets/gdpr_dialog.dart';
 import 'package:green_walking/widgets/navigation_drawer.dart';
-import 'package:green_walking/widgets/place_list_tile.dart';
-import 'package:latlong/latlong.dart';
+import 'package:mapbox_gl/mapbox_gl.dart';
 
-import '../../core.dart';
 import '../../intl.dart';
-import '../../types/place.dart';
-import '../detail/detail.dart';
-import 'attribution.dart';
 
 class MapConfig {
   MapConfig({this.accessToken, this.lastLocation});
@@ -56,11 +44,8 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final MapController mapController = MapController();
-  final PopupController _popupController = PopupController();
-  // (south-west, north-east)
-  List<PlaceMarker> places = <PlaceMarker>[];
-  GeoHash _lastGeohash;
+  MapboxMapController mapController;
+  //GeoHash _lastGeohash;
   MabboxTileset mapboxStyle = MabboxTileset.outdoor;
   LatLng _lastLoc;
 
@@ -71,6 +56,7 @@ class _MapPageState extends State<MapPage> {
         .addPostFrameCallback((_) => enableAnalyticsOrConsent(context));
   }
 
+  /*
   void onPositionChanged(MapPosition position, bool hasGesture) {
     final LatLng center = position.center;
     if (center == null) {
@@ -108,6 +94,7 @@ class _MapPageState extends State<MapPage> {
       });
     });
   }
+  */
 
   @override
   Widget build(BuildContext context) {
@@ -184,7 +171,8 @@ class _MapPageState extends State<MapPage> {
                   if (value == null) {
                     return;
                   }
-                  mapController.move(value, 14.0);
+                  mapController?.moveCamera(CameraUpdate.newCameraPosition(
+                      CameraPosition(target: value, zoom: 14.0)));
                 });
               },
             ),
@@ -216,38 +204,24 @@ class _MapPageState extends State<MapPage> {
   }
 
   Widget map(BuildContext context, MapConfig config) {
-    final AppLocalizations locale = AppLocalizations.of(context);
-    return FlutterMap(
-        mapController: mapController,
-        options: MapOptions(
-          center: (config.lastLocation != null)
-              ? config.lastLocation
-              : LatLng(53.5519, 9.8682),
-          zoom: 14.0,
-          plugins: <MapPlugin>[
-            AttributionPlugin(),
-            MarkerClusterPlugin(),
-            LocationPlugin(),
-          ],
-          // Turn off rotation because in flutter_map 0.12.0 all elements rotate.
-          interactiveFlags: InteractiveFlag.all & ~InteractiveFlag.rotate,
-          minZoom: 11, // zoom out
-          maxZoom: 18, // zoom in
-          onTap: (_) => _popupController.hidePopup(),
-          onPositionChanged: onPositionChanged,
-        ),
-        layers: <LayerOptions>[
-          TileLayerOptions(
-            urlTemplate:
-                'https://api.mapbox.com/styles/v1/${mapboxStyle.id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
-            additionalOptions: <String, String>{
-              'accessToken': config.accessToken,
-              // Use if https://github.com/fleaflet/flutter_map/pull/740/ is merged.
-              //'id': mapboxStyle,
-            },
-            tileProvider: NetworkTileProvider(),
-            overrideTilesWhenUrlChanges: true,
-          ),
+    //final AppLocalizations locale = AppLocalizations.of(context);
+    return MapboxMap(
+        accessToken: config.accessToken,
+        onMapCreated: (MapboxMapController controller) {
+          mapController = controller;
+        },
+        initialCameraPosition: CameraPosition(
+            target: (config.lastLocation != null)
+                ? config.lastLocation
+                : const LatLng(53.5519, 9.8682),
+            zoom: 11.0),
+        myLocationEnabled: false,
+        rotateGesturesEnabled: false,
+        minMaxZoomPreference: const MinMaxZoomPreference(11.0, 18.0),
+        styleString: mapboxStyle.id);
+
+    //onCameraIdle: () => onPositionChanged(mapController.cameraPosition.target),
+    /*
           LocationOptions(
             onLocationUpdate: (LatLngData ld) {
               if (ld == null) {
@@ -378,13 +352,6 @@ class _MapPageState extends State<MapPage> {
                   );
                 }),
           ),
-          AttributionOptions(
-              logoAssetName: 'assets/mapbox-logo.svg',
-              // Use white for satellite layer it's better visible.
-              color: mapboxStyle == MabboxTileset.satellite
-                  ? Colors.white
-                  : Colors.blueGrey,
-              satelliteLayer: mapboxStyle == MabboxTileset.satellite),
-        ]);
+        ]);*/
   }
 }
