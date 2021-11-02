@@ -275,28 +275,6 @@ class _MapPageState extends State<MapPage> {
     );
 
     /*
-          MarkerClusterLayerOptions(
-            size: const Size(40, 40),
-            fitBoundsOptions: const FitBoundsOptions(
-              padding: EdgeInsets.all(100),
-            ),
-            markers: places,
-            builder: (BuildContext context, List<Marker> markers) {
-              // Avoid using a FloatingActionButton here.
-              // See https://github.com/lpongetti/flutter_map_marker_cluster/issues/18
-              return Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.secondary,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    markers.length.toString(),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
-              );
-            },
             popupOptions: PopupOptions(
                 popupSnap: PopupSnap.markerTop,
                 popupController: _popupController,
