@@ -79,13 +79,19 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
-  void onPositionChanged(LatLng center) {
-    if (center == null) {
+  void onPositionChanged(CameraPosition position) {
+    if (position == null) {
+      return;
+    }
+    if (position.zoom < 11.0) {
+      // clearSymbols does not work https://github.com/tobrun/flutter-mapbox-gl/issues/651
+      mapController?.removeSymbols(mapController.symbols);
+      _lastGeohash = null;
       return;
     }
 
     final GeoHash _newGeohash = GeoHash.fromDecimalDegrees(
-        center.longitude, center.latitude,
+        position.target.longitude, position.target.latitude,
         precision: 4);
     if (_lastGeohash != null && _lastGeohash.contains(_newGeohash.geohash)) {
       return;
@@ -108,7 +114,8 @@ class _MapPageState extends State<MapPage> {
           .toList();
       final List<Map<String, Place>> data =
           value.map((Place p) => <String, Place>{'place': p}).toList();
-      mapController.clearSymbols();
+      // clearSymbols does not work https://github.com/tobrun/flutter-mapbox-gl/issues/651
+      mapController.removeSymbols(mapController.symbols);
       mapController.addSymbols(options, data);
 
       setState(() {
@@ -164,7 +171,7 @@ class _MapPageState extends State<MapPage> {
 
                           mapController.moveCamera(CameraUpdate.newLatLngZoom(
                               await mapController.requestMyLocationLatLng(),
-                              15.0));
+                              16.0));
                         },
                         // TODO(Xennis): Use Icons.location_disabled if location service is not avaiable.
                         child: const Icon(
@@ -284,7 +291,7 @@ class _MapPageState extends State<MapPage> {
                     return;
                   }
                   mapController?.moveCamera(CameraUpdate.newCameraPosition(
-                      CameraPosition(target: value, zoom: 14.0)));
+                      CameraPosition(target: value, zoom: 16.0)));
                 });
               },
             ),
@@ -322,6 +329,7 @@ class _MapPageState extends State<MapPage> {
       onMapCreated: (MapboxMapController controller) {
         mapController = controller;
         mapController.onSymbolTapped.add(_onSymbolTapped);
+        onPositionChanged(mapController.cameraPosition);
       },
       initialCameraPosition: CameraPosition(
           target: (config.lastLocation != null)
@@ -330,10 +338,9 @@ class _MapPageState extends State<MapPage> {
           zoom: 11.0),
       myLocationEnabled: true,
       rotateGesturesEnabled: false,
-      minMaxZoomPreference: const MinMaxZoomPreference(11.0, 18.0),
       styleString: mapboxStyle.id,
-      onCameraIdle: () =>
-          onPositionChanged(mapController.cameraPosition.target),
+      trackCameraPosition: true,
+      onCameraIdle: () => onPositionChanged(mapController.cameraPosition),
       onStyleLoadedCallback: () async {
         // TODO(Xennis): Use Icons.location_pin
         final ByteData bytes = await rootBundle.load('assets/place-icon.png');
