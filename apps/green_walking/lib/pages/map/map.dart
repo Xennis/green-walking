@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:green_walking/pages/detail/detail.dart';
 import 'package:green_walking/pages/map/tileset.dart';
 import 'package:green_walking/pages/search.dart';
 import 'package:green_walking/services/mapbox_geocoding.dart';
@@ -17,6 +18,7 @@ import 'package:green_walking/types/language.dart';
 import 'package:green_walking/types/place.dart';
 import 'package:green_walking/widgets/gdpr_dialog.dart';
 import 'package:green_walking/widgets/navigation_drawer.dart';
+import 'package:green_walking/widgets/place_list_tile.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 
 import '../../intl.dart';
@@ -54,6 +56,7 @@ class _MapPageState extends State<MapPage> {
   GeoHash _lastGeohash;
   MabboxTileset mapboxStyle = MabboxTileset.outdoor;
   LatLng _lastLoc;
+  Place _placeCardPreview;
 
   @override
   void initState() {
@@ -71,6 +74,9 @@ class _MapPageState extends State<MapPage> {
   void _onSymbolTapped(Symbol symbol) {
     mapController
         ?.animateCamera(CameraUpdate.newLatLng(symbol.options.geometry));
+    setState(() {
+      _placeCardPreview = symbol.data['place'] as Place;
+    });
   }
 
   void onPositionChanged(LatLng center) {
@@ -90,7 +96,7 @@ class _MapPageState extends State<MapPage> {
         languageFromString(AppLocalizations.of(context).localeName);
 
     nearbyPlaces(_newGeohash, lang).then((List<Place> value) {
-      final List<SymbolOptions> markers = value
+      final List<SymbolOptions> options = value
           .map((Place p) => SymbolOptions(
                 geometry: p.geopoint,
                 iconImage: 'place-marker',
@@ -100,8 +106,10 @@ class _MapPageState extends State<MapPage> {
                 //iconColor: '#${placeTypeToColor(p.type).value.toRadixString(16)}'
               ))
           .toList();
+      final List<Map<String, Place>> data =
+          value.map((Place p) => <String, Place>{'place': p}).toList();
       mapController.clearSymbols();
-      mapController.addSymbols(markers);
+      mapController.addSymbols(options, data);
 
       setState(() {
         _lastGeohash = _newGeohash;
@@ -122,11 +130,50 @@ class _MapPageState extends State<MapPage> {
               return Stack(
                 children: <Widget>[
                   Center(
-                      child: Row(children: <Widget>[
+                      child: Column(children: <Widget>[
                     Flexible(
                       child: map(context, snapshot.data),
-                    )
+                    ),
+                    Visibility(
+                      visible: _placeCardPreview != null,
+                      child: placeCardPreview(),
+                    ),
                   ])),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0, right: 16.0),
+                      child: FloatingActionButton(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.secondary,
+                        onPressed: () async {
+                          if (await Geolocator.checkPermission() ==
+                              LocationPermission.denied) {
+                            if (<LocationPermission>[
+                                  LocationPermission.always,
+                                  LocationPermission.whileInUse
+                                ].contains(
+                                    await Geolocator.requestPermission()) ==
+                                false) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content:
+                                          Text(locale.errorNoPositionFound)));
+                            }
+                          }
+
+                          mapController.moveCamera(CameraUpdate.newLatLngZoom(
+                              await mapController.requestMyLocationLatLng(),
+                              15.0));
+                        },
+                        // TODO(Xennis): Use Icons.location_disabled if location service is not avaiable.
+                        child: const Icon(
+                          Icons.location_searching,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
                   Positioned(
                     top: 37,
                     right: 15,
@@ -142,27 +189,55 @@ class _MapPageState extends State<MapPage> {
 
             return const Center(child: CircularProgressIndicator());
           }),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Theme.of(context).colorScheme.secondary,
-        onPressed: () async {
-          if (await Geolocator.checkPermission() == LocationPermission.denied) {
-            if (<LocationPermission>[
-                  LocationPermission.always,
-                  LocationPermission.whileInUse
-                ].contains(await Geolocator.requestPermission()) ==
-                false) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(locale.errorNoPositionFound)));
-            }
-          }
+    );
+  }
 
-          mapController.moveCamera(CameraUpdate.newLatLngZoom(
-              await mapController.requestMyLocationLatLng(), 15.0));
-        },
-        // TODO(Xennis): Use Icons.location_disabled if location service is not avaiable.
-        child: const Icon(
-          Icons.location_searching,
-          color: Colors.white,
+  Widget placeCardPreview() {
+    final AppLocalizations locale = AppLocalizations.of(context);
+    final TextStyle tx =
+        TextStyle(color: Theme.of(context).colorScheme.secondary);
+
+    if (_placeCardPreview == null) {
+      return Container();
+    }
+
+    return Container(
+      height: 150.0,
+      child: Card(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            PlaceListTile(
+              place: _placeCardPreview,
+            ),
+            ButtonBar(
+              children: <Widget>[
+                TextButton(
+                  child: Text(locale.ok.toUpperCase(), style: tx),
+                  onPressed: () {
+                    setState(() {
+                      _placeCardPreview = null;
+                    });
+                  },
+                ),
+                TextButton(
+                  child: Text(locale.details.toUpperCase(), style: tx),
+                  onPressed: () {
+                    //if (p == null) {
+                    //  log('no park found');
+                    //  return;
+                    //}
+                    Navigator.of(context)
+                        .push<dynamic>(MaterialPageRoute<dynamic>(
+                      builder: (BuildContext context) => DetailPage(
+                        park: _placeCardPreview,
+                      ),
+                    ));
+                  },
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -273,55 +348,5 @@ class _MapPageState extends State<MapPage> {
         SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, location.position);
       },
     );
-
-    /*
-            popupOptions: PopupOptions(
-                popupSnap: PopupSnap.markerTop,
-                popupController: _popupController,
-                popupBuilder: (_, Marker marker) {
-                  final Place p = (marker as PlaceMarker).place;
-                  final TextStyle tx =
-                      TextStyle(color: Theme.of(context).colorScheme.secondary);
-                  return Container(
-                    width: 300,
-                    child: Card(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          PlaceListTile(
-                            place: p,
-                          ),
-                          ButtonBar(
-                            children: <Widget>[
-                              TextButton(
-                                child: Text(locale.ok.toUpperCase(), style: tx),
-                                onPressed: () => _popupController.hidePopup(),
-                              ),
-                              TextButton(
-                                child: Text(locale.details.toUpperCase(),
-                                    style: tx),
-                                onPressed: () {
-                                  if (p == null) {
-                                    log('no park found');
-                                    return;
-                                  }
-                                  Navigator.of(context)
-                                      .push<dynamic>(MaterialPageRoute<dynamic>(
-                                    builder: (BuildContext context) =>
-                                        DetailPage(
-                                      park: p,
-                                    ),
-                                  ));
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }),
-          ),
-        ]);*/
   }
 }
