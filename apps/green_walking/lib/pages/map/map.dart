@@ -134,61 +134,67 @@ class _MapPageState extends State<MapPage> {
           future: MapConfig.create(DefaultAssetBundle.of(context)),
           builder: (BuildContext context, AsyncSnapshot<MapConfig> snapshot) {
             if (snapshot.hasData) {
-              return Stack(
-                children: <Widget>[
-                  Center(
-                      child: Column(children: <Widget>[
+              return Center(
+                child: Column(
+                  children: <Widget>[
                     Flexible(
-                      child: map(context, snapshot.data),
-                    ),
+                        child: Stack(
+                      children: <Widget>[
+                        map(context, snapshot.data),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                bottom: 16.0, right: 16.0),
+                            child: FloatingActionButton(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.secondary,
+                              onPressed: () async {
+                                if (await Geolocator.checkPermission() ==
+                                    LocationPermission.denied) {
+                                  if (<LocationPermission>[
+                                        LocationPermission.always,
+                                        LocationPermission.whileInUse
+                                      ].contains(await Geolocator
+                                          .requestPermission()) ==
+                                      false) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                locale.errorNoPositionFound)));
+                                  }
+                                }
+
+                                mapController.moveCamera(
+                                    CameraUpdate.newLatLngZoom(
+                                        await mapController
+                                            .requestMyLocationLatLng(),
+                                        16.0));
+                              },
+                              // TODO(Xennis): Use Icons.location_disabled if location service is not avaiable.
+                              child: const Icon(
+                                Icons.location_searching,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SafeArea(
+                          top: true,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(15, 7, 15, 0),
+                            child:
+                                searchBar(context, snapshot.data.accessToken),
+                          ),
+                        ),
+                      ],
+                    )),
                     Visibility(
                       visible: _placeCardPreview != null,
                       child: placeCardPreview(),
-                    ),
-                  ])),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0, right: 16.0),
-                      child: FloatingActionButton(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.secondary,
-                        onPressed: () async {
-                          if (await Geolocator.checkPermission() ==
-                              LocationPermission.denied) {
-                            if (<LocationPermission>[
-                                  LocationPermission.always,
-                                  LocationPermission.whileInUse
-                                ].contains(
-                                    await Geolocator.requestPermission()) ==
-                                false) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content:
-                                          Text(locale.errorNoPositionFound)));
-                            }
-                          }
-
-                          mapController.moveCamera(CameraUpdate.newLatLngZoom(
-                              await mapController.requestMyLocationLatLng(),
-                              16.0));
-                        },
-                        // TODO(Xennis): Use Icons.location_disabled if location service is not avaiable.
-                        child: const Icon(
-                          Icons.location_searching,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SafeArea(
-                    top: true,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(15, 7, 15, 0),
-                      child: searchBar(context, snapshot.data.accessToken),
-                    ),
-                  ),
-                ],
+                    )
+                  ],
+                ),
               );
             }
             if (snapshot.hasError) {
@@ -210,7 +216,6 @@ class _MapPageState extends State<MapPage> {
     }
 
     return Container(
-      height: 150.0,
       child: Card(
         child: Column(
           mainAxisSize: MainAxisSize.min,
