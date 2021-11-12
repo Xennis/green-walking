@@ -181,11 +181,12 @@ class _MapPageState extends State<MapPage> {
                       ),
                     ),
                   ),
-                  Positioned(
-                    top: 37,
-                    right: 15,
-                    left: 15,
-                    child: searchBar(context, snapshot.data.accessToken),
+                  SafeArea(
+                    top: true,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 7, 15, 0),
+                      child: searchBar(context, snapshot.data.accessToken),
+                    ),
                   ),
                 ],
               );
