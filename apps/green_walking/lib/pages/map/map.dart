@@ -337,7 +337,7 @@ class _MapPageState extends State<MapPage> {
               : const LatLng(53.5519, 9.8682),
           zoom: 11.0),
       myLocationEnabled: true,
-      rotateGesturesEnabled: false,
+      rotateGesturesEnabled: true,
       styleString: mapboxStyle.id,
       trackCameraPosition: true,
       onCameraIdle: () => onPositionChanged(mapController.cameraPosition),
