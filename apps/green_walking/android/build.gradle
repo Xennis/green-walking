@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.4.32'
+    ext.kotlin_version = '1.5.20'
     repositories {
         google()
         jcenter()
@@ -9,9 +9,9 @@ buildscript {
         // version can be found here https://developer.android.com/studio/releases/gradle-plugin
         classpath 'com.android.tools.build:gradle:7.0.3'
         // version can be found here https://mvnrepository.com/artifact/com.google.gms/google-services?repo=google
-        classpath 'com.google.gms:google-services:4.3.8'
+        classpath 'com.google.gms:google-services:4.3.10'
         // details see https://firebase.google.com/docs/crashlytics/get-started?platform=android#java
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.6.1'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.8.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
