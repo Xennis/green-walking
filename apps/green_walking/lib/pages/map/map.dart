@@ -6,7 +6,6 @@ import 'package:dart_geohash/dart_geohash.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:green_walking/pages/detail/detail.dart';
 import 'package:green_walking/pages/map/tileset.dart';

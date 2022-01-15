@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:green_walking/types/language.dart';
 import 'package:intl/intl.dart';
