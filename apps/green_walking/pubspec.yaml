@@ -37,7 +37,7 @@ dependencies:
   geolocator: ^7.7.1
   intl: ^0.17.0
   intl_generator: ^0.2.1
-  mapbox_gl: ^0.14.0
+  mapbox_gl: ^0.15.0
   shared_preferences: ^2.0.8
   url_launcher: ^6.0.13
 
