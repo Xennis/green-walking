@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../core.dart';
-import '../intl.dart';
 import '../types/place.dart';
 
 class PlaceListTile extends StatelessWidget {
@@ -24,7 +24,7 @@ class PlaceListTile extends StatelessWidget {
       children.add(CategoryChips(categories));
     }
     return ListTile(
-      title: Text(place.name ?? AppLocalizations.of(context).nameless),
+      title: Text(place.name ?? AppLocalizations.of(context)!.nameless),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: children,

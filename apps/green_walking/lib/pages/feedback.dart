@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../intl.dart';
 
 class FeedbackPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations locale = AppLocalizations.of(context);
+    final AppLocalizations locale = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(locale.feedbackPage),

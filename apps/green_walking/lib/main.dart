@@ -1,10 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:green_walking/types/language.dart';
 
-import 'intl.dart';
 import 'routes.dart';
 
 void main() {
@@ -23,7 +23,7 @@ class GreenWalkingApp extends StatelessWidget {
     final ThemeData theme = ThemeData();
     return MaterialApp(
       onGenerateTitle: (BuildContext context) =>
-          AppLocalizations.of(context).appTitle,
+          AppLocalizations.of(context)!.appTitle,
       theme: theme.copyWith(
         primaryColor: Colors.green,
         colorScheme: theme.colorScheme.copyWith(secondary: Colors.blue),
@@ -38,7 +38,7 @@ class GreenWalkingApp extends StatelessWidget {
         return routes;
       }(),
       localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
-        AppLocalizationsDelegate(),
+        AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,

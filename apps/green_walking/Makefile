@@ -4,13 +4,11 @@ check: lint test
 
 format:
 	@echo ">>> Flutter format"
-	# Exclude the auto-generated intl files
-	find . -name '*.dart' -not -name 'messages_*.dart' -exec flutter format {} \;
+	flutter format .
 
 format-check:
 	@echo ">>> Check Dart format"
-	# Exclude the auto-generated intl files
-	find . -name '*.dart' -not -name 'messages_*.dart' -exec flutter format --set-exit-if-changed {} \;
+	flutter format --set-exit-if-changed .
 
 lint:
 	@echo ">>> Flutter analyze"
@@ -32,9 +30,3 @@ release-android:
 release-web:
 	@echo ">>> [Web] Flutter build release"
 	flutter build web
-
-l10n:
-	@echo ">>> intl generate intl_messages.arb"
-	flutter pub pub run intl_generator:extract_to_arb --output-dir=lib/l10n lib/intl.dart
-	@echo ">>> intl generate messages_all.dart"
-	flutter pub pub run intl_generator:generate_from_arb --output-dir=lib/l10n --no-use-deferred-loading lib/intl.dart lib/l10n/intl_*.arb

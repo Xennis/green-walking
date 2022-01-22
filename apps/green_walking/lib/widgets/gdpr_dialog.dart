@@ -1,10 +1,10 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../core.dart';
-import '../intl.dart';
 import '../services/shared_prefs.dart';
 
 void enableAnalyticsOrConsent(BuildContext context) {
@@ -22,7 +22,7 @@ void enableAnalyticsOrConsent(BuildContext context) {
 class GdprDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations locale = AppLocalizations.of(context);
+    final AppLocalizations locale = AppLocalizations.of(context)!;
     return AlertDialog(
       content: SingleChildScrollView(
         child: ListBody(

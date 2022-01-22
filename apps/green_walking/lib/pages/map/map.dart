@@ -6,6 +6,7 @@ import 'package:dart_geohash/dart_geohash.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:green_walking/pages/detail/detail.dart';
 import 'package:green_walking/pages/map/tileset.dart';
@@ -19,8 +20,6 @@ import 'package:green_walking/widgets/gdpr_dialog.dart';
 import 'package:green_walking/widgets/navigation_drawer.dart';
 import 'package:green_walking/widgets/place_list_tile.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
-
-import '../../intl.dart';
 
 class MapConfig {
   MapConfig(this.accessToken, {this.lastLocation});
@@ -100,7 +99,7 @@ class _MapPageState extends State<MapPage> {
     _lastGeohash = _newGeohash;
 
     final Language lang =
-        languageFromString(AppLocalizations.of(context).localeName);
+        languageFromString(AppLocalizations.of(context)!.localeName);
 
     nearbyPlaces(_newGeohash, lang).then((List<Place> value) {
       final List<SymbolOptions> options = value
@@ -127,7 +126,7 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations locale = AppLocalizations.of(context);
+    final AppLocalizations locale = AppLocalizations.of(context)!;
     return Scaffold(
       key: _scaffoldKey,
       drawer: NavigationDrawer(),
@@ -208,7 +207,7 @@ class _MapPageState extends State<MapPage> {
   }
 
   Widget placeCardPreview() {
-    final AppLocalizations locale = AppLocalizations.of(context);
+    final AppLocalizations locale = AppLocalizations.of(context)!;
     final TextStyle tx =
         TextStyle(color: Theme.of(context).colorScheme.secondary);
     final Place? place = _placeCardPreview;
@@ -258,7 +257,7 @@ class _MapPageState extends State<MapPage> {
   }
 
   Widget searchBar(BuildContext context, String accessToken) {
-    final AppLocalizations locale = AppLocalizations.of(context);
+    final AppLocalizations locale = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,

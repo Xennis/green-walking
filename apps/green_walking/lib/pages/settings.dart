@@ -1,8 +1,7 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:green_walking/services/shared_prefs.dart';
-
-import '../intl.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -14,7 +13,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations locale = AppLocalizations.of(context);
+    final AppLocalizations locale = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(locale.settingsPage),

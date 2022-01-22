@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:green_walking/services/mapbox_geocoding.dart';
 
 import '../core.dart';
-import '../intl.dart';
 
 class SearchPage extends StatelessWidget {
   const SearchPage(this.result, {Key? key}) : super(key: key);
@@ -11,7 +11,7 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations locale = AppLocalizations.of(context);
+    final AppLocalizations locale = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(locale.searchResults),
@@ -29,7 +29,7 @@ class SearchPage extends StatelessWidget {
   }
 
   Widget _resultList(BuildContext context) {
-    final AppLocalizations locale = AppLocalizations.of(context);
+    final AppLocalizations locale = AppLocalizations.of(context)!;
     return FutureBuilder<MapboxGeocodingResult>(
         future: result,
         builder: (BuildContext context,
