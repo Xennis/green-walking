@@ -8,7 +8,7 @@ import '../intl.dart';
 import '../services/shared_prefs.dart';
 
 void enableAnalyticsOrConsent(BuildContext context) {
-  SharedPrefs.getBool(SharedPrefs.ANALYTICS_ENABLED).then((bool enabled) {
+  SharedPrefs.getBool(SharedPrefs.ANALYTICS_ENABLED).then((bool? enabled) {
     if (enabled == true) {
       // Privacy: Only enable analytics if it is set to enabled.
       FirebaseAnalytics().setAnalyticsCollectionEnabled(true);

@@ -7,9 +7,8 @@ import 'package:green_walking/services/mapbox_geocoding.dart';
 void main() {
   testWidgets('SearchPage() can be rendered', (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(
-        home: SearchPage(
-            result:
-                Future<MapboxGeocodingResult>.value(MapboxGeocodingResult())),
+        home: SearchPage(Future<MapboxGeocodingResult>.value(
+            MapboxGeocodingResult(<MaboxGeocodingPlace>[]))),
         localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
           AppLocalizationsDelegate()
         ]));

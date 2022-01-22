@@ -9,9 +9,9 @@ class SharedPrefs {
   static const String KEY_LAST_LOCATION = 'last-location';
   static const String ANALYTICS_ENABLED = 'analytics-enabled';
 
-  static Future<LatLng> getLatLng(String key) async {
+  static Future<LatLng?> getLatLng(String key) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String raw = prefs.getString(key);
+    final String? raw = prefs.getString(key);
     if (raw == null) {
       return null;
     }
@@ -26,9 +26,6 @@ class SharedPrefs {
   }
 
   static void setLatLng(String key, LatLng val) {
-    if (val == null) {
-      return;
-    }
     try {
       final String raw = GeoHasher().encode(val.longitude, val.latitude);
       SharedPreferences.getInstance()
@@ -38,15 +35,12 @@ class SharedPrefs {
     }
   }
 
-  static Future<bool> getBool(String key) async {
+  static Future<bool?> getBool(String key) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getBool(key);
   }
 
   static void setBool(String key, bool val) {
-    if (val == null) {
-      return;
-    }
     SharedPreferences.getInstance()
         .then((SharedPreferences prefs) => prefs.setBool(key, val));
   }

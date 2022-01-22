@@ -6,47 +6,49 @@ import '../../intl.dart';
 import '../../types/place.dart';
 
 class DetailFooter extends StatelessWidget {
-  const DetailFooter(
-      {Key key, @required this.wikidataId, this.image, this.extract})
-      : assert(wikidataId != null),
-        super(key: key);
+  const DetailFooter(this.wikidataId,
+      {Key? key, @required this.image, this.extract})
+      : super(key: key);
 
   final String wikidataId;
-  final PlaceImage image;
-  final PlaceExtract extract;
+  final PlaceImage? image;
+  final PlaceExtract? extract;
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context);
     final List<Widget> children = <Widget>[
       _Attribution(
-        headline: locale.metaDataAttributionTitle,
-        text: locale.poweredBy('Wikidata'),
-        links: <String, String>{
+        locale.poweredBy('Wikidata'),
+        locale.metaDataAttributionTitle,
+        <String, String>{
           '${locale.poweredBy('Wikidata')}\n': 'https://www.wikidata.org',
           locale.improveData: 'https://www.wikidata.org/wiki/$wikidataId',
         },
       )
     ];
-    if (image?.descriptionUrl != null) {
+    final PlaceImage? img = image;
+    final String? descriptionUrl = image?.descriptionUrl;
+    if (img != null && descriptionUrl != null) {
       children.add(_Attribution(
-        headline: locale.image,
-        text: '${locale.image}: ${image.artist} / ${image.licenseShortName}',
-        links: <String, String>{
-          '${image.artist}\n': image.descriptionUrl,
-          '${image.licenseShortName}\n': image.licenseUrl,
-          locale.improveData: image.descriptionUrl
+        '${locale.image}: ${img.artist} / ${img.licenseShortName}',
+        locale.image,
+        <String?, String?>{
+          '${img.artist}\n': descriptionUrl,
+          '${img.licenseShortName}\n': img.licenseUrl,
+          locale.improveData: img.descriptionUrl
         },
       ));
     }
-    if (extract?.text != null) {
+    final PlaceExtract? ext = extract;
+    if (ext != null && ext.text != null) {
       children.add(_Attribution(
-        headline: locale.text,
-        text: '${locale.text}: Wikipedia / ${extract.licenseShortName}',
-        links: <String, String>{
-          'Wikipedia\n': extract.url,
-          '${extract.licenseShortName}\n': extract.licenseUrl,
-          locale.improveData: extract.url
+        '${locale.text}: Wikipedia / ${ext.licenseShortName}',
+        locale.text,
+        <String, String?>{
+          'Wikipedia\n': ext.url,
+          '${ext.licenseShortName}\n': ext.licenseUrl,
+          locale.improveData: ext.url
         },
       ));
     }
@@ -58,23 +60,18 @@ class DetailFooter extends StatelessWidget {
 }
 
 class _Attribution extends StatelessWidget {
-  const _Attribution(
-      {Key key,
-      @required this.text,
-      @required this.headline,
-      @required this.links,
-      this.textColor = Colors.grey})
-      : assert(text != null && headline != null && links != null),
-        super(key: key);
+  const _Attribution(this.text, this.headline, this.links,
+      {Key? key, this.textColor = Colors.grey})
+      : super(key: key);
 
   final String text;
   final String headline;
-  final Map<String, String> links;
+  final Map<String?, String?> links;
   final Color textColor;
 
-  static List<Widget> _createLinkList(Map<String, String> links) {
+  static List<Widget> _createLinkList(Map<String?, String?> links) {
     final List<Widget> res = <Widget>[];
-    links.forEach((String text, String link) {
+    links.forEach((String? text, String? link) {
       if (text == null) {
         return;
       }

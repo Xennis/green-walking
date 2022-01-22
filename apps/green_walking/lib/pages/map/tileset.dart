@@ -1,7 +1,7 @@
 enum MabboxTileset { outdoor, satellite }
 
 extension MabboxTilesetExtension on MabboxTileset {
-  String get id {
+  String? get id {
     switch (this) {
       case MabboxTileset.outdoor:
         return 'mapbox://styles/xennis/ckfbioyul1iln1ap0pm5hrcgy';

@@ -23,27 +23,27 @@ import 'package:mapbox_gl/mapbox_gl.dart';
 import '../../intl.dart';
 
 class MapConfig {
-  MapConfig({this.accessToken, this.lastLocation});
+  MapConfig(this.accessToken, {this.lastLocation});
 
   String accessToken;
-  LatLng lastLocation;
+  LatLng? lastLocation;
 
   static Future<MapConfig> create(AssetBundle assetBundle) async {
     await FirebaseAuth.instance.signInAnonymously();
     final String accessToken =
         await assetBundle.loadString('assets/mapbox-access-token.txt');
-    LatLng lastLocation =
+    LatLng? lastLocation =
         await SharedPrefs.getLatLng(SharedPrefs.KEY_LAST_LOCATION);
     if (lastLocation != null) {
       lastLocation = null;
     }
 
-    return MapConfig(accessToken: accessToken, lastLocation: lastLocation);
+    return MapConfig(accessToken, lastLocation: lastLocation);
   }
 }
 
 class MapPage extends StatefulWidget {
-  const MapPage({Key key}) : super(key: key);
+  const MapPage({Key? key}) : super(key: key);
 
   @override
   _MapPageState createState() => _MapPageState();
@@ -51,40 +51,42 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  MapboxMapController mapController;
-  GeoHash _lastGeohash;
+  MapboxMapController? mapController;
+  GeoHash? _lastGeohash;
   MabboxTileset mapboxStyle = MabboxTileset.outdoor;
-  LatLng _lastLoc;
-  Place _placeCardPreview;
+  LatLng? _lastLoc;
+  Place? _placeCardPreview;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance
+    WidgetsBinding.instance!
         .addPostFrameCallback((_) => enableAnalyticsOrConsent(context));
   }
 
   @override
   void dispose() {
-    mapController?.onSymbolTapped?.remove(_onSymbolTapped);
+    mapController?.onSymbolTapped.remove(_onSymbolTapped);
     super.dispose();
   }
 
   void _onSymbolTapped(Symbol symbol) {
-    mapController
-        ?.animateCamera(CameraUpdate.newLatLng(symbol.options.geometry));
-    setState(() {
-      _placeCardPreview = symbol.data['place'] as Place;
-    });
+    final LatLng? geometry = symbol.options.geometry;
+    if (geometry != null) {
+      mapController?.animateCamera(CameraUpdate.newLatLng(geometry));
+      setState(() {
+        _placeCardPreview = symbol.data!['place'] as Place?;
+      });
+    }
   }
 
-  void onPositionChanged(CameraPosition position) {
+  void onPositionChanged(CameraPosition? position) {
     if (position == null) {
       return;
     }
     if (position.zoom < 11.0) {
       // clearSymbols does not work https://github.com/tobrun/flutter-mapbox-gl/issues/651
-      mapController?.removeSymbols(mapController.symbols);
+      mapController?.removeSymbols(mapController!.symbols);
       _lastGeohash = null;
       return;
     }
@@ -92,7 +94,7 @@ class _MapPageState extends State<MapPage> {
     final GeoHash _newGeohash = GeoHash.fromDecimalDegrees(
         position.target.longitude, position.target.latitude,
         precision: 4);
-    if (_lastGeohash != null && _lastGeohash.contains(_newGeohash.geohash)) {
+    if (_lastGeohash != null && _lastGeohash!.contains(_newGeohash.geohash)) {
       return;
     }
     _lastGeohash = _newGeohash;
@@ -114,8 +116,8 @@ class _MapPageState extends State<MapPage> {
       final List<Map<String, Place>> data =
           value.map((Place p) => <String, Place>{'place': p}).toList();
       // clearSymbols does not work https://github.com/tobrun/flutter-mapbox-gl/issues/651
-      mapController.removeSymbols(mapController.symbols);
-      mapController.addSymbols(options, data);
+      mapController?.removeSymbols(mapController!.symbols);
+      mapController?.addSymbols(options, data);
 
       setState(() {
         _lastGeohash = _newGeohash;
@@ -132,14 +134,15 @@ class _MapPageState extends State<MapPage> {
       body: FutureBuilder<MapConfig>(
           future: MapConfig.create(DefaultAssetBundle.of(context)),
           builder: (BuildContext context, AsyncSnapshot<MapConfig> snapshot) {
-            if (snapshot.hasData) {
+            final MapConfig? data = snapshot.data;
+            if (snapshot.hasData && data != null) {
               return Center(
                 child: Column(
                   children: <Widget>[
                     Flexible(
                         child: Stack(
                       children: <Widget>[
-                        map(context, snapshot.data),
+                        map(context, data),
                         Align(
                           alignment: Alignment.bottomRight,
                           child: Padding(
@@ -163,12 +166,12 @@ class _MapPageState extends State<MapPage> {
                                                 locale.errorNoPositionFound)));
                                   }
                                 }
-
-                                mapController.moveCamera(
-                                    CameraUpdate.newLatLngZoom(
-                                        await mapController
-                                            .requestMyLocationLatLng(),
-                                        16.0));
+                                final LatLng? loc = await mapController
+                                    ?.requestMyLocationLatLng();
+                                if (loc != null) {
+                                  mapController?.moveCamera(
+                                      CameraUpdate.newLatLngZoom(loc, 16.0));
+                                }
                               },
                               // TODO(Xennis): Use Icons.location_disabled if location service is not avaiable.
                               child: const Icon(
@@ -182,8 +185,7 @@ class _MapPageState extends State<MapPage> {
                           top: true,
                           child: Padding(
                             padding: const EdgeInsets.fromLTRB(15, 7, 15, 0),
-                            child:
-                                searchBar(context, snapshot.data.accessToken),
+                            child: searchBar(context, data.accessToken),
                           ),
                         ),
                       ],
@@ -209,8 +211,8 @@ class _MapPageState extends State<MapPage> {
     final AppLocalizations locale = AppLocalizations.of(context);
     final TextStyle tx =
         TextStyle(color: Theme.of(context).colorScheme.secondary);
-
-    if (_placeCardPreview == null) {
+    final Place? place = _placeCardPreview;
+    if (place == null) {
       return Container();
     }
 
@@ -220,7 +222,7 @@ class _MapPageState extends State<MapPage> {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             PlaceListTile(
-              place: _placeCardPreview,
+              place,
             ),
             ButtonBar(
               children: <Widget>[
@@ -242,7 +244,7 @@ class _MapPageState extends State<MapPage> {
                     Navigator.of(context)
                         .push<dynamic>(MaterialPageRoute<dynamic>(
                       builder: (BuildContext context) => DetailPage(
-                        park: _placeCardPreview,
+                        place,
                       ),
                     ));
                   },
@@ -260,7 +262,7 @@ class _MapPageState extends State<MapPage> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.grey[200]),
+        border: Border.all(color: Colors.grey[200]!),
       ),
       child: Row(
         children: <Widget>[
@@ -270,7 +272,7 @@ class _MapPageState extends State<MapPage> {
                 semanticLabel:
                     MaterialLocalizations.of(context).openAppDrawerTooltip),
             onPressed: () {
-              _scaffoldKey.currentState.openDrawer();
+              _scaffoldKey.currentState?.openDrawer();
             },
           ),
           Expanded(
@@ -283,15 +285,14 @@ class _MapPageState extends State<MapPage> {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 15),
                   hintText: locale.searchBoxHintLabel('...')),
               onSubmitted: (String query) {
-                final Future<LatLng> moveToLoc = Navigator.push(
+                final Future<LatLng?> moveToLoc = Navigator.push(
                   context,
                   MaterialPageRoute<LatLng>(
                       builder: (BuildContext context) => SearchPage(
-                            result: mapboxGeocodingGet(
-                                query, accessToken, _lastLoc),
+                            mapboxGeocodingGet(query, accessToken, _lastLoc),
                           )),
                 );
-                moveToLoc.then((LatLng value) {
+                moveToLoc.then((LatLng? value) {
                   if (value == null) {
                     return;
                   }
@@ -333,30 +334,26 @@ class _MapPageState extends State<MapPage> {
       accessToken: config.accessToken,
       onMapCreated: (MapboxMapController controller) {
         mapController = controller;
-        mapController.onSymbolTapped.add(_onSymbolTapped);
-        onPositionChanged(mapController.cameraPosition);
+        mapController!.onSymbolTapped.add(_onSymbolTapped);
+        onPositionChanged(mapController!.cameraPosition);
       },
       initialCameraPosition: CameraPosition(
           target: (config.lastLocation != null)
-              ? config.lastLocation
+              ? config.lastLocation!
               : const LatLng(53.5519, 9.8682),
           zoom: 11.0),
       myLocationEnabled: true,
       rotateGesturesEnabled: true,
       styleString: mapboxStyle.id,
       trackCameraPosition: true,
-      onCameraIdle: () => onPositionChanged(mapController.cameraPosition),
+      onCameraIdle: () => onPositionChanged(mapController?.cameraPosition),
       onStyleLoadedCallback: () async {
         // TODO(Xennis): Use Icons.location_pin
         final ByteData bytes = await rootBundle.load('assets/place-icon.png');
         final Uint8List list = bytes.buffer.asUint8List();
-        mapController.addImage('place-marker', list);
+        mapController?.addImage('place-marker', list);
       },
       onUserLocationUpdated: (UserLocation location) {
-        if (location == null || location.position == null) {
-          _lastLoc = null;
-          return;
-        }
         SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, location.position);
       },
     );

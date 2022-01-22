@@ -39,15 +39,15 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                     ],
                   ),
-                  FutureBuilder<bool>(
+                  FutureBuilder<bool?>(
                       future:
                           SharedPrefs.getBool(SharedPrefs.ANALYTICS_ENABLED),
                       initialData: _analyticsEnabled,
-                      builder:
-                          (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                      builder: (BuildContext context,
+                          AsyncSnapshot<bool?> snapshot) {
                         return Switch(
                           value: snapshot.data ?? false,
-                          onChanged: (bool value) {
+                          onChanged: (bool? value) {
                             if (value == null) {
                               return;
                             }
