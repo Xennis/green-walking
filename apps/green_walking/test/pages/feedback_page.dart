@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:green_walking/intl.dart';
 import 'package:green_walking/pages/feedback.dart';
 
 void main() {
@@ -8,7 +8,7 @@ void main() {
     await tester.pumpWidget(MaterialApp(
         home: FeedbackPage(),
         localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
-          AppLocalizationsDelegate()
+          AppLocalizations.delegate
         ]));
   });
 }

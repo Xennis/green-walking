@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:mapbox_gl/mapbox_gl.dart' show LatLng;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core.dart';
-import '../../intl.dart';
 import '../../types/place.dart';
 import '../../widgets/place_list_tile.dart';
 import 'footer.dart';
@@ -124,7 +124,7 @@ class _DetailSpeedDial extends StatelessWidget {
           }
           launch(uri);
         },
-        label: AppLocalizations.of(context).maps,
+        label: AppLocalizations.of(context)!.maps,
         child: const Icon(Icons.map),
         backgroundColor: Colors.pinkAccent,
       ));
@@ -151,7 +151,7 @@ class _DetailSpeedDial extends StatelessWidget {
     if (officalWebiste != null) {
       children.add(SpeedDialChild(
         onTap: () => launch(officalWebiste),
-        label: AppLocalizations.of(context).website,
+        label: AppLocalizations.of(context)!.website,
         child: const Icon(Icons.web),
         backgroundColor: Colors.blueAccent,
       ));
@@ -170,7 +170,7 @@ class _Name extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String text = AppLocalizations.of(context).nameless;
+    String text = AppLocalizations.of(context)!.nameless;
     if (name != null) {
       text = name!;
     }
@@ -190,7 +190,7 @@ class _Description extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations locale = AppLocalizations.of(context);
+    final AppLocalizations locale = AppLocalizations.of(context)!;
 
     final List<InlineSpan> spans = <InlineSpan>[];
     String text;

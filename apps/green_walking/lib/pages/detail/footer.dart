@@ -1,8 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../intl.dart';
 import '../../types/place.dart';
 
 class DetailFooter extends StatelessWidget {
@@ -16,7 +16,7 @@ class DetailFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations locale = AppLocalizations.of(context);
+    final AppLocalizations locale = AppLocalizations.of(context)!;
     final List<Widget> children = <Widget>[
       _Attribution(
         locale.poweredBy('Wikidata'),
@@ -94,7 +94,7 @@ class _Attribution extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations locale = AppLocalizations.of(context);
+    final AppLocalizations locale = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () {
         showDialog<dynamic>(

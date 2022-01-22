@@ -1,15 +1,15 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../core.dart';
-import '../intl.dart';
 import '../routes.dart';
 
 class NavigationDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations locale = AppLocalizations.of(context);
+    final AppLocalizations locale = AppLocalizations.of(context)!;
     final TextStyle textStyle = Theme.of(context).textTheme.bodyText2!;
     return Drawer(
       child: ListView(
