@@ -5,9 +5,7 @@ import '../core.dart';
 import '../intl.dart';
 
 class SearchPage extends StatelessWidget {
-  const SearchPage({Key key, @required this.result})
-      : assert(result != null),
-        super(key: key);
+  const SearchPage(this.result, {Key? key}) : super(key: key);
 
   final Future<MapboxGeocodingResult> result;
 
@@ -36,17 +34,21 @@ class SearchPage extends StatelessWidget {
         future: result,
         builder: (BuildContext context,
             AsyncSnapshot<MapboxGeocodingResult> snapshot) {
-          if (snapshot.hasData) {
-            if (snapshot.data.features.isEmpty) {
+          final MapboxGeocodingResult? data = snapshot.data;
+          if (snapshot.hasData && data != null) {
+            if (data.features.isEmpty) {
               return Text(locale.searchNoResultsText);
             }
             return Expanded(
                 child: ListView.builder(
-              itemCount: snapshot.data.features.length,
+              itemCount: data.features.length,
               itemBuilder: (BuildContext context, int index) {
-                final MaboxGeocodingPlace elem = snapshot.data.features[index];
+                final MaboxGeocodingPlace elem = data.features[index];
                 final String subtitle = truncateString(
-                    elem.placeName.replaceFirst(elem.text + ', ', ''), 65);
+                        elem.placeName
+                            ?.replaceFirst((elem.text ?? '') + ', ', ''),
+                        65) ??
+                    '';
                 return Card(
                   child: ListTile(
                     leading: CircleAvatar(
@@ -59,7 +61,7 @@ class SearchPage extends StatelessWidget {
                         elem.center,
                       );
                     },
-                    title: Text(truncateString(elem.text, 25)),
+                    title: Text(truncateString(elem.text, 25) ?? ''),
                     subtitle: Text(subtitle),
                   ),
                 );

@@ -10,7 +10,7 @@ class NavigationDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context);
-    final TextStyle textStyle = Theme.of(context).textTheme.bodyText2;
+    final TextStyle textStyle = Theme.of(context).textTheme.bodyText2!;
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,

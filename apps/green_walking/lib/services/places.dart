@@ -21,7 +21,7 @@ Future<List<Place>> nearbyPlaces(GeoHash centerHash, Language lang) {
         .startAt(<String>[hash]).endAt(<String>[hash + '~']);
     return query.get().then((QuerySnapshot<Map<String, dynamic>> value) {
       return value.docs.map((DocumentSnapshot<Map<String, dynamic>> e) =>
-          Place.fromFirestore(e.data(), lang));
+          Place.fromFirestore(e.data()!, lang));
     });
   });
 

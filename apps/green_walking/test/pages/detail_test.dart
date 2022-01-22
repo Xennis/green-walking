@@ -12,10 +12,10 @@ void main() {
         licenseShortName: 'Public domain',
         descriptionUrl: '',
         url: '');
-    final Place p = Place(wikidataId: '1234', image: i, categories: <String>[]);
+    final Place p = Place('1234', image: i, categories: <String>[]);
     await tester.pumpWidget(MaterialApp(
         home: DetailPage(
-          park: p,
+          p,
         ),
         localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
           AppLocalizationsDelegate()

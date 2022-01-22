@@ -12,7 +12,7 @@ extension LanguageExtension on Language {
   }
 }
 
-Language languageFromString(String code) {
+Language languageFromString(String? code) {
   switch (code) {
     case 'de':
       return Language.de;

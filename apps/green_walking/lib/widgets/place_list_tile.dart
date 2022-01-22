@@ -5,9 +5,7 @@ import '../intl.dart';
 import '../types/place.dart';
 
 class PlaceListTile extends StatelessWidget {
-  const PlaceListTile({Key key, @required this.place})
-      : assert(place != null),
-        super(key: key);
+  const PlaceListTile(this.place, {Key? key}) : super(key: key);
 
   final Place place;
 
@@ -17,12 +15,13 @@ class PlaceListTile extends StatelessWidget {
     if (place.location != null) {
       children.add(Row(
         children: <Widget>[
-          Text(truncateString(place.location, 35)),
+          Text(truncateString(place.location, 35) ?? ''),
         ],
       ));
     }
-    if (place.categories != null) {
-      children.add(CategoryChips(categories: place.categories));
+    final List<String>? categories = place.categories;
+    if (categories != null) {
+      children.add(CategoryChips(categories));
     }
     return ListTile(
       title: Text(place.name ?? AppLocalizations.of(context).nameless),
@@ -35,10 +34,8 @@ class PlaceListTile extends StatelessWidget {
 }
 
 class CategoryChips extends StatelessWidget {
-  const CategoryChips(
-      {Key key, @required this.categories, this.truncateCutoff = 15})
-      : assert(categories != null),
-        super(key: key);
+  const CategoryChips(this.categories, {Key? key, this.truncateCutoff = 15})
+      : super(key: key);
 
   final List<String> categories;
   final int truncateCutoff;
@@ -54,7 +51,7 @@ class CategoryChips extends StatelessWidget {
             color: Theme.of(context).primaryColor,
           ),
         ),
-        label: Text(truncateString(c, truncateCutoff)),
+        label: Text(truncateString(c, truncateCutoff) ?? ''),
       ));
     }
     return res;

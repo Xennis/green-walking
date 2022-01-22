@@ -4,7 +4,7 @@ import 'package:green_walking/types/place.dart';
 const String privacyPolicyUrl =
     'https://raw.githubusercontent.com/Xennis/green-walking/master/web/privacy/privacy-policy.md';
 
-String truncateString(String myString, int cutoff) {
+String? truncateString(String? myString, int? cutoff) {
   if (myString == null) {
     return null;
   }
@@ -21,7 +21,6 @@ MaterialColor placeTypeToColor(String type) {
     case Place.TypeHeritage:
     case Place.TypeMonument:
       return Colors.brown;
-      break;
     case Place.TypeNature:
       return Colors.green;
     default:

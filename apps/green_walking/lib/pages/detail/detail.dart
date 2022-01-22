@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:mapbox_gl/mapbox_gl.dart' show LatLng;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core.dart';
@@ -10,19 +11,17 @@ import '../../widgets/place_list_tile.dart';
 import 'footer.dart';
 
 class DetailPage extends StatelessWidget {
-  const DetailPage({Key key, @required this.park})
-      : assert(park != null),
-        super(key: key);
+  const DetailPage(this.park, {Key? key}) : super(key: key);
 
   final Place park;
 
   // FIXME: Rework this and the functions below.
-  Widget _location(String location) {
+  Widget _location(String? location) {
     if (location == null) {
       return Container();
     }
     return Text(
-      truncateString(location, 80),
+      truncateString(location, 80) ?? '',
       style: const TextStyle(color: Colors.grey),
     );
   }
@@ -30,15 +29,15 @@ class DetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: _DetailSpeedDial(park: park),
+      floatingActionButton: _DetailSpeedDial(park),
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          Widget fs;
-          final String imageUrl = park.image?.url;
+          Widget? fs;
+          final String? imageUrl = park.image?.url;
           if (imageUrl != null) {
             fs = FlexibleSpaceBar(
               background: CachedNetworkImage(
-                imageUrl: park.image?.url,
+                imageUrl: imageUrl,
                 fit: BoxFit.cover,
               ),
             );
@@ -72,7 +71,7 @@ class DetailPage extends StatelessWidget {
                   _Name(name: park.name),
                   _location(park.location),
                   CategoryChips(
-                    categories: park.categories,
+                    park.categories ?? <String>[],
                     truncateCutoff: 25,
                   ),
                   _Description(
@@ -92,7 +91,7 @@ class DetailPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     DetailFooter(
-                      wikidataId: park.wikidataId,
+                      park.wikidataId,
                       image: park.image,
                       extract: park.extract,
                     ),
@@ -108,19 +107,18 @@ class DetailPage extends StatelessWidget {
 }
 
 class _DetailSpeedDial extends StatelessWidget {
-  const _DetailSpeedDial({Key key, @required this.park})
-      : assert(park != null),
-        super(key: key);
+  const _DetailSpeedDial(this.park, {Key? key}) : super(key: key);
 
   final Place park;
 
   @override
   Widget build(BuildContext context) {
-    final List<SpeedDialChild> children = <SpeedDialChild>[
-      SpeedDialChild(
+    final List<SpeedDialChild> children = <SpeedDialChild>[];
+    final LatLng? geopoint = park.geopoint;
+    if (geopoint != null) {
+      children.add(SpeedDialChild(
         onTap: () {
-          String uri =
-              'geo:${park.geopoint.latitude},${park.geopoint.longitude}';
+          String uri = 'geo:${geopoint.latitude},${geopoint.longitude}';
           if (park.name != null) {
             uri += '?q=${park.name}';
           }
@@ -129,27 +127,30 @@ class _DetailSpeedDial extends StatelessWidget {
         label: AppLocalizations.of(context).maps,
         child: const Icon(Icons.map),
         backgroundColor: Colors.pinkAccent,
-      ),
-    ];
-    if (park.wikipediaUrl != null) {
+      ));
+    }
+    final String? wikipediaUrl = park.wikipediaUrl;
+    if (wikipediaUrl != null) {
       children.add(SpeedDialChild(
-        onTap: () => launch(park.wikipediaUrl),
+        onTap: () => launch(wikipediaUrl),
         label: 'Wikipedia',
         child: const Icon(Icons.book),
         backgroundColor: Colors.greenAccent,
       ));
     }
-    if (park.commonsUrl != null) {
+    final String? commonsUrl = park.commonsUrl;
+    if (commonsUrl != null) {
       children.add(SpeedDialChild(
-        onTap: () => launch(park.commonsUrl),
+        onTap: () => launch(commonsUrl),
         label: 'Commons',
         child: const Icon(Icons.photo),
         backgroundColor: Colors.orangeAccent,
       ));
     }
-    if (park.officialWebsite != null) {
+    final String? officalWebiste = park.officialWebsite;
+    if (officalWebiste != null) {
       children.add(SpeedDialChild(
-        onTap: () => launch(park.officialWebsite),
+        onTap: () => launch(officalWebiste),
         label: AppLocalizations.of(context).website,
         child: const Icon(Icons.web),
         backgroundColor: Colors.blueAccent,
@@ -163,29 +164,29 @@ class _DetailSpeedDial extends StatelessWidget {
 }
 
 class _Name extends StatelessWidget {
-  const _Name({Key key, this.name}) : super(key: key);
+  const _Name({Key? key, this.name}) : super(key: key);
 
-  final String name;
+  final String? name;
 
   @override
   Widget build(BuildContext context) {
     String text = AppLocalizations.of(context).nameless;
     if (name != null) {
-      text = name;
+      text = name!;
     }
     return Text(
-      truncateString(text, 50),
+      truncateString(text, 50) ?? '',
       style: Theme.of(context).textTheme.headline4,
     );
   }
 }
 
 class _Description extends StatelessWidget {
-  const _Description({Key key, this.extract, this.description})
+  const _Description({Key? key, this.extract, this.description})
       : super(key: key);
 
-  final PlaceExtract extract;
-  final String description;
+  final PlaceExtract? extract;
+  final String? description;
 
   @override
   Widget build(BuildContext context) {
@@ -193,8 +194,9 @@ class _Description extends StatelessWidget {
 
     final List<InlineSpan> spans = <InlineSpan>[];
     String text;
-    if (extract?.text != null) {
-      text = extract.text;
+    final String? extractText = extract?.text;
+    if (extractText != null) {
+      text = extractText;
 
       if (extract?.fallbackLang != null) {
         spans.add(TextSpan(
@@ -204,7 +206,7 @@ class _Description extends StatelessWidget {
       }
     } else if (description != null) {
       // Use Wikidata description as fallback.
-      text = description;
+      text = description!;
     } else {
       text = locale.missingDescription;
     }
