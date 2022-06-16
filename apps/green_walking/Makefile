@@ -1,4 +1,4 @@
-.PHONY: check format format-check lint test launcher-icon release-android release-web i10n
+.PHONY: check format format-check lint test launcher-icon release-android release-web
 
 check: lint test
 
