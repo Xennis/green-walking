@@ -218,7 +218,10 @@ def run(argv=None):
             p
             | "wikidata_query/create" >> beam.Create(wd_queries())
             | "wikidata/query"
-            >> wikidata.Query(FileSystems.join(options.base_path, "wikidata_query_cache.sqlite"), user_agent=options.user_agent,)
+            >> wikidata.Query(
+                FileSystems.join(options.base_path, "wikidata_query_cache.sqlite"),
+                user_agent=options.user_agent,
+            )
             | "wikidata/group" >> beam.GroupByKey()
             | "wikidata/fetch"
             >> wikidata.Transform(
@@ -237,7 +240,11 @@ def run(argv=None):
         )
 
         changed_places = (
-            {Combine.TAG_COMMONS: commons_data, Combine.TAG_WIKIDATA: wikidata_data, Combine.TAG_WIKIPEDIA: wikipedia_data,}
+            {
+                Combine.TAG_COMMONS: commons_data,
+                Combine.TAG_WIKIDATA: wikidata_data,
+                Combine.TAG_WIKIPEDIA: wikipedia_data,
+            }
             | "combine/group_by_key" >> beam.CoGroupByKey()
             | "combine/combine" >> beam.ParDo(Combine())
             | "combine/changed" >> beam.ParDo(OutputNewOrChangedEntires(FileSystems.join(options.base_path, "output.sqlite")))
