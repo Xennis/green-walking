@@ -1,3 +1,4 @@
+import argparse
 import copy
 import logging
 from dataclasses import dataclass
@@ -181,9 +182,9 @@ def use_firestore_types(key: K, value: Dict[str, Any]) -> Tuple[K, Dict[str, Any
     return key, value
 
 
-class ParkdataPipelineOptions(PipelineOptions):
-    @classmethod
-    def _add_argparse_args(cls, parser):
+class ParkdataPipelineOptions:
+    @staticmethod
+    def add_args(parser):
         # User-Agent policy: https://w.wiki/CX6
         parser.add_argument(
             "--user_agent", type=str, help="User agent", default="green-walking/0.1 (https://github.com/Xennis/green-walking)"
@@ -207,47 +208,55 @@ class ParkdataPipelineOptions(PipelineOptions):
         return [language.ENGLISH, language.GERMAN]
 
 
-def run(argv=None):
-    pipeline_options = PipelineOptions(argv)
-    options = pipeline_options.view_as(ParkdataPipelineOptions)
+def run():
+    parser = argparse.ArgumentParser()
+    ParkdataPipelineOptions.add_args(parser)
+    args, beam_args = parser.parse_known_args()
+
+    beam_options = PipelineOptions(beam_args)
     # Save the main session that defines global import, functions and variables. Otherwise they are not saved during
     # the serialization. Details see https://cloud.google.com/dataflow/docs/resources/faq#how_do_i_handle_nameerrors
-    pipeline_options.view_as(SetupOptions).save_main_session = options.save_session
-    with beam.Pipeline(options=pipeline_options) as p:
+    beam_options.view_as(SetupOptions).save_main_session = args.save_session
+    with beam.Pipeline(options=beam_options) as p:
         wikidata_data, commons_ids = (
             p
             | "wikidata_query/create" >> beam.Create(wd_queries())
             | "wikidata/query"
-            >> wikidata.Query(FileSystems.join(options.base_path, "wikidata_query_cache.sqlite"), user_agent=options.user_agent,)
+            >> wikidata.Query(
+                FileSystems.join(args.base_path, "wikidata_query_cache.sqlite"),
+                user_agent=args.user_agent,
+            )
             | "wikidata/group" >> beam.GroupByKey()
             | "wikidata/fetch"
             >> wikidata.Transform(
-                options.supported_languages(),
-                cache_file=FileSystems.join(options.base_path, "wikidata_cache.sqlite"),
-                user_agent=options.user_agent,
+                ParkdataPipelineOptions.supported_languages(),
+                cache_file=FileSystems.join(args.base_path, "wikidata_cache.sqlite"),
+                user_agent=args.user_agent,
             )
         )
 
         commons_data = commons_ids | "commons" >> commons.Transform(
-            FileSystems.join(options.base_path, "commons_cache.sqlite"), user_agent=options.user_agent
+            FileSystems.join(args.base_path, "commons_cache.sqlite"), user_agent=args.user_agent
         )
 
         wikipedia_data = wikidata_data | "wikipedia" >> wikipedia.Transform(
-            FileSystems.join(options.base_path, "wikipedia_qache.sqlite"), user_agent=options.user_agent
+            FileSystems.join(args.base_path, "wikipedia_qache.sqlite"), user_agent=args.user_agent
         )
 
         changed_places = (
-            {Combine.TAG_COMMONS: commons_data, Combine.TAG_WIKIDATA: wikidata_data, Combine.TAG_WIKIPEDIA: wikipedia_data,}
+            {
+                Combine.TAG_COMMONS: commons_data,
+                Combine.TAG_WIKIDATA: wikidata_data,
+                Combine.TAG_WIKIPEDIA: wikipedia_data,
+            }
             | "combine/group_by_key" >> beam.CoGroupByKey()
             | "combine/combine" >> beam.ParDo(Combine())
-            | "combine/changed" >> beam.ParDo(OutputNewOrChangedEntires(FileSystems.join(options.base_path, "output.sqlite")))
+            | "combine/changed" >> beam.ParDo(OutputNewOrChangedEntires(FileSystems.join(args.base_path, "output.sqlite")))
         )
 
         (
             changed_places
             | "firestore_output/convert_types" >> beam.MapTuple(use_firestore_types)
             | "firestore_output/write"
-            >> beam.ParDo(
-                FirestoreWrite(project=options.project_id, collection="places_v4", credentials="gcp-service-account.json")
-            )
+            >> beam.ParDo(FirestoreWrite(project=args.project_id, collection="places_v4", credentials="gcp-service-account.json"))
         )
