@@ -8,7 +8,7 @@
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
     <application
-        android:name="io.flutter.app.FlutterApplication"
+        android:name="${applicationName}"
         android:label="Green Walking"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -58,6 +58,9 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+    <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
     <!-- Required by flutter_map -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Required by user_location -->
