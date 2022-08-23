@@ -52,7 +52,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             }
                             SharedPrefs.setBool(
                                 SharedPrefs.ANALYTICS_ENABLED, value);
-                            FirebaseAnalytics()
+                            FirebaseAnalytics.instance
                                 .setAnalyticsCollectionEnabled(value);
                             setState(() {
                               _analyticsEnabled = value;

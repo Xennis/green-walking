@@ -11,7 +11,7 @@ void enableAnalyticsOrConsent(BuildContext context) {
   SharedPrefs.getBool(SharedPrefs.ANALYTICS_ENABLED).then((bool? enabled) {
     if (enabled == true) {
       // Privacy: Only enable analytics if it is set to enabled.
-      FirebaseAnalytics().setAnalyticsCollectionEnabled(true);
+      FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
     } else if (enabled == null) {
       showDialog<dynamic>(
           context: context, builder: (BuildContext context) => GdprDialog());
@@ -56,14 +56,14 @@ class GdprDialog extends StatelessWidget {
             child: Text(locale.gdprDisagree.toUpperCase()),
             onPressed: () {
               SharedPrefs.setBool(SharedPrefs.ANALYTICS_ENABLED, false);
-              FirebaseAnalytics().setAnalyticsCollectionEnabled(false);
+              FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(false);
               Navigator.of(context).pop();
             }),
         TextButton(
             child: Text(locale.gdprAgree.toUpperCase()),
             onPressed: () {
               SharedPrefs.setBool(SharedPrefs.ANALYTICS_ENABLED, true);
-              FirebaseAnalytics().setAnalyticsCollectionEnabled(true);
+              FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
               Navigator.of(context).pop();
             }),
       ],
