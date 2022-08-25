@@ -4,15 +4,13 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
 class AttributionLayer extends StatelessWidget {
-  const AttributionLayer(
-      {Key? key,
-          required this.logoAssetName,
+  const AttributionLayer({
+    Key? key,
+    required this.logoAssetName,
     this.satelliteLayer = false,
     this.color = Colors.blueGrey,
-})
-      : super(key: key);
+  }) : super(key: key);
 
   final Color color;
   final String logoAssetName;
