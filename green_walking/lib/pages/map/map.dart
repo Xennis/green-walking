@@ -257,19 +257,20 @@ class _MapPageState extends State<MapPage> {
               InteractiveFlag.pinchZoom |
               InteractiveFlag.doubleTapZoom,
           //InteractiveFlag.rotate,
-          plugins: <MapPlugin>[AttributionPlugin(), VectorMapTilesPlugin()],
+          plugins: <MapPlugin>[VectorMapTilesPlugin()],
           onPositionChanged: (MapPosition position, bool hasGesture) {
             _lastMapPosition = position;
           }),
       layers: layerOptions,
-      nonRotatedLayers: [
-        AttributionOptions(
+      nonRotatedChildren: <Widget>[
+        AttributionLayer(
             logoAssetName: 'assets/mapbox-logo.svg',
             // Use white for satellite layer it's better visible.
             color: mapboxStyle == MabboxTileset.satellite
                 ? Colors.white
                 : Colors.blueGrey,
             satelliteLayer: mapboxStyle == MabboxTileset.satellite),
+        
       ],
     );
   }

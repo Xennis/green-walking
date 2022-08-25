@@ -1,17 +1,18 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 
-class AttributionOptions extends LayerOptions {
-  AttributionOptions({
-    required this.logoAssetName,
+class AttributionLayer extends StatelessWidget {
+  const AttributionLayer(
+      {Key? key,
+          required this.logoAssetName,
     this.satelliteLayer = false,
     this.color = Colors.blueGrey,
-  }) : super();
+})
+      : super(key: key);
 
   final Color color;
   final String logoAssetName;
@@ -19,25 +20,10 @@ class AttributionOptions extends LayerOptions {
   /// If true additional links required for the satellite layer will be
   /// displayed.
   final bool satelliteLayer;
-}
-
-class AttributionLayer extends StatelessWidget {
-  const AttributionLayer(
-      {Key? key,
-      required this.options,
-      required this.map,
-      required this.stream})
-      : assert(options is AttributionOptions),
-        super(key: key);
-
-  final LayerOptions options;
-  final MapState map;
-  final Stream<void> stream;
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context)!;
-    final AttributionOptions attrOptions = options as AttributionOptions;
     final List<Widget> links = <Widget>[
       RichText(
         text: TextSpan(
@@ -70,7 +56,7 @@ class AttributionLayer extends StatelessWidget {
         ),
       ),
     ];
-    if (attrOptions.satelliteLayer) {
+    if (satelliteLayer) {
       links.add(RichText(
         text: TextSpan(
           text: '\n© Maxar',
@@ -87,12 +73,12 @@ class AttributionLayer extends StatelessWidget {
       child: Row(
         children: <Widget>[
           const Text('  '), // FIXME: Use proper spacing
-          SvgPicture.asset(attrOptions.logoAssetName,
-              width: 80, color: attrOptions.color, semanticsLabel: 'Mapbox'),
+          SvgPicture.asset(logoAssetName,
+              width: 80, color: color, semanticsLabel: 'Mapbox'),
           IconButton(
               icon: Icon(
                 Icons.info,
-                color: attrOptions.color,
+                color: color,
                 semanticLabel: locale.attributionInfoSemanticLabel,
               ),
               onPressed: () {
@@ -117,18 +103,5 @@ class AttributionLayer extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-class AttributionPlugin extends MapPlugin {
-  @override
-  Widget createLayer(
-      LayerOptions options, MapState mapState, Stream<void> stream) {
-    return AttributionLayer(options: options, map: mapState, stream: stream);
-  }
-
-  @override
-  bool supportsLayer(LayerOptions options) {
-    return options is AttributionOptions;
   }
 }
