@@ -178,7 +178,7 @@ packages:
     source: sdk
     version: "0.0.0"
   geolocator:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: geolocator
       url: "https://pub.dartlang.org"

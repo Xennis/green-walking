@@ -4,8 +4,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class AttributionLayer extends StatelessWidget {
-  const AttributionLayer({
+class MapboxAttribution extends StatelessWidget {
+  const MapboxAttribution({
     Key? key,
     required this.logoAssetName,
     this.satelliteLayer = false,
