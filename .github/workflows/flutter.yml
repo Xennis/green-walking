@@ -13,13 +13,13 @@ jobs:
         channel: 'stable'
     - name: Install dependencies
       run: flutter pub get
-      working-directory: apps/green_walking
+      working-directory: green_walking
     - name: Check format
       run: find . -name '*.dart' -not -name 'messages_*.dart' -exec flutter format --set-exit-if-changed {} \;
-      working-directory: apps/green_walking
+      working-directory: green_walking
     - name: Run linter
       run: flutter analyze .
-      working-directory: apps/green_walking
+      working-directory: green_walking
     - name: Run tests
       run: flutter test .
-      working-directory: apps/green_walking
+      working-directory: green_walking
