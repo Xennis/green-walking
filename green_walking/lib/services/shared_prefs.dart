@@ -1,6 +1,6 @@
+import 'dart:convert';
 import 'dart:developer';
 
-import 'package:dart_geohash/dart_geohash.dart';
 import 'package:latlong2/latlong.dart' show LatLng;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,8 +16,8 @@ class SharedPrefs {
       return null;
     }
     try {
-      final List<double> res = GeoHasher().decode(raw);
-      return LatLng(res[1], res[0]);
+      final Map<String, dynamic> parsed = jsonDecode(raw) as Map<String, dynamic>;
+      return LatLng.fromJson(parsed);
     } catch (e) {
       // No last location is not critical. A raised exception on start up is.
       log('failed to load location: ' + e.toString());
@@ -27,7 +27,7 @@ class SharedPrefs {
 
   static void setLatLng(String key, LatLng val) {
     try {
-      final String raw = GeoHasher().encode(val.longitude, val.latitude);
+      final String raw = val.toJson().toString();
       SharedPreferences.getInstance()
           .then((SharedPreferences prefs) => prefs.setString(key, raw));
     } catch (e) {
