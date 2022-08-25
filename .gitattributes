@@ -1,5 +1,4 @@
 # Credentials
-gcp-service-account.json filter=git-crypt diff=git-crypt
 google-services.json filter=git-crypt diff=git-crypt
 GoogleService-Info.plist filter=git-crypt diff=git-crypt
 key.jks filter=git-crypt diff=git-crypt
