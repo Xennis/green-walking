@@ -33,10 +33,11 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  flutter_map: ^2.2.0
   flutter_speed_dial: ^6.0.0
   geolocator: ^9.0.1
   intl: ^0.17.0
-  mapbox_gl: ^0.16.0
+  latlong2: ^0.8.1
   shared_preferences: ^2.0.8
   url_launcher: ^6.0.13
 

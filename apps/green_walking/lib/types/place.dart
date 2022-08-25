@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:green_walking/types/language.dart';
-import 'package:mapbox_gl/mapbox_gl.dart' show LatLng;
+import 'package:latlong2/latlong.dart' show LatLng;
 
 class PlaceExtract {
   PlaceExtract({
