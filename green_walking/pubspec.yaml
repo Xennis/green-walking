@@ -27,7 +27,6 @@ dependencies:
   flutter_map: ^2.2.0
   flutter_map_location_marker: ^4.1.4
   flutter_svg: ^1.1.4
-  geolocator: ^9.0.1
   intl: ^0.17.0
   latlong2: ^0.8.1
   shared_preferences: ^2.0.8

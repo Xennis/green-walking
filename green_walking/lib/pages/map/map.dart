@@ -6,10 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:green_walking/pages/map/tileset.dart';
-import 'package:green_walking/pages/search.dart';
-import 'package:green_walking/services/mapbox_geocoding.dart';
 import 'package:green_walking/services/shared_prefs.dart';
 import 'package:green_walking/widgets/gdpr_dialog.dart';
 import 'package:green_walking/widgets/navigation_drawer.dart';
@@ -18,8 +15,11 @@ import 'package:vector_map_tiles/vector_map_tiles.dart';
 import 'package:vector_tile_renderer/vector_tile_renderer.dart'
     show ThemeReader;
 
-import 'attribution.dart';
+import '../../services/mapbox_geocoding.dart';
+import '../search.dart';
+import 'mapbox_attribution.dart';
 import 'fuu.dart';
+import 'search_bar.dart';
 
 class MapConfig {
   MapConfig(this.accessToken, {this.lastLocation});
@@ -132,12 +132,35 @@ class _MapPageState extends State<MapPage> {
                             ),
                           ),
                         ),*/
-                        SafeArea(
-                          top: true,
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(15, 7, 15, 0),
-                            child: searchBar(context, data.accessToken),
-                          ),
+                        SearchBar(
+                          scaffoldKey: _scaffoldKey,
+                          onSearchSubmitted: (String query) {
+                            final Future<LatLng?> moveToLoc = Navigator.push(
+                              context,
+                              MaterialPageRoute<LatLng>(
+                                  builder: (BuildContext context) => SearchPage(
+                                        mapboxGeocodingGet(
+                                            query, data.accessToken, _lastLoc),
+                                      )),
+                            );
+                            moveToLoc.then((LatLng? value) {
+                              if (value == null) {
+                                return;
+                              }
+                              mapController.move(value, 16.0);
+                            });
+                          },
+                          onLayerToogle: () {
+                            if (mapboxStyle == MabboxTileset.satellite) {
+                              setState(() {
+                                mapboxStyle = MabboxTileset.outdoor;
+                              });
+                            } else {
+                              setState(() {
+                                mapboxStyle = MabboxTileset.satellite;
+                              });
+                            }
+                          },
                         ),
                       ],
                     )),
@@ -151,76 +174,6 @@ class _MapPageState extends State<MapPage> {
 
             return const Center(child: CircularProgressIndicator());
           }),
-    );
-  }
-
-  Widget searchBar(BuildContext context, String accessToken) {
-    final AppLocalizations locale = AppLocalizations.of(context)!;
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: Row(
-        children: <Widget>[
-          IconButton(
-            splashColor: Colors.grey,
-            icon: Icon(Icons.menu,
-                semanticLabel:
-                    MaterialLocalizations.of(context).openAppDrawerTooltip),
-            onPressed: () {
-              _scaffoldKey.currentState?.openDrawer();
-            },
-          ),
-          Expanded(
-            child: TextField(
-              cursorColor: Colors.black,
-              keyboardType: TextInputType.text,
-              textInputAction: TextInputAction.go,
-              decoration: InputDecoration(
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-                  hintText: locale.searchBoxHintLabel('...')),
-              onSubmitted: (String query) {
-                final Future<LatLng?> moveToLoc = Navigator.push(
-                  context,
-                  MaterialPageRoute<LatLng>(
-                      builder: (BuildContext context) => SearchPage(
-                            mapboxGeocodingGet(query, accessToken, _lastLoc),
-                          )),
-                );
-                moveToLoc.then((LatLng? value) {
-                  if (value == null) {
-                    return;
-                  }
-                  mapController.move(value, 16.0);
-                });
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: IconButton(
-              splashColor: Colors.grey,
-              icon: Icon(
-                Icons.layers,
-                semanticLabel: locale.mapSwitchLayerSemanticLabel,
-              ),
-              onPressed: () {
-                if (mapboxStyle == MabboxTileset.satellite) {
-                  setState(() {
-                    mapboxStyle = MabboxTileset.outdoor;
-                  });
-                } else {
-                  setState(() {
-                    mapboxStyle = MabboxTileset.satellite;
-                  });
-                }
-              },
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -294,7 +247,7 @@ class _MapPageState extends State<MapPage> {
           }),
       children: layerOptions,
       nonRotatedChildren: <Widget>[
-        AttributionLayer(
+        MapboxAttribution(
             logoAssetName: 'assets/mapbox-logo.svg',
             // Use white for satellite layer it's better visible.
             color: mapboxStyle == MabboxTileset.satellite
