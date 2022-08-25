@@ -1,26 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:typed_data';
 
-import 'package:dart_geohash/dart_geohash.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:green_walking/pages/detail/detail.dart';
 import 'package:green_walking/pages/map/tileset.dart';
 import 'package:green_walking/pages/search.dart';
 import 'package:green_walking/services/mapbox_geocoding.dart';
-import 'package:green_walking/services/places.dart';
 import 'package:green_walking/services/shared_prefs.dart';
-import 'package:green_walking/types/language.dart';
-import 'package:green_walking/types/place.dart';
 import 'package:green_walking/widgets/gdpr_dialog.dart';
 import 'package:green_walking/widgets/navigation_drawer.dart';
-import 'package:green_walking/widgets/place_list_tile.dart';
 import 'package:latlong2/latlong.dart' show LatLng;
 import 'package:vector_map_tiles/vector_map_tiles.dart' as vmt;
 import 'package:vector_tile_renderer/vector_tile_renderer.dart' as vtr;
@@ -34,7 +25,6 @@ class MapConfig {
   LatLng? lastLocation;
 
   static Future<MapConfig> create(AssetBundle assetBundle) async {
-    await FirebaseAuth.instance.signInAnonymously();
     final String accessToken =
         await assetBundle.loadString('assets/mapbox-access-token.txt');
     LatLng? lastLocation =
@@ -57,10 +47,8 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   MapController? mapController;
-  GeoHash? _lastGeohash;
   MabboxTileset mapboxStyle = MabboxTileset.outdoor;
   LatLng? _lastLoc;
-  Place? _placeCardPreview;
 
   @override
   void initState() {
@@ -68,53 +56,6 @@ class _MapPageState extends State<MapPage> {
     WidgetsBinding.instance
         .addPostFrameCallback((_) => enableAnalyticsOrConsent(context));
   }
-
-  /*
-  void onPositionChanged(CameraPosition? position) {
-    if (position == null) {
-      return;
-    }
-    if (position.zoom < 11.0) {
-      // clearSymbols does not work https://github.com/tobrun/flutter-mapbox-gl/issues/651
-      mapController?.removeSymbols(mapController!.symbols);
-      _lastGeohash = null;
-      return;
-    }
-
-    final GeoHash _newGeohash = GeoHash.fromDecimalDegrees(
-        position.target.longitude, position.target.latitude,
-        precision: 4);
-    if (_lastGeohash != null && _lastGeohash!.contains(_newGeohash.geohash)) {
-      return;
-    }
-    _lastGeohash = _newGeohash;
-
-    final Language lang =
-        languageFromString(AppLocalizations.of(context)!.localeName);
-
-    nearbyPlaces(_newGeohash, lang).then((List<Place> value) {
-      final List<SymbolOptions> options = value
-          .map((Place p) => SymbolOptions(
-                geometry: p.geopoint,
-                iconImage: 'place-marker',
-                iconSize: 0.5,
-                iconAnchor: 'top',
-                // TODO(Xennis): Use different colors
-                //iconColor: '#${placeTypeToColor(p.type).value.toRadixString(16)}'
-              ))
-          .toList();
-      final List<Map<String, Place>> data =
-          value.map((Place p) => <String, Place>{'place': p}).toList();
-      // clearSymbols does not work https://github.com/tobrun/flutter-mapbox-gl/issues/651
-      mapController?.removeSymbols(mapController!.symbols);
-      mapController?.addSymbols(options, data);
-
-      setState(() {
-        _lastGeohash = _newGeohash;
-      });
-    });
-  }
-  */
 
   @override
   Widget build(BuildContext context) {
@@ -182,10 +123,6 @@ class _MapPageState extends State<MapPage> {
                         ),
                       ],
                     )),
-                    Visibility(
-                      visible: _placeCardPreview != null,
-                      child: placeCardPreview(),
-                    )
                   ],
                 ),
               );
@@ -196,56 +133,6 @@ class _MapPageState extends State<MapPage> {
 
             return const Center(child: CircularProgressIndicator());
           }),
-    );
-  }
-
-  Widget placeCardPreview() {
-    final AppLocalizations locale = AppLocalizations.of(context)!;
-    final TextStyle tx =
-        TextStyle(color: Theme.of(context).colorScheme.secondary);
-    final Place? place = _placeCardPreview;
-    if (place == null) {
-      return Container();
-    }
-
-    return Container(
-      child: Card(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            PlaceListTile(
-              place,
-            ),
-            ButtonBar(
-              children: <Widget>[
-                TextButton(
-                  child: Text(locale.ok.toUpperCase(), style: tx),
-                  onPressed: () {
-                    setState(() {
-                      _placeCardPreview = null;
-                    });
-                  },
-                ),
-                TextButton(
-                  child: Text(locale.details.toUpperCase(), style: tx),
-                  onPressed: () {
-                    //if (p == null) {
-                    //  log('no park found');
-                    //  return;
-                    //}
-                    Navigator.of(context)
-                        .push<dynamic>(MaterialPageRoute<dynamic>(
-                      builder: (BuildContext context) => DetailPage(
-                        place,
-                      ),
-                    ));
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -320,7 +207,12 @@ class _MapPageState extends State<MapPage> {
   }
 
   Widget map(BuildContext context, MapConfig config) {
-    //final AppLocalizations locale = AppLocalizations.of(context);
+    // TODO: Save last location
+    /*
+      onUserLocationUpdated: (UserLocation location) {
+        SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, location.position);
+      },
+    */
     Map<String, dynamic> fuu = jsonDecode(fuuRaw) as Map<String, dynamic>;
     return FlutterMap(
       mapController: mapController,
@@ -329,23 +221,23 @@ class _MapPageState extends State<MapPage> {
               ? config.lastLocation!
               : LatLng(53.5519, 9.8682),
           zoom: 11.0,
-                          interactiveFlags: InteractiveFlag.drag |
-                    InteractiveFlag.flingAnimation |
-                    InteractiveFlag.pinchMove |
-                    InteractiveFlag.pinchZoom |
-                    InteractiveFlag.doubleTapZoom,
-                    //InteractiveFlag.rotate,
-          plugins: [
-            vmt.VectorMapTilesPlugin()
-          ]),
+          interactiveFlags: InteractiveFlag.drag |
+              InteractiveFlag.flingAnimation |
+              InteractiveFlag.pinchMove |
+              InteractiveFlag.pinchZoom |
+              InteractiveFlag.doubleTapZoom,
+          //InteractiveFlag.rotate,
+          plugins: [vmt.VectorMapTilesPlugin()]),
       layers: [
         // normally you would see TileLayerOptions which provides raster tiles
-              // instead this vector tile layer replaces the standard tile layer
-              vmt.VectorTileLayerOptions(
-                  theme: vtr.ThemeReader().read(fuu),
-                  tileOffset: vmt.TileOffset.mapbox,
-                  tileProviders: vmt.TileProviders(
-                      {'composite': _cachingTileProvider(_urlTemplate())})),
+        // instead this vector tile layer replaces the standard tile layer
+        vmt.VectorTileLayerOptions(
+            theme: vtr.ThemeReader().read(fuu),
+            tileOffset: vmt.TileOffset.mapbox,
+            tileProviders: vmt.TileProviders({
+              'composite':
+                  _cachingTileProvider(_urlTemplate(config.accessToken))
+            })),
         /*
         TileLayerOptions(
           urlTemplate:
@@ -361,33 +253,9 @@ class _MapPageState extends State<MapPage> {
         */
       ],
     );
-    /*
-    return MapboxMap(
-      accessToken: config.accessToken,
-      onMapCreated: (MapboxMapController controller) {
-        mapController = controller;
-        mapController!.onSymbolTapped.add(_onSymbolTapped);
-        onPositionChanged(mapController!.cameraPosition);
-      },
-      myLocationEnabled: true,
-      rotateGesturesEnabled: true,
-      styleString: mapboxStyle.id,
-      trackCameraPosition: true,
-      onCameraIdle: () => onPositionChanged(mapController?.cameraPosition),
-      onStyleLoadedCallback: () async {
-        // TODO(Xennis): Use Icons.location_pin
-        final ByteData bytes = await rootBundle.load('assets/place-icon.png');
-        final Uint8List list = bytes.buffer.asUint8List();
-        mapController?.addImage('place-marker', list);
-      },
-      onUserLocationUpdated: (UserLocation location) {
-        SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, location.position);
-      },
-    );
-    */
   }
 
-    vmt.VectorTileProvider _cachingTileProvider(String urlTemplate) {
+  vmt.VectorTileProvider _cachingTileProvider(String urlTemplate) {
     return vmt.MemoryCacheVectorTileProvider(
         delegate: vmt.NetworkVectorTileProvider(
             urlTemplate: urlTemplate,
@@ -398,19 +266,12 @@ class _MapPageState extends State<MapPage> {
         maxSizeBytes: 1024 * 1024 * 2);
   }
 
-  vtr.Theme _mapTheme() {
-    // maps are rendered using themes
-    // to provide a dark theme do something like this:
-    // if (MediaQuery.of(context).platformBrightness == Brightness.dark) return myDarkTheme();
-    return vtr.ProvidedThemes.lightTheme();
-  }
-
-  String _urlTemplate() {
+  String _urlTemplate(String accessToken) {
     // Stadia Maps source https://docs.stadiamaps.com/vector/
     //return 'https://tiles.stadiamaps.com/data/openmaptiles/{z}/{x}/{y}.pbf?api_key=$apiKey';
 
     // Mapbox source https://docs.mapbox.com/api/maps/vector-tiles/#example-request-retrieve-vector-tiles
     //return 'https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/{z}/{x}/{y}.mvt?access_token=<key>';
-    return 'https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/{z}/{x}/{y}.mvt?access_token=<key>';
+    return 'https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/{z}/{x}/{y}.mvt?access_token=$accessToken';
   }
 }
