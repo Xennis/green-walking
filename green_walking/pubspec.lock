@@ -132,6 +132,15 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_compass:
+    dependency: "direct overridden"
+    description:
+      path: "."
+      ref: "14e134f0aed3c9fe09065bea05281f2c26f171d1"
+      resolved-ref: "14e134f0aed3c9fe09065bea05281f2c26f171d1"
+      url: "https://github.com/hemanthrajv/flutter_compass.git"
+    source: git
+    version: "0.7.0"
   flutter_localizations:
     dependency: "direct main"
     description: flutter
@@ -144,6 +153,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.0"
+  flutter_map_location_marker:
+    dependency: "direct main"
+    description:
+      name: flutter_map_location_marker
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.1.4"
   flutter_svg:
     dependency: "direct main"
     description:
