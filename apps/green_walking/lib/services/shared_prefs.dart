@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:dart_geohash/dart_geohash.dart';
-import 'package:mapbox_gl/mapbox_gl.dart' show LatLng;
+import 'package:latlong2/latlong.dart' show LatLng;
 import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: avoid_classes_with_only_static_members

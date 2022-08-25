@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:green_walking/pages/detail/detail.dart';
 import 'package:green_walking/pages/map/tileset.dart';
@@ -19,7 +20,7 @@ import 'package:green_walking/types/place.dart';
 import 'package:green_walking/widgets/gdpr_dialog.dart';
 import 'package:green_walking/widgets/navigation_drawer.dart';
 import 'package:green_walking/widgets/place_list_tile.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:latlong2/latlong.dart' show LatLng;
 
 class MapConfig {
   MapConfig(this.accessToken, {this.lastLocation});
@@ -50,7 +51,7 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  MapboxMapController? mapController;
+  MapController? mapController;
   GeoHash? _lastGeohash;
   MabboxTileset mapboxStyle = MabboxTileset.outdoor;
   LatLng? _lastLoc;
@@ -63,22 +64,7 @@ class _MapPageState extends State<MapPage> {
         .addPostFrameCallback((_) => enableAnalyticsOrConsent(context));
   }
 
-  @override
-  void dispose() {
-    mapController?.onSymbolTapped.remove(_onSymbolTapped);
-    super.dispose();
-  }
-
-  void _onSymbolTapped(Symbol symbol) {
-    final LatLng? geometry = symbol.options.geometry;
-    if (geometry != null) {
-      mapController?.animateCamera(CameraUpdate.newLatLng(geometry));
-      setState(() {
-        _placeCardPreview = symbol.data!['place'] as Place?;
-      });
-    }
-  }
-
+  /*
   void onPositionChanged(CameraPosition? position) {
     if (position == null) {
       return;
@@ -123,6 +109,7 @@ class _MapPageState extends State<MapPage> {
       });
     });
   }
+  */
 
   @override
   Widget build(BuildContext context) {
@@ -165,12 +152,13 @@ class _MapPageState extends State<MapPage> {
                                                 locale.errorNoPositionFound)));
                                   }
                                 }
+                                // TODO: Get Location
+                                /*
                                 final LatLng? loc = await mapController
                                     ?.requestMyLocationLatLng();
                                 if (loc != null) {
-                                  mapController?.moveCamera(
-                                      CameraUpdate.newLatLngZoom(loc, 16.0));
-                                }
+                                  mapController?.move(loc, 16.0);
+                                }*/
                               },
                               // TODO(Xennis): Use Icons.location_disabled if location service is not avaiable.
                               child: const Icon(
@@ -295,8 +283,7 @@ class _MapPageState extends State<MapPage> {
                   if (value == null) {
                     return;
                   }
-                  mapController?.moveCamera(CameraUpdate.newCameraPosition(
-                      CameraPosition(target: value, zoom: 16.0)));
+                  mapController?.move(value, 16.0);
                 });
               },
             ),
@@ -329,6 +316,28 @@ class _MapPageState extends State<MapPage> {
 
   Widget map(BuildContext context, MapConfig config) {
     //final AppLocalizations locale = AppLocalizations.of(context);
+    return FlutterMap(
+      mapController: mapController,
+      options: MapOptions(
+          center: (config.lastLocation != null)
+              ? config.lastLocation!
+              : LatLng(53.5519, 9.8682),
+          zoom: 11.0),
+      layers: [
+        TileLayerOptions(
+          urlTemplate:
+              'https://api.mapbox.com/styles/v1/${mapboxStyle.id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
+          additionalOptions: <String, String>{
+            'accessToken': config.accessToken,
+            // Use if https://github.com/fleaflet/flutter_map/pull/740/ is merged.
+            //'id': mapboxStyle,
+          },
+          tileProvider: NetworkTileProvider(),
+          overrideTilesWhenUrlChanges: true,
+        )
+      ],
+    );
+    /*
     return MapboxMap(
       accessToken: config.accessToken,
       onMapCreated: (MapboxMapController controller) {
@@ -336,11 +345,6 @@ class _MapPageState extends State<MapPage> {
         mapController!.onSymbolTapped.add(_onSymbolTapped);
         onPositionChanged(mapController!.cameraPosition);
       },
-      initialCameraPosition: CameraPosition(
-          target: (config.lastLocation != null)
-              ? config.lastLocation!
-              : const LatLng(53.5519, 9.8682),
-          zoom: 11.0),
       myLocationEnabled: true,
       rotateGesturesEnabled: true,
       styleString: mapboxStyle.id,
@@ -356,5 +360,6 @@ class _MapPageState extends State<MapPage> {
         SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, location.position);
       },
     );
+    */
   }
 }

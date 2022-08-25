@@ -4,7 +4,7 @@ import 'package:async/async.dart' show FutureGroup;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dart_geohash/dart_geohash.dart';
 import 'package:green_walking/types/language.dart';
-import 'package:mapbox_gl/mapbox_gl.dart' show LatLng;
+import 'package:latlong2/latlong.dart' show LatLng;
 
 import '../types/place.dart';
 
