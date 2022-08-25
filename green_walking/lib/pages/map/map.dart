@@ -13,8 +13,9 @@ import 'package:green_walking/services/shared_prefs.dart';
 import 'package:green_walking/widgets/gdpr_dialog.dart';
 import 'package:green_walking/widgets/navigation_drawer.dart';
 import 'package:latlong2/latlong.dart' show LatLng;
-import 'package:vector_map_tiles/vector_map_tiles.dart' as vmt;
-import 'package:vector_tile_renderer/vector_tile_renderer.dart' as vtr;
+import 'package:vector_map_tiles/vector_map_tiles.dart';
+import 'package:vector_tile_renderer/vector_tile_renderer.dart'
+    show ThemeReader;
 
 import 'fuu.dart';
 
@@ -47,7 +48,8 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   MapController mapController = MapController();
-  MabboxTileset mapboxStyle = MabboxTileset.outdoor;
+  MabboxTileset mapboxStyle = MabboxTileset.satellite;
+  MapPosition? _lastMapPosition;
   LatLng? _lastLoc;
 
   @override
@@ -213,65 +215,60 @@ class _MapPageState extends State<MapPage> {
         SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, location.position);
       },
     */
-    Map<String, dynamic> fuu = jsonDecode(fuuRaw) as Map<String, dynamic>;
+
+    final List<LayerOptions> layerOptions = [];
+    if (mapboxStyle == MabboxTileset.outdoor) {
+      // Mapbox source https://docs.mapbox.com/api/maps/vector-tiles/#example-request-retrieve-vector-tiles
+      const String tilesetID = 'mapbox.mapbox-streets-v8';
+      final String urlTemplate =
+          'https://api.mapbox.com/v4/$tilesetID/{z}/{x}/{y}.mvt?style=${mapboxStyle.stylePath}@00&access_token=${config.accessToken}';
+      final Map<String, dynamic> fuu = jsonDecode(fuuRaw) as Map<String, dynamic>;
+
+      layerOptions.add(VectorTileLayerOptions(
+          theme: ThemeReader().read(fuu),
+          tileOffset: TileOffset.mapbox,
+          tileProviders:
+              TileProviders({'composite': _cachingTileProvider(urlTemplate)})));
+    } else {
+      layerOptions.add(TileLayerOptions(
+        urlTemplate:
+            'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
+        additionalOptions: <String, String>{
+          'accessToken': config.accessToken,
+          'id': mapboxStyle.id ?? '',
+        },
+        tileProvider: NetworkTileProvider(),
+        overrideTilesWhenUrlChanges: true,
+      ));
+    }
+
     return FlutterMap(
       mapController: mapController,
       options: MapOptions(
-          center: (config.lastLocation != null)
-              ? config.lastLocation!
-              : LatLng(53.5519, 9.8682),
-          zoom: 11.0,
+          center: _lastMapPosition?.center ?? config.lastLocation ?? LatLng(53.5519, 9.8682),
+          zoom: _lastMapPosition?.zoom ?? 11.0,
           interactiveFlags: InteractiveFlag.drag |
               InteractiveFlag.flingAnimation |
               InteractiveFlag.pinchMove |
               InteractiveFlag.pinchZoom |
               InteractiveFlag.doubleTapZoom,
           //InteractiveFlag.rotate,
-          plugins: [vmt.VectorMapTilesPlugin()]),
-      layers: [
-        // normally you would see TileLayerOptions which provides raster tiles
-        // instead this vector tile layer replaces the standard tile layer
-        vmt.VectorTileLayerOptions(
-            theme: vtr.ThemeReader().read(fuu),
-            tileOffset: vmt.TileOffset.mapbox,
-            tileProviders: vmt.TileProviders({
-              'composite':
-                  _cachingTileProvider(_urlTemplate(config.accessToken))
-            })),
-        /*
-        TileLayerOptions(
-          urlTemplate:
-              'https://api.mapbox.com/styles/v1/${mapboxStyle.id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
-          additionalOptions: <String, String>{
-            'accessToken': config.accessToken,
-            // Use if https://github.com/fleaflet/flutter_map/pull/740/ is merged.
-            //'id': mapboxStyle,
-          },
-          tileProvider: NetworkTileProvider(),
-          overrideTilesWhenUrlChanges: true,
-        )
-        */
-      ],
+          plugins: <MapPlugin>[VectorMapTilesPlugin()],
+          onPositionChanged: (MapPosition position, bool hasGesture) {
+            _lastMapPosition = position;
+          }),
+      layers: layerOptions,
     );
   }
 
-  vmt.VectorTileProvider _cachingTileProvider(String urlTemplate) {
-    return vmt.MemoryCacheVectorTileProvider(
-        delegate: vmt.NetworkVectorTileProvider(
+  VectorTileProvider _cachingTileProvider(String urlTemplate) {
+    return MemoryCacheVectorTileProvider(
+        delegate: NetworkVectorTileProvider(
             urlTemplate: urlTemplate,
             // this is the maximum zoom of the provider, not the
             // maximum of the map. vector tiles are rendered
             // to larger sizes to support higher zoom levels
             maximumZoom: 22),
         maxSizeBytes: 1024 * 1024 * 2);
-  }
-
-  String _urlTemplate(String accessToken) {
-    // Stadia Maps source https://docs.stadiamaps.com/vector/
-    //return 'https://tiles.stadiamaps.com/data/openmaptiles/{z}/{x}/{y}.pbf?api_key=$apiKey';
-
-    // Mapbox source https://docs.mapbox.com/api/maps/vector-tiles/#example-request-retrieve-vector-tiles
-    //return 'https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/{z}/{x}/{y}.mvt?access_token=<key>';
-    return 'https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/{z}/{x}/{y}.mvt?access_token=$accessToken';
   }
 }
