@@ -17,6 +17,7 @@ import 'package:vector_map_tiles/vector_map_tiles.dart';
 import 'package:vector_tile_renderer/vector_tile_renderer.dart'
     show ThemeReader;
 
+import 'attribution.dart';
 import 'fuu.dart';
 
 class MapConfig {
@@ -222,7 +223,8 @@ class _MapPageState extends State<MapPage> {
       const String tilesetID = 'mapbox.mapbox-streets-v8';
       final String urlTemplate =
           'https://api.mapbox.com/v4/$tilesetID/{z}/{x}/{y}.mvt?style=${mapboxStyle.stylePath}@00&access_token=${config.accessToken}';
-      final Map<String, dynamic> fuu = jsonDecode(fuuRaw) as Map<String, dynamic>;
+      final Map<String, dynamic> fuu =
+          jsonDecode(fuuRaw) as Map<String, dynamic>;
 
       layerOptions.add(VectorTileLayerOptions(
           theme: ThemeReader().read(fuu),
@@ -245,7 +247,9 @@ class _MapPageState extends State<MapPage> {
     return FlutterMap(
       mapController: mapController,
       options: MapOptions(
-          center: _lastMapPosition?.center ?? config.lastLocation ?? LatLng(53.5519, 9.8682),
+          center: _lastMapPosition?.center ??
+              config.lastLocation ??
+              LatLng(53.5519, 9.8682),
           zoom: _lastMapPosition?.zoom ?? 11.0,
           interactiveFlags: InteractiveFlag.drag |
               InteractiveFlag.flingAnimation |
@@ -253,11 +257,20 @@ class _MapPageState extends State<MapPage> {
               InteractiveFlag.pinchZoom |
               InteractiveFlag.doubleTapZoom,
           //InteractiveFlag.rotate,
-          plugins: <MapPlugin>[VectorMapTilesPlugin()],
+          plugins: <MapPlugin>[AttributionPlugin(), VectorMapTilesPlugin()],
           onPositionChanged: (MapPosition position, bool hasGesture) {
             _lastMapPosition = position;
           }),
       layers: layerOptions,
+      nonRotatedLayers: [
+        AttributionOptions(
+            logoAssetName: 'assets/mapbox-logo.svg',
+            // Use white for satellite layer it's better visible.
+            color: mapboxStyle == MabboxTileset.satellite
+                ? Colors.white
+                : Colors.blueGrey,
+            satelliteLayer: mapboxStyle == MabboxTileset.satellite),
+      ],
     );
   }
 

@@ -25,6 +25,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_map: ^2.2.0
+  flutter_svg: ^1.1.4
   geolocator: ^9.0.1
   intl: ^0.17.0
   latlong2: ^0.8.1
@@ -54,7 +55,7 @@ flutter:
   assets:
      - assets/app-icon.png
      - assets/mapbox-access-token.txt
-     - assets/place-icon.png
+     - assets/mapbox-logo.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
