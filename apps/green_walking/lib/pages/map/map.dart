@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:typed_data';
 
@@ -21,6 +22,10 @@ import 'package:green_walking/widgets/gdpr_dialog.dart';
 import 'package:green_walking/widgets/navigation_drawer.dart';
 import 'package:green_walking/widgets/place_list_tile.dart';
 import 'package:latlong2/latlong.dart' show LatLng;
+import 'package:vector_map_tiles/vector_map_tiles.dart' as vmt;
+import 'package:vector_tile_renderer/vector_tile_renderer.dart' as vtr;
+
+import 'fuu.dart';
 
 class MapConfig {
   MapConfig(this.accessToken, {this.lastLocation});
@@ -316,14 +321,32 @@ class _MapPageState extends State<MapPage> {
 
   Widget map(BuildContext context, MapConfig config) {
     //final AppLocalizations locale = AppLocalizations.of(context);
+    Map<String, dynamic> fuu = jsonDecode(fuuRaw) as Map<String, dynamic>;
     return FlutterMap(
       mapController: mapController,
       options: MapOptions(
           center: (config.lastLocation != null)
               ? config.lastLocation!
               : LatLng(53.5519, 9.8682),
-          zoom: 11.0),
+          zoom: 11.0,
+                          interactiveFlags: InteractiveFlag.drag |
+                    InteractiveFlag.flingAnimation |
+                    InteractiveFlag.pinchMove |
+                    InteractiveFlag.pinchZoom |
+                    InteractiveFlag.doubleTapZoom,
+                    //InteractiveFlag.rotate,
+          plugins: [
+            vmt.VectorMapTilesPlugin()
+          ]),
       layers: [
+        // normally you would see TileLayerOptions which provides raster tiles
+              // instead this vector tile layer replaces the standard tile layer
+              vmt.VectorTileLayerOptions(
+                  theme: vtr.ThemeReader().read(fuu),
+                  tileOffset: vmt.TileOffset.mapbox,
+                  tileProviders: vmt.TileProviders(
+                      {'composite': _cachingTileProvider(_urlTemplate())})),
+        /*
         TileLayerOptions(
           urlTemplate:
               'https://api.mapbox.com/styles/v1/${mapboxStyle.id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
@@ -335,6 +358,7 @@ class _MapPageState extends State<MapPage> {
           tileProvider: NetworkTileProvider(),
           overrideTilesWhenUrlChanges: true,
         )
+        */
       ],
     );
     /*
@@ -361,5 +385,32 @@ class _MapPageState extends State<MapPage> {
       },
     );
     */
+  }
+
+    vmt.VectorTileProvider _cachingTileProvider(String urlTemplate) {
+    return vmt.MemoryCacheVectorTileProvider(
+        delegate: vmt.NetworkVectorTileProvider(
+            urlTemplate: urlTemplate,
+            // this is the maximum zoom of the provider, not the
+            // maximum of the map. vector tiles are rendered
+            // to larger sizes to support higher zoom levels
+            maximumZoom: 22),
+        maxSizeBytes: 1024 * 1024 * 2);
+  }
+
+  vtr.Theme _mapTheme() {
+    // maps are rendered using themes
+    // to provide a dark theme do something like this:
+    // if (MediaQuery.of(context).platformBrightness == Brightness.dark) return myDarkTheme();
+    return vtr.ProvidedThemes.lightTheme();
+  }
+
+  String _urlTemplate() {
+    // Stadia Maps source https://docs.stadiamaps.com/vector/
+    //return 'https://tiles.stadiamaps.com/data/openmaptiles/{z}/{x}/{y}.pbf?api_key=$apiKey';
+
+    // Mapbox source https://docs.mapbox.com/api/maps/vector-tiles/#example-request-retrieve-vector-tiles
+    //return 'https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/{z}/{x}/{y}.mvt?access_token=<key>';
+    return 'https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/{z}/{x}/{y}.mvt?access_token=<key>';
   }
 }

@@ -40,6 +40,8 @@ dependencies:
   latlong2: ^0.8.1
   shared_preferences: ^2.0.8
   url_launcher: ^6.0.13
+  vector_map_tiles: ^2.3.0
+  vector_tile_renderer: ^2.6.2
 
 dev_dependencies:
   #flutter_launcher_icons: ^0.8.1
