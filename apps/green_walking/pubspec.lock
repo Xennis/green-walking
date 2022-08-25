@@ -204,6 +204,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.2.14"
+  fixnum:
+    dependency: transitive
+    description:
+      name: fixnum
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.1"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -476,6 +483,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
+  protobuf:
+    dependency: transitive
+    description:
+      name: protobuf
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.0"
   quiver:
     dependency: transitive
     description:
@@ -698,6 +712,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.6"
+  vector_map_tiles:
+    dependency: "direct main"
+    description:
+      name: vector_map_tiles
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.3.0"
   vector_math:
     dependency: transitive
     description:
@@ -705,6 +726,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.2"
+  vector_tile:
+    dependency: transitive
+    description:
+      name: vector_tile
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
+  vector_tile_renderer:
+    dependency: "direct main"
+    description:
+      name: vector_tile_renderer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.6.2"
   win32:
     dependency: transitive
     description:
