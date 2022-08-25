@@ -46,7 +46,7 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  MapController? mapController;
+  MapController mapController = MapController();
   MabboxTileset mapboxStyle = MabboxTileset.outdoor;
   LatLng? _lastLoc;
 
@@ -175,7 +175,7 @@ class _MapPageState extends State<MapPage> {
                   if (value == null) {
                     return;
                   }
-                  mapController?.move(value, 16.0);
+                  mapController.move(value, 16.0);
                 });
               },
             ),
