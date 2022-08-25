@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:green_walking/pages/map/tileset.dart';
 import 'package:green_walking/pages/search.dart';
@@ -53,11 +54,24 @@ class _MapPageState extends State<MapPage> {
   MapPosition? _lastMapPosition;
   LatLng? _lastLoc;
 
+  late CenterOnLocationUpdate _centerOnLocationUpdate;
+  late StreamController<double?> _centerCurrentLocationStreamController;
+
   @override
   void initState() {
     super.initState();
+
+    _centerOnLocationUpdate = CenterOnLocationUpdate.always;
+    _centerCurrentLocationStreamController = StreamController<double?>();
+
     WidgetsBinding.instance
         .addPostFrameCallback((_) => enableAnalyticsOrConsent(context));
+  }
+
+  @override
+  void dispose() {
+    _centerCurrentLocationStreamController.close();
+    super.dispose();
   }
 
   @override
@@ -78,6 +92,7 @@ class _MapPageState extends State<MapPage> {
                         child: Stack(
                       children: <Widget>[
                         map(context, data),
+                        /*
                         Align(
                           alignment: Alignment.bottomRight,
                           child: Padding(
@@ -116,7 +131,7 @@ class _MapPageState extends State<MapPage> {
                               ),
                             ),
                           ),
-                        ),
+                        ),*/
                         SafeArea(
                           top: true,
                           child: Padding(
@@ -217,7 +232,7 @@ class _MapPageState extends State<MapPage> {
       },
     */
 
-    final List<LayerOptions> layerOptions = [];
+    final List<Widget> layerOptions = [];
     if (mapboxStyle == MabboxTileset.outdoor) {
       // Mapbox source https://docs.mapbox.com/api/maps/vector-tiles/#example-request-retrieve-vector-tiles
       const String tilesetID = 'mapbox.mapbox-streets-v8';
@@ -226,13 +241,15 @@ class _MapPageState extends State<MapPage> {
       final Map<String, dynamic> fuu =
           jsonDecode(fuuRaw) as Map<String, dynamic>;
 
-      layerOptions.add(VectorTileLayerOptions(
-          theme: ThemeReader().read(fuu),
-          tileOffset: TileOffset.mapbox,
-          tileProviders:
-              TileProviders({'composite': _cachingTileProvider(urlTemplate)})));
+      layerOptions.add(VectorTileLayerWidget(
+          options: VectorTileLayerOptions(
+              theme: ThemeReader().read(fuu),
+              tileOffset: TileOffset.mapbox,
+              tileProviders: TileProviders(
+                  {'composite': _cachingTileProvider(urlTemplate)}))));
     } else {
-      layerOptions.add(TileLayerOptions(
+      layerOptions.add(TileLayerWidget(
+          options: TileLayerOptions(
         urlTemplate:
             'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
         additionalOptions: <String, String>{
@@ -241,8 +258,17 @@ class _MapPageState extends State<MapPage> {
         },
         tileProvider: NetworkTileProvider(),
         overrideTilesWhenUrlChanges: true,
-      ));
+      )));
     }
+    layerOptions.add(
+      LocationMarkerLayerWidget(
+        plugin: LocationMarkerPlugin(
+          centerCurrentLocationStream:
+              _centerCurrentLocationStreamController.stream,
+          centerOnLocationUpdate: _centerOnLocationUpdate,
+        ),
+      ),
+    );
 
     return FlutterMap(
       mapController: mapController,
@@ -260,8 +286,13 @@ class _MapPageState extends State<MapPage> {
           plugins: <MapPlugin>[VectorMapTilesPlugin()],
           onPositionChanged: (MapPosition position, bool hasGesture) {
             _lastMapPosition = position;
+            if (hasGesture) {
+              setState(
+                () => _centerOnLocationUpdate = CenterOnLocationUpdate.never,
+              );
+            }
           }),
-      layers: layerOptions,
+      children: layerOptions,
       nonRotatedChildren: <Widget>[
         AttributionLayer(
             logoAssetName: 'assets/mapbox-logo.svg',
@@ -270,7 +301,24 @@ class _MapPageState extends State<MapPage> {
                 ? Colors.white
                 : Colors.blueGrey,
             satelliteLayer: mapboxStyle == MabboxTileset.satellite),
-        
+        Positioned(
+          right: 20,
+          bottom: 20,
+          child: FloatingActionButton(
+            onPressed: () {
+              // Automatically center the location marker on the map when location updated until user interact with the map.
+              setState(
+                () => _centerOnLocationUpdate = CenterOnLocationUpdate.always,
+              );
+              // Center the location marker on the map and zoom the map to level 18.
+              _centerCurrentLocationStreamController.add(18);
+            },
+            child: const Icon(
+              Icons.my_location,
+              color: Colors.white,
+            ),
+          ),
+        )
       ],
     );
   }
