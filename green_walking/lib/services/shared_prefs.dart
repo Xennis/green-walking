@@ -16,7 +16,8 @@ class SharedPrefs {
       return null;
     }
     try {
-      final Map<String, dynamic> parsed = jsonDecode(raw) as Map<String, dynamic>;
+      final Map<String, dynamic> parsed =
+          jsonDecode(raw) as Map<String, dynamic>;
       return LatLng.fromJson(parsed);
     } catch (e) {
       // No last location is not critical. A raised exception on start up is.

@@ -1,4 +1,3 @@
-
 const String privacyPolicyUrl =
     'https://raw.githubusercontent.com/Xennis/green-walking/master/web/privacy/privacy-policy.md';
 
