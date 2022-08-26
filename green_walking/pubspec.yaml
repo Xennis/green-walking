@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 2.0.0+38
 
 environment:
-  sdk: ">=2.15.1 <3.0.0"
+  sdk: ">=2.17.0 <3.0.0"
 
 dependencies:
   firebase_analytics: ^9.3.2
@@ -24,21 +24,11 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  flutter_map: ^2.2.0
-  flutter_map_location_marker: ^4.1.4
-  flutter_svg: ^1.1.4
+  http: ^0.13.5
   intl: ^0.17.0
-  latlong2: ^0.8.1
+  mapbox_gl: ^0.16.0
   shared_preferences: ^2.0.8
   url_launcher: ^6.0.13
-  vector_map_tiles: ^2.3.0
-  vector_tile_renderer: ^2.6.2
-
-dependency_overrides:
-  flutter_compass: #^0.7.0 # Here the git ref is used because current 0.7.0 forces android min sdk to be 23
-    git:
-      url: https://github.com/hemanthrajv/flutter_compass.git
-      ref: 14e134f0aed3c9fe09065bea05281f2c26f171d1
 
 dev_dependencies:
   #flutter_launcher_icons: ^0.8.1
@@ -51,17 +41,10 @@ dev_dependencies:
 # The following section is specific to Flutter.
 flutter:
   generate: true # required for l10n
-
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
   uses-material-design: true
-
-  # To add assets to your application, add an assets section, like this:
   assets:
      - assets/app-icon.png
      - assets/mapbox-access-token.txt
-     - assets/mapbox-logo.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

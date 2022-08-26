@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:latlong2/latlong.dart' show LatLng;
+import 'package:mapbox_gl/mapbox_gl.dart' show LatLng;
 import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: avoid_classes_with_only_static_members
@@ -16,9 +16,9 @@ class SharedPrefs {
       return null;
     }
     try {
-      final Map<String, dynamic> parsed =
-          jsonDecode(raw) as Map<String, dynamic>;
-      return LatLng.fromJson(parsed);
+      final List<double> parsed =
+          jsonDecode(raw) as List<double>;
+      return LatLng(parsed[0], parsed[1]);
     } catch (e) {
       // No last location is not critical. A raised exception on start up is.
       log('failed to load location: ' + e.toString());
