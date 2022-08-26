@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:latlong2/latlong.dart' show LatLng;
+import 'package:mapbox_gl/mapbox_gl.dart' show LatLng;
 
 class MaboxGeocodingPlace {
   MaboxGeocodingPlace({this.text, this.placeName, this.center});

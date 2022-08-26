@@ -4,21 +4,14 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:green_walking/pages/map/tileset.dart';
 import 'package:green_walking/services/shared_prefs.dart';
 import 'package:green_walking/widgets/gdpr_dialog.dart';
 import 'package:green_walking/widgets/navigation_drawer.dart';
-import 'package:latlong2/latlong.dart' show LatLng;
-import 'package:vector_map_tiles/vector_map_tiles.dart';
-import 'package:vector_tile_renderer/vector_tile_renderer.dart'
-    show ThemeReader;
+import 'package:mapbox_gl/mapbox_gl.dart';
 
 import '../../services/mapbox_geocoding.dart';
 import '../search.dart';
-import 'mapbox_attribution.dart';
-import 'fuu.dart';
 import 'search_bar.dart';
 
 class MapConfig {
@@ -49,30 +42,34 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  MapController mapController = MapController();
-  MabboxTileset mapboxStyle = MabboxTileset.satellite;
-  MapPosition? _lastMapPosition;
+  MapboxMapController? mapController;
+  MabboxTileset mapboxStyle = MabboxTileset.outdoor;
   LatLng? _lastLoc;
-
-  late CenterOnLocationUpdate _centerOnLocationUpdate;
-  late StreamController<double?> _centerCurrentLocationStreamController;
 
   @override
   void initState() {
     super.initState();
-
-    _centerOnLocationUpdate = CenterOnLocationUpdate.always;
-    _centerCurrentLocationStreamController = StreamController<double?>();
-
     WidgetsBinding.instance
         .addPostFrameCallback((_) => enableAnalyticsOrConsent(context));
   }
 
   @override
   void dispose() {
-    _centerCurrentLocationStreamController.close();
+    //mapController?.onSymbolTapped.remove(_onSymbolTapped);
     super.dispose();
   }
+
+  /*
+  void _onSymbolTapped(Symbol symbol) {
+    final LatLng? geometry = symbol.options.geometry;
+    if (geometry != null) {
+      mapController?.animateCamera(CameraUpdate.newLatLng(geometry));
+      setState(() {
+        _placeCardPreview = symbol.data!['place'] as Place?;
+      });
+    }
+  }
+  */
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +118,8 @@ class _MapPageState extends State<MapPage> {
                                 final LatLng? loc = await mapController
                                     ?.requestMyLocationLatLng();
                                 if (loc != null) {
-                                  mapController?.move(loc, 16.0);
+                                  mapController?.moveCamera(
+                                      CameraUpdate.newLatLngZoom(loc, 16.0));
                                 }*/
                               },
                               // TODO(Xennis): Use Icons.location_disabled if location service is not avaiable.
@@ -147,7 +145,8 @@ class _MapPageState extends State<MapPage> {
                               if (value == null) {
                                 return;
                               }
-                              mapController.move(value, 16.0);
+                              mapController?.moveCamera(CameraUpdate.newCameraPosition(
+                      CameraPosition(target: value, zoom: 16.0)));
                             });
                           },
                           onLayerToogle: () {
@@ -178,112 +177,32 @@ class _MapPageState extends State<MapPage> {
   }
 
   Widget map(BuildContext context, MapConfig config) {
-    // TODO: Save last location
-    /*
+    return MapboxMap(
+      accessToken: config.accessToken,
+      onMapCreated: (MapboxMapController controller) {
+        mapController = controller;
+        //mapController!.onSymbolTapped.add(_onSymbolTapped);
+        //onPositionChanged(mapController!.cameraPosition);
+      },
+      initialCameraPosition: CameraPosition(
+          target: (config.lastLocation != null)
+              ? config.lastLocation!
+              : const LatLng(53.5519, 9.8682),
+          zoom: 11.0),
+      myLocationEnabled: true,
+      rotateGesturesEnabled: true,
+      styleString: mapboxStyle.id,
+      trackCameraPosition: true,
+      //onCameraIdle: () => onPositionChanged(mapController?.cameraPosition),
+      onStyleLoadedCallback: () async {
+        // TODO(Xennis): Use Icons.location_pin
+        //final ByteData bytes = await rootBundle.load('assets/place-icon.png');
+        //final Uint8List list = bytes.buffer.asUint8List();
+        //mapController?.addImage('place-marker', list);
+      },
       onUserLocationUpdated: (UserLocation location) {
         SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, location.position);
       },
-    */
-
-    final List<Widget> layerOptions = [];
-    if (mapboxStyle == MabboxTileset.outdoor) {
-      // Mapbox source https://docs.mapbox.com/api/maps/vector-tiles/#example-request-retrieve-vector-tiles
-      const String tilesetID = 'mapbox.mapbox-streets-v8';
-      final String urlTemplate =
-          'https://api.mapbox.com/v4/$tilesetID/{z}/{x}/{y}.mvt?style=${mapboxStyle.stylePath}@00&access_token=${config.accessToken}';
-      final Map<String, dynamic> fuu =
-          jsonDecode(fuuRaw) as Map<String, dynamic>;
-
-      layerOptions.add(VectorTileLayerWidget(
-          options: VectorTileLayerOptions(
-              theme: ThemeReader().read(fuu),
-              tileOffset: TileOffset.mapbox,
-              tileProviders: TileProviders(
-                  {'composite': _cachingTileProvider(urlTemplate)}))));
-    } else {
-      layerOptions.add(TileLayerWidget(
-          options: TileLayerOptions(
-        urlTemplate:
-            'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
-        additionalOptions: <String, String>{
-          'accessToken': config.accessToken,
-          'id': mapboxStyle.id ?? '',
-        },
-        tileProvider: NetworkTileProvider(),
-        overrideTilesWhenUrlChanges: true,
-      )));
-    }
-    layerOptions.add(
-      LocationMarkerLayerWidget(
-        plugin: LocationMarkerPlugin(
-          centerCurrentLocationStream:
-              _centerCurrentLocationStreamController.stream,
-          centerOnLocationUpdate: _centerOnLocationUpdate,
-        ),
-      ),
     );
-
-    return FlutterMap(
-      mapController: mapController,
-      options: MapOptions(
-          center: _lastMapPosition?.center ??
-              config.lastLocation ??
-              LatLng(53.5519, 9.8682),
-          zoom: _lastMapPosition?.zoom ?? 11.0,
-          interactiveFlags: InteractiveFlag.drag |
-              InteractiveFlag.flingAnimation |
-              InteractiveFlag.pinchMove |
-              InteractiveFlag.pinchZoom |
-              InteractiveFlag.doubleTapZoom,
-          //InteractiveFlag.rotate,
-          plugins: <MapPlugin>[VectorMapTilesPlugin()],
-          onPositionChanged: (MapPosition position, bool hasGesture) {
-            _lastMapPosition = position;
-            if (hasGesture) {
-              setState(
-                () => _centerOnLocationUpdate = CenterOnLocationUpdate.never,
-              );
-            }
-          }),
-      children: layerOptions,
-      nonRotatedChildren: <Widget>[
-        MapboxAttribution(
-            logoAssetName: 'assets/mapbox-logo.svg',
-            // Use white for satellite layer it's better visible.
-            color: mapboxStyle == MabboxTileset.satellite
-                ? Colors.white
-                : Colors.blueGrey,
-            satelliteLayer: mapboxStyle == MabboxTileset.satellite),
-        Positioned(
-          right: 20,
-          bottom: 20,
-          child: FloatingActionButton(
-            onPressed: () {
-              // Automatically center the location marker on the map when location updated until user interact with the map.
-              setState(
-                () => _centerOnLocationUpdate = CenterOnLocationUpdate.always,
-              );
-              // Center the location marker on the map and zoom the map to level 18.
-              _centerCurrentLocationStreamController.add(18);
-            },
-            child: const Icon(
-              Icons.my_location,
-              color: Colors.white,
-            ),
-          ),
-        )
-      ],
-    );
-  }
-
-  VectorTileProvider _cachingTileProvider(String urlTemplate) {
-    return MemoryCacheVectorTileProvider(
-        delegate: NetworkVectorTileProvider(
-            urlTemplate: urlTemplate,
-            // this is the maximum zoom of the provider, not the
-            // maximum of the map. vector tiles are rendered
-            // to larger sizes to support higher zoom levels
-            maximumZoom: 22),
-        maxSizeBytes: 1024 * 1024 * 2);
   }
 }
