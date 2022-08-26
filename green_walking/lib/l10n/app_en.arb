@@ -321,7 +321,14 @@
     "placeholders_order": [],
     "placeholders": {}
   },
-  "errorNoPositionFound": "No position found",
+  "errorNoLocationPermission": "Please grant the app location permissions.",
+  "@errorNoLocationPermission": {
+    "description": "Error message displayed to user if location permissions are missing",
+    "type": "text",
+    "placeholders_order": [],
+    "placeholders": {}
+  },
+  "errorNoPositionFound": "No location found",
   "@errorNoPositionFound": {
     "description": "Error message displayed to user if no (GPS) location could be found",
     "type": "text",

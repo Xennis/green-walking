@@ -266,6 +266,13 @@
     "type": "text",
     "placeholders": {}
   },
+  "errorNoLocationPermission": "Bitte erlaube der App Location Berechtigungen",
+  "@errorNoLocationPermission": {
+    "description": "Error message displayed to user if location permissions are missing",
+    "type": "text",
+    "placeholders_order": [],
+    "placeholders": {}
+  },
   "errorNoPositionFound": "Keine Position gefunden",
   "@errorNoPositionFound": {
     "description": "Error message displayed to user if no (GPS) location could be found",
