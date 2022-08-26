@@ -41,7 +41,6 @@ class _MapPageState extends State<MapPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   MapboxMapController? mapController;
   MabboxTileset mapboxStyle = MabboxTileset.outdoor;
-  LatLng? _lastLoc;
 
   @override
   void initState() {
@@ -53,6 +52,10 @@ class _MapPageState extends State<MapPage> {
   @override
   void dispose() {
     //mapController?.onSymbolTapped.remove(_onSymbolTapped);
+    final LatLng? mapPosition = mapController?.cameraPosition?.target;
+    if (mapPosition != null) {
+      SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, mapPosition);
+    }
     super.dispose();
   }
 
@@ -125,27 +128,22 @@ class _MapPageState extends State<MapPage> {
         //final Uint8List list = bytes.buffer.asUint8List();
         //mapController?.addImage('place-marker', list);
       },
-      onUserLocationUpdated: (UserLocation location) {
-        SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, location.position);
-      },
     );
   }
 
-  void _onSearchSubmitted(String query, String accessToken) {
-    final Future<LatLng?> moveToLoc = Navigator.push(
-      context,
-      MaterialPageRoute<LatLng>(
-          builder: (BuildContext context) => SearchPage(
-                mapboxGeocodingGet(query, accessToken, _lastLoc),
-              )),
-    );
-    moveToLoc.then((LatLng? value) {
-      if (value == null) {
-        return;
-      }
-      mapController?.moveCamera(CameraUpdate.newCameraPosition(
-          CameraPosition(target: value, zoom: 16.0)));
-    });
+  Future<void> _onSearchSubmitted(String query, String accessToken) async {
+    final LatLng? userLoc = await mapController?.requestMyLocationLatLng();
+    final LatLng? moveToLoc = await Navigator.push(
+        context,
+        MaterialPageRoute<LatLng>(
+          builder: (BuildContext context) =>
+              SearchPage(mapboxGeocodingGet(query, accessToken, userLoc)),
+        ));
+    if (moveToLoc == null) {
+      return;
+    }
+    mapController?.moveCamera(CameraUpdate.newCameraPosition(
+        CameraPosition(target: moveToLoc, zoom: 16.0)));
   }
 
   void _onLayerToggle() {
