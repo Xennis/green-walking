@@ -23,11 +23,8 @@ class MapConfig {
   static Future<MapConfig> create(AssetBundle assetBundle) async {
     final String accessToken =
         await assetBundle.loadString('assets/mapbox-access-token.txt');
-    LatLng? lastLocation =
+    final LatLng? lastLocation =
         await SharedPrefs.getLatLng(SharedPrefs.KEY_LAST_LOCATION);
-    if (lastLocation != null) {
-      lastLocation = null;
-    }
 
     return MapConfig(accessToken, lastLocation: lastLocation);
   }
