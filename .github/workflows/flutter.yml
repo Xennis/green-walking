@@ -9,17 +9,21 @@ jobs:
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '2.x'
-        channel: 'stable'
+        flutter-version: '3.x'
+        channel: 'beta'
+    - name: Unlock secrets
+      uses: sliteteam/github-action-git-crypt-unlock@1.2.0
+      env:
+        GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
     - name: Install dependencies
       run: flutter pub get
       working-directory: green_walking
     - name: Check format
-      run: find . -name '*.dart' -not -name 'messages_*.dart' -exec flutter format --set-exit-if-changed {} \;
+      run: make format-check
       working-directory: green_walking
     - name: Run linter
-      run: flutter analyze .
+      run: make lint
       working-directory: green_walking
     - name: Run tests
-      run: flutter test .
+      run: make test
       working-directory: green_walking

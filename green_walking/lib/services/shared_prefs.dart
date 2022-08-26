@@ -16,8 +16,7 @@ class SharedPrefs {
       return null;
     }
     try {
-      final List<double> parsed =
-          jsonDecode(raw) as List<double>;
+      final List<double> parsed = jsonDecode(raw) as List<double>;
       return LatLng(parsed[0], parsed[1]);
     } catch (e) {
       // No last location is not critical. A raised exception on start up is.

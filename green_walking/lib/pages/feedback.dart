@@ -38,7 +38,7 @@ class FeedbackPage extends StatelessWidget {
                         //'body': 'App Version xx',
                       },
                     );
-                    launch(mailTo.toString());
+                    launchUrl(mailTo);
                   },
                   child:
                       Text(locale.feedbackSendMailToLabel('code@xennis.org')),
