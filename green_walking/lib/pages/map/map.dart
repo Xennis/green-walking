@@ -2,15 +2,17 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:green_walking/pages/map/tileset.dart';
-import 'package:green_walking/services/shared_prefs.dart';
-import 'package:green_walking/widgets/gdpr_dialog.dart';
-import 'package:green_walking/widgets/navigation_drawer.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 
 import '../../services/mapbox_geocoding.dart';
+import '../../services/shared_prefs.dart';
+import '../../widgets/gdpr_dialog.dart';
+import '../../widgets/navigation_drawer.dart';
 import '../search.dart';
+import 'location_button.dart';
 import 'search_bar.dart';
+import 'tileset.dart';
 
 class MapConfig {
   MapConfig(this.accessToken, {this.lastLocation});
@@ -57,20 +59,9 @@ class _MapPageState extends State<MapPage> {
     super.dispose();
   }
 
-  /*
-  void _onSymbolTapped(Symbol symbol) {
-    final LatLng? geometry = symbol.options.geometry;
-    if (geometry != null) {
-      mapController?.animateCamera(CameraUpdate.newLatLng(geometry));
-      setState(() {
-        _placeCardPreview = symbol.data!['place'] as Place?;
-      });
-    }
-  }
-  */
-
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations locale = AppLocalizations.of(context)!;
     return Scaffold(
       key: _scaffoldKey,
       drawer: NavigationDrawer(),
@@ -86,78 +77,17 @@ class _MapPageState extends State<MapPage> {
                         child: Stack(
                       children: <Widget>[
                         map(context, data),
-                        /*
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                bottom: 16.0, right: 16.0),
-                            child: FloatingActionButton(
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.secondary,
-                              onPressed: () async {
-                                if (await Geolocator.checkPermission() ==
-                                    LocationPermission.denied) {
-                                  if (<LocationPermission>[
-                                        LocationPermission.always,
-                                        LocationPermission.whileInUse
-                                      ].contains(await Geolocator
-                                          .requestPermission()) ==
-                                      false) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                            content: Text(
-                                                locale.errorNoPositionFound)));
-                                  }
-                                }
-                                // TODO: Get Location
-                                /*
-                                final LatLng? loc = await mapController
-                                    ?.requestMyLocationLatLng();
-                                if (loc != null) {
-                                  mapController?.moveCamera(
-                                      CameraUpdate.newLatLngZoom(loc, 16.0));
-                                }*/
-                              },
-                              // TODO(Xennis): Use Icons.location_disabled if location service is not avaiable.
-                              child: const Icon(
-                                Icons.location_searching,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),*/
+                        LocationButton(
+                            onOkay: () => _onLocationSearchPressed(locale),
+                            onNoPermissions: () => ScaffoldMessenger.of(context)
+                                .showSnackBar(SnackBar(
+                                    content: Text(
+                                        locale.errorNoLocationPermission)))),
                         SearchBar(
                           scaffoldKey: _scaffoldKey,
-                          onSearchSubmitted: (String query) {
-                            final Future<LatLng?> moveToLoc = Navigator.push(
-                              context,
-                              MaterialPageRoute<LatLng>(
-                                  builder: (BuildContext context) => SearchPage(
-                                        mapboxGeocodingGet(
-                                            query, data.accessToken, _lastLoc),
-                                      )),
-                            );
-                            moveToLoc.then((LatLng? value) {
-                              if (value == null) {
-                                return;
-                              }
-                              mapController?.moveCamera(
-                                  CameraUpdate.newCameraPosition(CameraPosition(
-                                      target: value, zoom: 16.0)));
-                            });
-                          },
-                          onLayerToogle: () {
-                            if (mapboxStyle == MabboxTileset.satellite) {
-                              setState(() {
-                                mapboxStyle = MabboxTileset.outdoor;
-                              });
-                            } else {
-                              setState(() {
-                                mapboxStyle = MabboxTileset.satellite;
-                              });
-                            }
-                          },
+                          onSearchSubmitted: (String query) =>
+                              _onSearchSubmitted(query, data.accessToken),
+                          onLayerToogle: _onLayerToggle,
                         ),
                       ],
                     )),
@@ -203,4 +133,55 @@ class _MapPageState extends State<MapPage> {
       },
     );
   }
+
+  void _onSearchSubmitted(String query, String accessToken) {
+    final Future<LatLng?> moveToLoc = Navigator.push(
+      context,
+      MaterialPageRoute<LatLng>(
+          builder: (BuildContext context) => SearchPage(
+                mapboxGeocodingGet(query, accessToken, _lastLoc),
+              )),
+    );
+    moveToLoc.then((LatLng? value) {
+      if (value == null) {
+        return;
+      }
+      mapController?.moveCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(target: value, zoom: 16.0)));
+    });
+  }
+
+  void _onLayerToggle() {
+    if (mapboxStyle == MabboxTileset.satellite) {
+      setState(() {
+        mapboxStyle = MabboxTileset.outdoor;
+      });
+    } else {
+      setState(() {
+        mapboxStyle = MabboxTileset.satellite;
+      });
+    }
+  }
+
+  Future<void> _onLocationSearchPressed(AppLocalizations locale) async {
+    final LatLng? loc = await mapController?.requestMyLocationLatLng();
+    if (loc != null) {
+      mapController?.moveCamera(CameraUpdate.newLatLngZoom(loc, 16.0));
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(locale.errorNoPositionFound)));
+    }
+  }
+
+  /*
+  void _onSymbolTapped(Symbol symbol) {
+    final LatLng? geometry = symbol.options.geometry;
+    if (geometry != null) {
+      mapController?.animateCamera(CameraUpdate.newLatLng(geometry));
+      setState(() {
+        _placeCardPreview = symbol.data!['place'] as Place?;
+      });
+    }
+  }
+  */
 }
