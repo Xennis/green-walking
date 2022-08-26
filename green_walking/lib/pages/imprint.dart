@@ -43,7 +43,7 @@ class ImprintPage extends StatelessWidget {
                     text: locale.gdprPrivacyPolicy,
                     style: const TextStyle(color: Colors.blue),
                     recognizer: TapGestureRecognizer()
-                      ..onTap = () => launch(privacyPolicyUrl),
+                      ..onTap = () => launchUrl(privacyPolicyUrl),
                   ),
                   const TextSpan(text: '.')
                 ],

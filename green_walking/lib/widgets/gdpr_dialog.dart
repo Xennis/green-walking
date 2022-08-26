@@ -39,7 +39,7 @@ class GdprDialog extends StatelessWidget {
                       style: const TextStyle(color: Colors.blue),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          launch(privacyPolicyUrl);
+                          launchUrl(privacyPolicyUrl);
                         },
                     ),
                     const TextSpan(

@@ -76,7 +76,8 @@ class NavigationDrawer extends StatelessWidget {
                           color: Theme.of(context).colorScheme.secondary),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          launch('https://github.com/Xennis/green-walking');
+                          launchUrl(
+                              Uri.https('github.com/Xennis/green-walking'));
                         },
                     ),
                     TextSpan(style: textStyle, text: '.'),
@@ -88,7 +89,7 @@ class NavigationDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.lock),
             title: Text(locale.dataPrivacyNavigationLabel),
-            onTap: () => launch(privacyPolicyUrl),
+            onTap: () => launchUrl(privacyPolicyUrl),
             trailing: Icon(
               Icons.open_in_new,
               semanticLabel: locale.openInBrowserSemanticLabel,

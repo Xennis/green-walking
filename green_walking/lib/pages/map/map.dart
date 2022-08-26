@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:green_walking/pages/map/tileset.dart';
 import 'package:green_walking/services/shared_prefs.dart';
 import 'package:green_walking/widgets/gdpr_dialog.dart';
@@ -73,7 +71,6 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations locale = AppLocalizations.of(context)!;
     return Scaffold(
       key: _scaffoldKey,
       drawer: NavigationDrawer(),
@@ -145,8 +142,9 @@ class _MapPageState extends State<MapPage> {
                               if (value == null) {
                                 return;
                               }
-                              mapController?.moveCamera(CameraUpdate.newCameraPosition(
-                      CameraPosition(target: value, zoom: 16.0)));
+                              mapController?.moveCamera(
+                                  CameraUpdate.newCameraPosition(CameraPosition(
+                                      target: value, zoom: 16.0)));
                             });
                           },
                           onLayerToogle: () {
