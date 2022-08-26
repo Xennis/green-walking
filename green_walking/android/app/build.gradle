@@ -40,9 +40,6 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    lintOptions {
-        disable 'InvalidPackage'
-    }
 
     defaultConfig {
         // Unique Application ID (https://developer.android.com/studio/build/application-id.html).
@@ -67,6 +64,9 @@ android {
         release {
             signingConfig signingConfigs.release
         }
+    }
+    lint {
+        disable 'InvalidPackage'
     }
 }
 
