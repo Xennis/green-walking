@@ -19,10 +19,9 @@ Unsere Datenschutzerklärung ist wie folgt gegliedert:
 Verantwortlicher Anbieter dieser App im datenschutzrechtlichen Sinne ist:
 
     Fabian Rosenthal
-    c/o skriptspektor e. U.
-    Robert-Preußler-Straße 13 / TOP 1
-    5020 Salzburg
-    AT – Österreich
+    Schäferkampsallee 61
+    20357 Hamburg
+    DE – Germany
     code [at] xennis.org
 
 Datenschutzbeauftragte/r beim Anbieter ist:

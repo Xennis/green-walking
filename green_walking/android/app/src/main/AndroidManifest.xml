@@ -62,11 +62,15 @@
     <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-    <!-- Required by flutter_map -->
     <uses-permission android:name="android.permission.INTERNET"/>
-    <!-- Required by user_location -->
+    <!-- Location -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <!-- Required only when requesting background location access on Android 10 (API level 29) and higher. -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" tools:node="remove"/>
+    <!-- Required on Android 13 and higher: Avoid it get merged in by SDK
+        https://developer.android.com/about/versions/13/behavior-changes-13#ad-id
+        https://firebase.google.com/docs/analytics/configure-data-collection?platform=android#permanently_deactivate_collection
+    -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
 </manifest>

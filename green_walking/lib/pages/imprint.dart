@@ -26,11 +26,8 @@ class ImprintPage extends StatelessWidget {
                     text: '${locale.imprintTmgText('5')}:\n\n',
                   ),
                   const TextSpan(
-                      text: 'Fabian Rosenthal / Green Walking\n',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  const TextSpan(
                       text:
-                          'c/o skriptspektor e. U.\nRobert-Preußler-Straße 13 / TOP 1\n5020 Salzburg\nAT – Österreich\ncode [at] xennis.org\n\n'),
+                          'Fabian Rosenthal\nSchäferkampsallee 61\n20357\nHamburg\nGermany\ncode [at] xennis.org\n\n'),
                   TextSpan(
                     text: '${locale.imprintDisclaimerLabel}:',
                     style: const TextStyle(fontWeight: FontWeight.bold),
