@@ -77,7 +77,7 @@ class NavigationDrawer extends StatelessWidget {
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
                           launchUrl(
-                              Uri.https('github.com/Xennis/green-walking'));
+                              Uri.https('github.com', '/Xennis/green-walking'));
                         },
                     ),
                     TextSpan(style: textStyle, text: '.'),
