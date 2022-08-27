@@ -164,7 +164,8 @@ class _MapPageState extends State<MapPage> {
   Future<void> _onLocationSearchPressed(AppLocalizations locale) async {
     final LatLng? loc = await mapController?.requestMyLocationLatLng();
     if (loc != null) {
-      mapController?.moveCamera(CameraUpdate.newLatLngZoom(loc, 16.0));
+      mapController?.moveCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(target: loc, zoom: 16.0)));
     } else {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(locale.errorNoPositionFound)));
