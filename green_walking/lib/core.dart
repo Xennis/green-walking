@@ -1,5 +1,5 @@
-Uri privacyPolicyUrl = Uri.https(
-    'raw.githubusercontent.com', '/Xennis/green-walking/main/web/privacy/privacy-policy.md');
+Uri privacyPolicyUrl = Uri.https('raw.githubusercontent.com',
+    '/Xennis/green-walking/main/web/privacy/privacy-policy.md');
 
 String? truncateString(String? myString, int? cutoff) {
   if (myString == null) {
