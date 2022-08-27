@@ -29,17 +29,7 @@ class FeedbackPage extends StatelessWidget {
               alignment: MainAxisAlignment.center,
               children: <Widget>[
                 ElevatedButton(
-                  onPressed: () {
-                    final Uri mailTo = Uri(
-                      scheme: 'mailto',
-                      path: 'code@xennis.org',
-                      queryParameters: <String, String>{
-                        'subject': locale.feedbackMailSubject(locale.appTitle),
-                        //'body': 'App Version xx',
-                      },
-                    );
-                    launchUrl(mailTo);
-                  },
+                  onPressed: () => _onPressed(locale),
                   child:
                       Text(locale.feedbackSendMailToLabel('code@xennis.org')),
                 ),
@@ -49,5 +39,17 @@ class FeedbackPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _onPressed(AppLocalizations locale) {
+    final Uri mailTo = Uri(
+      scheme: 'mailto',
+      path: 'code@xennis.org',
+      queryParameters: <String, String>{
+        'subject': locale.feedbackMailSubject(locale.appTitle),
+        //'body': 'App Version xx',
+      },
+    );
+    launchUrl(mailTo);
   }
 }
