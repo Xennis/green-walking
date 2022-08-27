@@ -38,6 +38,8 @@ class SearchBar extends StatelessWidget {
                   ),
                   Expanded(
                     child: TextField(
+                      // Otherwise the keyboard always appears.
+                      autofocus: false,
                       cursorColor: Colors.black,
                       keyboardType: TextInputType.text,
                       textInputAction: TextInputAction.go,
