@@ -64,6 +64,9 @@ class _MapPageState extends State<MapPage> {
     final AppLocalizations locale = AppLocalizations.of(context)!;
     return Scaffold(
       key: _scaffoldKey,
+      // If the search in the search bar is clicked the keyboard appears. The keyboard
+      // should be over the map and by that avoid resizing of the whole app / map.
+      resizeToAvoidBottomInset: false,
       drawer: NavigationDrawer(),
       body: FutureBuilder<MapConfig>(
           future: MapConfig.create(DefaultAssetBundle.of(context)),
