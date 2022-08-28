@@ -140,12 +140,12 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<void> _onSearchSubmitted(String query, String accessToken) async {
-    final LatLng? userLoc = await mapController?.requestMyLocationLatLng();
+    final LatLng? mapPosition = mapController?.cameraPosition?.target;
     final LatLng? moveToLoc = await Navigator.push(
         context,
         MaterialPageRoute<LatLng>(
           builder: (BuildContext context) =>
-              SearchPage(mapboxGeocodingGet(query, accessToken, userLoc)),
+              SearchPage(mapboxGeocodingGet(query, accessToken, mapPosition)),
         ));
     if (moveToLoc == null) {
       return;
