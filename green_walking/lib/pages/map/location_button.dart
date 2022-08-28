@@ -90,6 +90,7 @@ class _LocationButtonState extends State<LocationButton> {
   }
 
   Future<void> _onPressed() async {
+    // TODO(Xennis): Catch exception!
     // Check permission
     if (await Geolocator.checkPermission() == LocationPermission.denied) {
       if (<LocationPermission>[
@@ -101,13 +102,11 @@ class _LocationButtonState extends State<LocationButton> {
       }
     }
 
-    // Check enabled
-    bool enabled = await Geolocator.isLocationServiceEnabled();
-    if (!enabled) {
-      // See https://github.com/Baseflow/flutter-geolocator/issues/1034#issuecomment-1142153435
-      await Geolocator.getCurrentPosition();
-      enabled = await Geolocator.isLocationServiceEnabled();
-    }
+    // Requesting the location also enables the location service if it
+    // is disabled.
+    // See https://github.com/Baseflow/flutter-geolocator/issues/1034#issuecomment-1142153435
+    // TODO(Xennis): Add timeout and catch exception.
+    await Geolocator.getCurrentPosition();
 
     widget.onOkay();
   }
