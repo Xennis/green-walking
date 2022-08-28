@@ -10,6 +10,7 @@ import '../../services/shared_prefs.dart';
 import '../../widgets/gdpr_dialog.dart';
 import '../../widgets/navigation_drawer.dart';
 import '../search.dart';
+import 'attribution.dart';
 import 'location_button.dart';
 import 'search_bar.dart';
 import 'tileset.dart';
@@ -82,6 +83,9 @@ class _MapPageState extends State<MapPage> {
                         child: Stack(
                       children: <Widget>[
                         map(context, data),
+                        Attribution(
+                            satelliteLayer:
+                                mapboxStyle == MabboxTileset.satellite),
                         LocationButton(
                             userLocation: _userLocation,
                             onOkay: () => _onLocationSearchPressed(locale),
@@ -116,6 +120,7 @@ class _MapPageState extends State<MapPage> {
     return MapboxMap(
       accessToken: config.accessToken,
       onMapCreated: (MapboxMapController controller) {
+        controller.setTelemetryEnabled(false);
         mapController = controller;
         //mapController!.onSymbolTapped.add(_onSymbolTapped);
         //onPositionChanged(mapController!.cameraPosition);
