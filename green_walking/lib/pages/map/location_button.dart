@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -13,19 +15,24 @@ class LocationButton extends StatefulWidget {
 }
 
 class _LocationButtonState extends State<LocationButton> {
+  late final Timer _timer;
+
   bool _locationServiceEnabled = true;
 
   @override
   void initState() {
     super.initState();
-    Geolocator.isLocationServiceEnabled().then((bool value) {
-      if (value == _locationServiceEnabled) {
-        return;
-      }
-      setState(() {
-        _locationServiceEnabled = value;
-      });
+
+    _checkLocationServiceEnabled();
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer result) {
+      _checkLocationServiceEnabled();
     });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 
   @override
@@ -46,6 +53,15 @@ class _LocationButtonState extends State<LocationButton> {
         ),
       ),
     );
+  }
+
+  Future<void> _checkLocationServiceEnabled() async {
+    final bool enabled = await Geolocator.isLocationServiceEnabled();
+    if (enabled != _locationServiceEnabled) {
+      setState(() {
+        _locationServiceEnabled = enabled;
+      });
+    }
   }
 
   Future<void> _onPressed() async {
