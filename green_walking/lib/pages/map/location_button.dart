@@ -2,13 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:mapbox_gl/mapbox_gl.dart' show LatLng;
 
 class LocationButton extends StatefulWidget {
   const LocationButton(
-      {super.key, required this.onOkay, required this.onNoPermissions});
+      {super.key,
+      required this.onOkay,
+      required this.onNoPermissions,
+      required this.userLocation});
 
   final VoidCallback onOkay;
   final VoidCallback onNoPermissions;
+  final ValueNotifier<LatLng?> userLocation;
 
   @override
   _LocationButtonState createState() => _LocationButtonState();
@@ -18,25 +23,35 @@ class _LocationButtonState extends State<LocationButton> {
   late final Timer _timer;
 
   bool _locationServiceEnabled = true;
+  bool _locationCentered = false;
 
   @override
   void initState() {
     super.initState();
 
     _checkLocationServiceEnabled();
-    _timer = Timer.periodic(const Duration(seconds: 1), (Timer result) {
+    _timer = Timer.periodic(const Duration(seconds: 1, microseconds: 500),
+        (Timer result) {
       _checkLocationServiceEnabled();
     });
+
+    widget.userLocation.addListener(_checkUserLocationCentered);
   }
 
   @override
   void dispose() {
     _timer.cancel();
+    widget.userLocation.removeListener(_checkUserLocationCentered);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final IconData icon = _locationServiceEnabled
+        ? _locationCentered
+            ? Icons.my_location
+            : Icons.location_searching
+        : Icons.location_disabled;
     return Align(
       alignment: Alignment.bottomRight,
       child: Padding(
@@ -45,14 +60,24 @@ class _LocationButtonState extends State<LocationButton> {
           backgroundColor: Theme.of(context).colorScheme.secondary,
           onPressed: _onPressed,
           child: Icon(
-            _locationServiceEnabled
-                ? Icons.location_searching
-                : Icons.location_disabled,
+            icon,
             color: Colors.white,
           ),
         ),
       ),
     );
+  }
+
+  void _checkUserLocationCentered() {
+    if (_locationCentered && widget.userLocation.value == null) {
+      setState(() {
+        _locationCentered = false;
+      });
+    } else if (!_locationCentered && widget.userLocation.value != null) {
+      setState(() {
+        _locationCentered = true;
+      });
+    }
   }
 
   Future<void> _checkLocationServiceEnabled() async {
@@ -82,11 +107,6 @@ class _LocationButtonState extends State<LocationButton> {
       // See https://github.com/Baseflow/flutter-geolocator/issues/1034#issuecomment-1142153435
       await Geolocator.getCurrentPosition();
       enabled = await Geolocator.isLocationServiceEnabled();
-    }
-    if (enabled != _locationServiceEnabled) {
-      setState(() {
-        _locationServiceEnabled = enabled;
-      });
     }
 
     widget.onOkay();

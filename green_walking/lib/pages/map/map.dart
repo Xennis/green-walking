@@ -39,6 +39,8 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final ValueNotifier<LatLng?> _userLocation = ValueNotifier<LatLng?>(null);
+
   MapboxMapController? mapController;
   MabboxTileset mapboxStyle = MabboxTileset.outdoor;
 
@@ -81,11 +83,14 @@ class _MapPageState extends State<MapPage> {
                       children: <Widget>[
                         map(context, data),
                         LocationButton(
+                            userLocation: _userLocation,
                             onOkay: () => _onLocationSearchPressed(locale),
-                            onNoPermissions: () => ScaffoldMessenger.of(context)
-                                .showSnackBar(SnackBar(
-                                    content: Text(
-                                        locale.errorNoLocationPermission)))),
+                            onNoPermissions: () =>
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          locale.errorNoLocationPermission)),
+                                )),
                         SearchBar(
                           scaffoldKey: _scaffoldKey,
                           onSearchSubmitted: (String query) =>
@@ -124,7 +129,7 @@ class _MapPageState extends State<MapPage> {
       rotateGesturesEnabled: true,
       styleString: mapboxStyle.id,
       trackCameraPosition: true,
-      //onCameraIdle: () => onPositionChanged(mapController?.cameraPosition),
+      onCameraIdle: _onCameraIdle,
       onStyleLoadedCallback: () async {
         // TODO(Xennis): Use Icons.location_pin
         //final ByteData bytes = await rootBundle.load('assets/place-icon.png');
@@ -164,11 +169,21 @@ class _MapPageState extends State<MapPage> {
   Future<void> _onLocationSearchPressed(AppLocalizations locale) async {
     final LatLng? loc = await mapController?.requestMyLocationLatLng();
     if (loc != null) {
-      mapController?.moveCamera(CameraUpdate.newCameraPosition(
+      await mapController?.moveCamera(CameraUpdate.newCameraPosition(
           CameraPosition(target: loc, zoom: 16.0)));
+      // Request location and camera position.target can slightly differ.
+      _userLocation.value = mapController?.cameraPosition?.target;
     } else {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(locale.errorNoPositionFound)));
+    }
+  }
+
+  void _onCameraIdle() {
+    if (_userLocation.value != null) {
+      if (mapController?.cameraPosition?.target != _userLocation.value) {
+        _userLocation.value = null;
+      }
     }
   }
 
