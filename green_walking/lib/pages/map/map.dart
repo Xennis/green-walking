@@ -152,6 +152,14 @@ class _MapPageState extends State<MapPage> {
     }
     mapController?.moveCamera(CameraUpdate.newCameraPosition(
         CameraPosition(target: moveToLoc, zoom: 16.0)));
+    mapController?.clearCircles();
+    mapController?.addCircle(CircleOptions(
+        circleRadius: 12,
+        circleColor: '#FFC0CB',
+        circleOpacity: 0.6,
+        circleStrokeWidth: 2,
+        circleStrokeColor: '#FFC0CB',
+        geometry: moveToLoc));
   }
 
   void _onLayerToggle() {
