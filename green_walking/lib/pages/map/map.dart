@@ -96,9 +96,24 @@ class _MapPageState extends State<MapPage> {
                                           locale.errorNoLocationPermission)),
                                 )),
                         MapAppBar(
-                          scaffoldKey: _scaffoldKey,
-                          onSearchTap: () => _onSearchTab(data.accessToken),
                           onLayerToogle: _onLayerToggle,
+                          leading: IconButton(
+                              splashColor: Colors.grey,
+                              icon: Icon(Icons.menu,
+                                  semanticLabel:
+                                      MaterialLocalizations.of(context)
+                                          .openAppDrawerTooltip),
+                              onPressed: () =>
+                                  _scaffoldKey.currentState?.openDrawer()),
+                          title: TextField(
+                            readOnly: true,
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                contentPadding:
+                                    const EdgeInsets.symmetric(horizontal: 15),
+                                hintText: locale.searchBoxHintLabel('...')),
+                            onTap: () => _onSearchTab(data.accessToken),
+                          ),
                         ),
                       ],
                     )),

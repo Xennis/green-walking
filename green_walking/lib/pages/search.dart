@@ -22,6 +22,7 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations locale = AppLocalizations.of(context)!;
     return Scaffold(
         // If the search in the search bar is clicked the keyboard appears. The keyboard
         // should be over the map and by that avoid resizing of the whole app / map.
@@ -30,7 +31,25 @@ class _SearchPageState extends State<SearchPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              MapAppBar(onSearchSubmitted: _onSearchSubmitted),
+              MapAppBar(
+                  leading: IconButton(
+                      splashColor: Colors.grey,
+                      icon: Icon(Icons.arrow_back,
+                          semanticLabel: MaterialLocalizations.of(context)
+                              .backButtonTooltip),
+                      onPressed: () => Navigator.pop(context)),
+                  title: TextField(
+                      autofocus: true,
+                      cursorColor: Colors.black,
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.go,
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 15),
+                          hintText: locale.searchBoxHintLabel('...')),
+                      onSubmitted: _onSearchSubmitted,
+                    ),),
               _resultList(context),
               /*
           Padding(
