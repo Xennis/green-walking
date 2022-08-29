@@ -4,34 +4,14 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class MapAppBar extends StatelessWidget {
   const MapAppBar(
       {Key? key,
-      this.scaffoldKey,
-      this.onSearchSubmitted,
-      this.onLayerToogle,
-      this.onSearchTap})
+      required this.leading,
+      required this.title,
+      this.onLayerToogle})
       : super(key: key);
 
-  final GlobalKey<ScaffoldState>? scaffoldKey;
-  final void Function(String)? onSearchSubmitted;
-  final GestureTapCallback? onSearchTap;
+  final IconButton leading;
+  final TextField title;
   final VoidCallback? onLayerToogle;
-
-  Widget _leading(BuildContext context) {
-    final GlobalKey<ScaffoldState>? key = scaffoldKey;
-    if (key != null) {
-      return IconButton(
-          splashColor: Colors.grey,
-          icon: Icon(Icons.menu,
-              semanticLabel:
-                  MaterialLocalizations.of(context).openAppDrawerTooltip),
-          onPressed: () => key.currentState?.openDrawer());
-    }
-
-    return IconButton(
-        splashColor: Colors.grey,
-        icon: Icon(Icons.arrow_back,
-            semanticLabel: MaterialLocalizations.of(context).backButtonTooltip),
-        onPressed: () => Navigator.pop(context));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,22 +27,9 @@ class MapAppBar extends StatelessWidget {
               ),
               child: Row(
                 children: <Widget>[
-                  _leading(context),
+                  leading,
                   Expanded(
-                    child: TextField(
-                      autofocus: true,
-                      cursorColor: Colors.black,
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.go,
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 15),
-                          hintText: locale.searchBoxHintLabel('...')),
-                      onSubmitted: onSearchSubmitted,
-                      readOnly: scaffoldKey != null,
-                      onTap: onSearchTap,
-                    ),
+                    child: title,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
