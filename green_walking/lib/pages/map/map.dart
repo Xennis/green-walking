@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 
-import '../../services/mapbox_geocoding.dart';
 import '../../services/shared_prefs.dart';
+import '../../widgets/app_bar.dart';
 import '../../widgets/gdpr_dialog.dart';
 import '../../widgets/navigation_drawer.dart';
+import '../../widgets/page_route.dart';
 import '../search.dart';
 import 'attribution.dart';
 import 'location_button.dart';
-import 'search_bar.dart';
 import 'tileset.dart';
 
 class MapConfig {
@@ -95,10 +95,9 @@ class _MapPageState extends State<MapPage> {
                                       content: Text(
                                           locale.errorNoLocationPermission)),
                                 )),
-                        SearchBar(
+                        MapAppBar(
                           scaffoldKey: _scaffoldKey,
-                          onSearchSubmitted: (String query) =>
-                              _onSearchSubmitted(query, data.accessToken),
+                          onSearchTap: () => _onSearchTab(data.accessToken),
                           onLayerToogle: _onLayerToggle,
                         ),
                       ],
@@ -144,14 +143,14 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Future<void> _onSearchSubmitted(String query, String accessToken) async {
+  Future<void> _onSearchTab(String accessToken) async {
     final LatLng? mapPosition = mapController?.cameraPosition?.target;
     final LatLng? moveToLoc = await Navigator.push(
-        context,
-        MaterialPageRoute<LatLng>(
+      context,
+      NoTransitionPageRoute<LatLng>(
           builder: (BuildContext context) =>
-              SearchPage(mapboxGeocodingGet(query, accessToken, mapPosition)),
-        ));
+              SearchPage(mapPosition: mapPosition, accessToken: accessToken)),
+    );
     if (moveToLoc == null) {
       return;
     }

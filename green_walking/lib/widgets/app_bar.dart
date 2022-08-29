@@ -1,17 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class SearchBar extends StatelessWidget {
-  const SearchBar(
+class MapAppBar extends StatelessWidget {
+  const MapAppBar(
       {Key? key,
-      required this.scaffoldKey,
+      this.scaffoldKey,
       this.onSearchSubmitted,
-      this.onLayerToogle})
+      this.onLayerToogle,
+      this.onSearchTap})
       : super(key: key);
 
-  final GlobalKey<ScaffoldState> scaffoldKey;
+  final GlobalKey<ScaffoldState>? scaffoldKey;
   final void Function(String)? onSearchSubmitted;
+  final GestureTapCallback? onSearchTap;
   final VoidCallback? onLayerToogle;
+
+  Widget _leading(BuildContext context) {
+    final GlobalKey<ScaffoldState>? key = scaffoldKey;
+    if (key != null) {
+      return IconButton(
+          splashColor: Colors.grey,
+          icon: Icon(Icons.menu,
+              semanticLabel:
+                  MaterialLocalizations.of(context).openAppDrawerTooltip),
+          onPressed: () => key.currentState?.openDrawer());
+    }
+
+    return IconButton(
+        splashColor: Colors.grey,
+        icon: Icon(Icons.arrow_back,
+            semanticLabel: MaterialLocalizations.of(context).backButtonTooltip),
+        onPressed: () => Navigator.pop(context));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,19 +47,10 @@ class SearchBar extends StatelessWidget {
               ),
               child: Row(
                 children: <Widget>[
-                  IconButton(
-                    splashColor: Colors.grey,
-                    icon: Icon(Icons.menu,
-                        semanticLabel: MaterialLocalizations.of(context)
-                            .openAppDrawerTooltip),
-                    onPressed: () {
-                      scaffoldKey.currentState?.openDrawer();
-                    },
-                  ),
+                  _leading(context),
                   Expanded(
                     child: TextField(
-                      // Otherwise the keyboard always appears.
-                      autofocus: false,
+                      autofocus: true,
                       cursorColor: Colors.black,
                       keyboardType: TextInputType.text,
                       textInputAction: TextInputAction.go,
@@ -49,6 +60,8 @@ class SearchBar extends StatelessWidget {
                               const EdgeInsets.symmetric(horizontal: 15),
                           hintText: locale.searchBoxHintLabel('...')),
                       onSubmitted: onSearchSubmitted,
+                      readOnly: scaffoldKey != null,
+                      onTap: onSearchTap,
                     ),
                   ),
                   Padding(
