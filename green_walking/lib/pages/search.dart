@@ -32,35 +32,30 @@ class _SearchPageState extends State<SearchPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               MapAppBar(
-                  leading: IconButton(
-                      splashColor: Colors.grey,
-                      icon: Icon(Icons.arrow_back,
-                          semanticLabel: MaterialLocalizations.of(context)
-                              .backButtonTooltip),
-                      onPressed: () => Navigator.pop(context)),
-                  title: TextField(
-                      autofocus: true,
-                      cursorColor: Colors.black,
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.go,
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 15),
-                          hintText: locale.searchBoxHintLabel('...')),
-                      onSubmitted: _onSearchSubmitted,
-                    ),),
-              _resultList(context),
-              /*
-          Padding(
-            padding: const EdgeInsets.fromLTRB(5, 25, 5, 0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                _resultList(context),
-              ],
-            ),
-          ),*/
+                leading: IconButton(
+                    splashColor: Colors.grey,
+                    icon: Icon(Icons.arrow_back,
+                        semanticLabel: MaterialLocalizations.of(context)
+                            .backButtonTooltip),
+                    onPressed: () => Navigator.pop(context)),
+                title: TextField(
+                  autofocus: true,
+                  cursorColor: Colors.black,
+                  keyboardType: TextInputType.text,
+                  textInputAction: TextInputAction.go,
+                  decoration: InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 15),
+                      hintText: locale.searchBoxHintLabel('...')),
+                  onSubmitted: _onSearchSubmitted,
+                ),
+              ),
+              Expanded(
+                  child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 25, 10, 0),
+                child: _resultList(context),
+              )),
             ],
           ),
         ));
@@ -97,24 +92,22 @@ class _SearchPageState extends State<SearchPage> {
                             ?.replaceFirst((elem.text ?? '') + ', ', ''),
                         65) ??
                     '';
-                return Padding(
-                    padding: const EdgeInsets.only(left: 5, right: 5),
-                    child: Card(
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          child: Text((index + 1).toString()),
-                        ),
-                        isThreeLine: true,
-                        onTap: () {
-                          Navigator.pop(
-                            context,
-                            elem.center,
-                          );
-                        },
-                        title: Text(truncateString(elem.text, 25) ?? ''),
-                        subtitle: Text(subtitle),
-                      ),
-                    ));
+                return Card(
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      child: Text((index + 1).toString()),
+                    ),
+                    isThreeLine: true,
+                    onTap: () {
+                      Navigator.pop(
+                        context,
+                        elem.center,
+                      );
+                    },
+                    title: Text(truncateString(elem.text, 25) ?? ''),
+                    subtitle: Text(subtitle),
+                  ),
+                );
               },
             ));
           } else if (snapshot.hasError) {
