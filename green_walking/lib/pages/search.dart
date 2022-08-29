@@ -82,8 +82,7 @@ class _SearchPageState extends State<SearchPage> {
             if (data.features.isEmpty) {
               return Text(locale.searchNoResultsText);
             }
-            return Expanded(
-                child: ListView.builder(
+            return ListView.builder(
               itemCount: data.features.length,
               itemBuilder: (BuildContext context, int index) {
                 final MaboxGeocodingPlace elem = data.features[index];
@@ -109,7 +108,7 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                 );
               },
-            ));
+            );
           } else if (snapshot.hasError) {
             return Text(locale.errorNoConnectionToSearchServer);
           }
