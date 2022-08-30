@@ -11,7 +11,7 @@ class LocationButton extends StatefulWidget {
       required this.onNoPermissions,
       required this.userLocation});
 
-  final VoidCallback onOkay;
+  final void Function(bool) onOkay;
   final VoidCallback onNoPermissions;
   final ValueNotifier<LatLng?> userLocation;
 
@@ -90,24 +90,31 @@ class _LocationButtonState extends State<LocationButton> {
   }
 
   Future<void> _onPressed() async {
-    // TODO(Xennis): Catch exception!
+    bool permissionGranted = false;
+
     // Check permission
     if (await Geolocator.checkPermission() == LocationPermission.denied) {
+      // TODO(Xennis): Catch exception!
       if (<LocationPermission>[
             LocationPermission.always,
             LocationPermission.whileInUse
           ].contains(await Geolocator.requestPermission()) ==
           false) {
         widget.onNoPermissions();
+        return;
       }
+
+      permissionGranted = true;
     }
 
-    // Requesting the location also enables the location service if it
-    // is disabled.
-    // See https://github.com/Baseflow/flutter-geolocator/issues/1034#issuecomment-1142153435
-    // TODO(Xennis): Add timeout and catch exception.
-    await Geolocator.getCurrentPosition();
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      // Requesting the location also enables the location service if it
+      // is disabled.
+      // See https://github.com/Baseflow/flutter-geolocator/issues/1034#issuecomment-1142153435
+      // TODO(Xennis): Add timeout and catch exception.
+      await Geolocator.getCurrentPosition();
+    }
 
-    widget.onOkay();
+    widget.onOkay(permissionGranted);
   }
 }
