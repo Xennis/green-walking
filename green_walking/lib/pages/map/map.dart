@@ -88,7 +88,9 @@ class _MapPageState extends State<MapPage> {
                                 mapboxStyle == MabboxTileset.satellite),
                         LocationButton(
                             userLocation: _userLocation,
-                            onOkay: () => _onLocationSearchPressed(locale),
+                            onOkay: (bool permissionGranted) =>
+                                _onLocationSearchPressed(
+                                    locale, permissionGranted),
                             onNoPermissions: () =>
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -193,7 +195,20 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  Future<void> _onLocationSearchPressed(AppLocalizations locale) async {
+  Future<void> _onLocationSearchPressed(
+      AppLocalizations locale, bool permissionGranted) async {
+    // mapbox-gl: `myLocationEnabled` is set to true above. Due to this the
+    // library checks on initialization if it can enable it. But if the
+    // permission are missing it can't. The result is that
+    // `requestMyLocationLatLng` returns nothing (not even null).
+    //
+    // That's why in case of granted permission (i.e. the app had no permission
+    // beforehand) we explicitly need to trigger `updateMyLocationEnabled`
+    // which will be called by `updateMyLocationTrackingMode`.
+    if (permissionGranted) {
+      await mapController
+          ?.updateMyLocationTrackingMode(MyLocationTrackingMode.Tracking);
+    }
     final LatLng? loc = await mapController?.requestMyLocationLatLng();
     if (loc != null) {
       await mapController?.moveCamera(CameraUpdate.newCameraPosition(
