@@ -6,6 +6,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../core.dart';
 
 class ImprintPage extends StatelessWidget {
+  const ImprintPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context)!;

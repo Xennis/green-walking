@@ -14,7 +14,7 @@ class SearchPage extends StatefulWidget {
   final LatLng? mapPosition;
 
   @override
-  _SearchPageState createState() => _SearchPageState();
+  State<SearchPage> createState() => _SearchPageState();
 }
 
 class _SearchPageState extends State<SearchPage> {
@@ -88,7 +88,7 @@ class _SearchPageState extends State<SearchPage> {
                 final MaboxGeocodingPlace elem = data.features[index];
                 final String subtitle = truncateString(
                         elem.placeName
-                            ?.replaceFirst((elem.text ?? '') + ', ', ''),
+                            ?.replaceFirst('${elem.text ?? ''}, ', ''),
                         65) ??
                     '';
                 return Card(

@@ -7,6 +7,8 @@ import '../core.dart';
 import '../routes.dart';
 
 class NavigationDrawer extends StatelessWidget {
+  const NavigationDrawer({super.key});
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context)!;
@@ -51,7 +53,6 @@ class NavigationDrawer extends StatelessWidget {
           ),
           const Divider(),
           AboutListTile(
-            child: Text(locale.aboutPage),
             icon: const Icon(Icons.explore),
             applicationIcon: Image.asset(
               'assets/app-icon.png',
@@ -85,6 +86,7 @@ class NavigationDrawer extends StatelessWidget {
                 ),
               ),
             ],
+            child: Text(locale.aboutPage),
           ),
           ListTile(
             leading: const Icon(Icons.lock),

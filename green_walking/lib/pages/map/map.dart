@@ -25,7 +25,7 @@ class MapConfig {
     final String accessToken =
         await assetBundle.loadString('assets/mapbox-access-token.txt');
     final LatLng? lastLocation =
-        await SharedPrefs.getLatLng(SharedPrefs.KEY_LAST_LOCATION);
+        await SharedPrefs.getLatLng(SharedPrefs.keyLastLocation);
 
     return MapConfig(accessToken, lastLocation: lastLocation);
   }
@@ -35,7 +35,7 @@ class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
 
   @override
-  _MapPageState createState() => _MapPageState();
+  State<MapPage> createState() => _MapPageState();
 }
 
 class _MapPageState extends State<MapPage> {
@@ -57,7 +57,7 @@ class _MapPageState extends State<MapPage> {
     //mapController?.onSymbolTapped.remove(_onSymbolTapped);
     final LatLng? mapPosition = mapController?.cameraPosition?.target;
     if (mapPosition != null) {
-      SharedPrefs.setLatLng(SharedPrefs.KEY_LAST_LOCATION, mapPosition);
+      SharedPrefs.setLatLng(SharedPrefs.keyLastLocation, mapPosition);
     }
     super.dispose();
   }
@@ -70,7 +70,7 @@ class _MapPageState extends State<MapPage> {
       // If the search in the search bar is clicked the keyboard appears. The keyboard
       // should be over the map and by that avoid resizing of the whole app / map.
       resizeToAvoidBottomInset: false,
-      drawer: NavigationDrawer(),
+      drawer: const NavigationDrawer(),
       body: FutureBuilder<MapConfig>(
           future: MapConfig.create(DefaultAssetBundle.of(context)),
           builder: (BuildContext context, AsyncSnapshot<MapConfig> snapshot) {
@@ -216,6 +216,8 @@ class _MapPageState extends State<MapPage> {
       // Request location and camera position.target can slightly differ.
       _userLocation.value = mapController?.cameraPosition?.target;
     } else {
+      // See https://dart-lang.github.io/linter/lints/use_build_context_synchronously.html
+      if (!mounted) return;
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(locale.errorNoPositionFound)));
     }

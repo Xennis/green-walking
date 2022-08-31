@@ -8,18 +8,21 @@ import '../core.dart';
 import '../services/shared_prefs.dart';
 
 void enableAnalyticsOrConsent(BuildContext context) {
-  SharedPrefs.getBool(SharedPrefs.ANALYTICS_ENABLED).then((bool? enabled) {
+  SharedPrefs.getBool(SharedPrefs.analyticsEnabled).then((bool? enabled) {
     if (enabled == true) {
       // Privacy: Only enable analytics if it is set to enabled.
       FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
     } else if (enabled == null) {
       showDialog<dynamic>(
-          context: context, builder: (BuildContext context) => GdprDialog());
+          context: context,
+          builder: (BuildContext context) => const GdprDialog());
     }
   });
 }
 
 class GdprDialog extends StatelessWidget {
+  const GdprDialog({super.key});
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context)!;
@@ -32,7 +35,7 @@ class GdprDialog extends StatelessWidget {
                   style: const TextStyle(color: Colors.grey),
                   children: <InlineSpan>[
                     TextSpan(
-                      text: locale.gdprDialogText + ' ',
+                      text: '${locale.gdprDialogText} ',
                     ),
                     TextSpan(
                       text: locale.gdprPrivacyPolicy,
@@ -55,14 +58,14 @@ class GdprDialog extends StatelessWidget {
         TextButton(
             child: Text(locale.gdprDisagree.toUpperCase()),
             onPressed: () {
-              SharedPrefs.setBool(SharedPrefs.ANALYTICS_ENABLED, false);
+              SharedPrefs.setBool(SharedPrefs.analyticsEnabled, false);
               FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(false);
               Navigator.of(context).pop();
             }),
         TextButton(
             child: Text(locale.gdprAgree.toUpperCase()),
             onPressed: () {
-              SharedPrefs.setBool(SharedPrefs.ANALYTICS_ENABLED, true);
+              SharedPrefs.setBool(SharedPrefs.analyticsEnabled, true);
               FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
               Navigator.of(context).pop();
             }),

@@ -3,6 +3,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class FeedbackPage extends StatelessWidget {
+  const FeedbackPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context)!;
