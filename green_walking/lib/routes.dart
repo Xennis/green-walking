@@ -15,9 +15,9 @@ class Routes {
 
 Map<String, WidgetBuilder> getRoutes(BuildContext context) {
   return <String, WidgetBuilder>{
-    Routes.feedback: (_) => FeedbackPage(),
-    Routes.imprint: (_) => ImprintPage(),
+    Routes.feedback: (_) => const FeedbackPage(),
+    Routes.imprint: (_) => const ImprintPage(),
     Routes.map: (_) => const MapPage(),
-    Routes.settings: (_) => SettingsPage(),
+    Routes.settings: (_) => const SettingsPage(),
   };
 }

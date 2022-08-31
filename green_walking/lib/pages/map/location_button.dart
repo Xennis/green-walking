@@ -16,7 +16,7 @@ class LocationButton extends StatefulWidget {
   final ValueNotifier<LatLng?> userLocation;
 
   @override
-  _LocationButtonState createState() => _LocationButtonState();
+  State<LocationButton> createState() => _LocationButtonState();
 }
 
 class _LocationButtonState extends State<LocationButton> {

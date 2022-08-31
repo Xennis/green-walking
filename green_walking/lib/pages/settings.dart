@@ -5,8 +5,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../services/shared_prefs.dart';
 
 class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
+
   @override
-  _SettingsPageState createState() => _SettingsPageState();
+  State<SettingsPage> createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
@@ -40,8 +42,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ],
                   ),
                   FutureBuilder<bool?>(
-                      future:
-                          SharedPrefs.getBool(SharedPrefs.ANALYTICS_ENABLED),
+                      future: SharedPrefs.getBool(SharedPrefs.analyticsEnabled),
                       initialData: _analyticsEnabled,
                       builder: (BuildContext context,
                           AsyncSnapshot<bool?> snapshot) {
@@ -52,7 +53,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               return;
                             }
                             SharedPrefs.setBool(
-                                SharedPrefs.ANALYTICS_ENABLED, value);
+                                SharedPrefs.analyticsEnabled, value);
                             FirebaseAnalytics.instance
                                 .setAnalyticsCollectionEnabled(value);
                             setState(() {
