@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -13,7 +12,6 @@ class NavigationDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context)!;
-    final TextStyle textStyle = Theme.of(context).textTheme.bodyText2!;
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -63,30 +61,6 @@ class NavigationDrawer extends StatelessWidget {
             applicationName: locale.appTitle,
             applicationVersion: locale.aboutVersion(appVersion),
             applicationLegalese: locale.aboutLegalese(appAuthor),
-            aboutBoxChildren: <Widget>[
-              const SizedBox(height: 24),
-              RichText(
-                text: TextSpan(
-                  children: <TextSpan>[
-                    TextSpan(
-                      style: textStyle,
-                      text: '${locale.aboutSourceCodeText} ',
-                    ),
-                    TextSpan(
-                      text: locale.aboutRepository('GitHub'),
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.secondary),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          launchUrl(
-                              Uri.https('github.com', '/Xennis/green-walking'));
-                        },
-                    ),
-                    TextSpan(style: textStyle, text: '.'),
-                  ],
-                ),
-              ),
-            ],
             child: Text(locale.aboutPage),
           ),
           ListTile(

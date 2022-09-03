@@ -143,26 +143,6 @@
       }
     }
   },
-  "aboutSourceCodeText": "To see the source code of this app, please visit the",
-  "@aboutSourceCodeText": {
-    "description": "Text for mentioning the source code",
-    "type": "text",
-    "placeholders_order": [],
-    "placeholders": {}
-  },
-  "aboutRepository": "{name} repository",
-  "@aboutRepository": {
-    "description": "Link for code repository",
-    "type": "text",
-    "placeholders_order": [
-      "name"
-    ],
-    "placeholders": {
-      "name": {
-        "example": "GitHub"
-      }
-    }
-  },
   "dataPrivacyNavigationLabel": "Data privacy",
   "@dataPrivacyNavigationLabel": {
     "description": "Label for data privacy link",
