@@ -17,8 +17,6 @@
   "aboutPage": "Über die App",
   "aboutVersion": "Version {version}",
   "aboutLegalese": "Entwickelt von {name}",
-  "aboutSourceCodeText": "Um den Quellcode der App zu sehen, besuche bitte das",
-  "aboutRepository": "{name} Repository",
   "dataPrivacyNavigationLabel": "Datenschutz",
   "imprint": "Impressum",
   "imprintTmgText": "Angaben gemäß § {paragraphNumber} TMG",
