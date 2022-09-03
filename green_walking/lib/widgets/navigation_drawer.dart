@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../config.dart';
 import '../core.dart';
 import '../routes.dart';
 
@@ -60,8 +61,8 @@ class NavigationDrawer extends StatelessWidget {
               height: 65,
             ),
             applicationName: locale.appTitle,
-            applicationVersion: locale.aboutVersion('2.0.0'),
-            applicationLegalese: locale.aboutLegalese('Xennis'),
+            applicationVersion: locale.aboutVersion(appVersion),
+            applicationLegalese: locale.aboutLegalese(appAuthor),
             aboutBoxChildren: <Widget>[
               const SizedBox(height: 24),
               RichText(
