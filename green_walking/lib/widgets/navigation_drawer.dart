@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -45,6 +47,8 @@ class NavigationDrawer extends StatelessWidget {
             title: Text(locale.feedbackPage),
             onTap: () => Navigator.of(context).pushNamed(Routes.feedback),
           ),
+          _RateAppListTile(),
+          const Divider(),
           ListTile(
             leading: const Icon(Icons.settings),
             title: Text(locale.settingsPage),
@@ -80,5 +84,22 @@ class NavigationDrawer extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _RateAppListTile extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    if (Platform.isAndroid) {
+      final AppLocalizations l10n = AppLocalizations.of(context)!;
+      return ListTile(
+          leading: const Icon(Icons.star),
+          title: Text(l10n.rateApp),
+          onTap: () => launchUrl(
+              Uri.https('play.google.com', '/store/apps/details',
+                  {'id': androidAppID}),
+              mode: LaunchMode.externalApplication));
+    }
+    return Container();
   }
 }

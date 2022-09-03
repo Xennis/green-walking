@@ -355,5 +355,9 @@
     "type": "text",
     "placeholders_order": [],
     "placeholders": {}
+  },
+  "rateApp": "Rate the app",
+  "@rateApp": {
+    "description": "Link text to rate the app."
   }
 }

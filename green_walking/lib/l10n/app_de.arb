@@ -43,5 +43,6 @@
   "searchBoxHintLabel": "Suche{dots}",
   "searchResults": "Ergebnisse",
   "searchNoResultsText": "Keine Ergebnisse gefunden",
-  "mapSwitchLayerSemanticLabel": "Kartenansicht wechseln"
+  "mapSwitchLayerSemanticLabel": "Kartenansicht wechseln",
+  "rateApp": "Bewerte die App"
 }
