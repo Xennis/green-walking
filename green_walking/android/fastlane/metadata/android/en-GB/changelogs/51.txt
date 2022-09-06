@@ -1,0 +1,2 @@
+* Fix last position not shown
+* Fix round app icon is missing
