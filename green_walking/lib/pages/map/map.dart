@@ -16,18 +16,18 @@ import 'location_button.dart';
 import 'tileset.dart';
 
 class MapConfig {
-  MapConfig(this.accessToken, {this.lastLocation});
+  MapConfig(this.accessToken, {this.lastPosition});
 
   String accessToken;
-  LatLng? lastLocation;
+  CameraPosition? lastPosition;
 
   static Future<MapConfig> create(AssetBundle assetBundle) async {
     final String accessToken =
         await assetBundle.loadString('assets/mapbox-access-token.txt');
-    final LatLng? lastLocation =
-        await SharedPrefs.getLatLng(SharedPrefs.keyLastLocation);
+    final CameraPosition? lastPosition =
+        await SharedPrefs.getCameraPosition(SharedPrefs.keyLastPosition);
 
-    return MapConfig(accessToken, lastLocation: lastLocation);
+    return MapConfig(accessToken, lastPosition: lastPosition);
   }
 }
 
@@ -50,16 +50,6 @@ class _MapPageState extends State<MapPage> {
     super.initState();
     WidgetsBinding.instance
         .addPostFrameCallback((_) => enableAnalyticsOrConsent(context));
-  }
-
-  @override
-  void dispose() {
-    //mapController?.onSymbolTapped.remove(_onSymbolTapped);
-    final LatLng? mapPosition = mapController?.cameraPosition?.target;
-    if (mapPosition != null) {
-      SharedPrefs.setLatLng(SharedPrefs.keyLastLocation, mapPosition);
-    }
-    super.dispose();
   }
 
   @override
@@ -141,11 +131,8 @@ class _MapPageState extends State<MapPage> {
         //mapController!.onSymbolTapped.add(_onSymbolTapped);
         //onPositionChanged(mapController!.cameraPosition);
       },
-      initialCameraPosition: CameraPosition(
-          target: (config.lastLocation != null)
-              ? config.lastLocation!
-              : const LatLng(53.5519, 9.8682),
-          zoom: 11.0),
+      initialCameraPosition: config.lastPosition ??
+          const CameraPosition(target: LatLng(53.5519, 9.8682), zoom: 11.0),
       myLocationEnabled: true,
       rotateGesturesEnabled: true,
       styleString: mapboxStyle.id,
@@ -224,11 +211,18 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _onCameraIdle() {
+    final CameraPosition? cameraPosition = mapController?.cameraPosition;
+    if (cameraPosition == null) {
+      return;
+    }
+
     if (_userLocation.value != null) {
-      if (mapController?.cameraPosition?.target != _userLocation.value) {
+      if (cameraPosition.target != _userLocation.value) {
         _userLocation.value = null;
       }
     }
+
+    SharedPrefs.setCameraPosition(SharedPrefs.keyLastPosition, cameraPosition);
   }
 
   /*
