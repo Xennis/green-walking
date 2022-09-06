@@ -1,0 +1,2 @@
+* Fehler behoben: Letzte Position wird nicht angezeigt
+* Fehler behoben: Rundes App-Icon fehlt
