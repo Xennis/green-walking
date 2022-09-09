@@ -13,6 +13,7 @@ import '../../widgets/page_route.dart';
 import '../search.dart';
 import 'attribution.dart';
 import 'location_button.dart';
+import 'rotation_button.dart';
 import 'tileset.dart';
 
 class MapConfig {
@@ -41,9 +42,10 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final ValueNotifier<LatLng?> _userLocation = ValueNotifier<LatLng?>(null);
+  final ValueNotifier<bool> _rotation = ValueNotifier(false);
 
-  MapboxMapController? mapController;
-  MabboxTileset mapboxStyle = MabboxTileset.outdoor;
+  MapboxMapController? _mapController;
+  MabboxTileset _mapboxStyle = MabboxTileset.outdoor;
 
   @override
   void initState() {
@@ -75,7 +77,7 @@ class _MapPageState extends State<MapPage> {
                         map(context, data),
                         Attribution(
                             satelliteLayer:
-                                mapboxStyle == MabboxTileset.satellite),
+                                _mapboxStyle == MabboxTileset.satellite),
                         LocationButton(
                             userLocation: _userLocation,
                             onOkay: (bool permissionGranted) =>
@@ -87,6 +89,9 @@ class _MapPageState extends State<MapPage> {
                                       content: Text(
                                           locale.errorNoLocationPermission)),
                                 )),
+                        RotationButton(
+                            rotation: _rotation,
+                            onPressed: _onRotationButtonPressed),
                         MapAppBar(
                           onLayerToogle: _onLayerToggle,
                           leading: IconButton(
@@ -127,7 +132,7 @@ class _MapPageState extends State<MapPage> {
       accessToken: config.accessToken,
       onMapCreated: (MapboxMapController controller) {
         controller.setTelemetryEnabled(false);
-        mapController = controller;
+        _mapController = controller;
         //mapController!.onSymbolTapped.add(_onSymbolTapped);
         //onPositionChanged(mapController!.cameraPosition);
       },
@@ -135,7 +140,7 @@ class _MapPageState extends State<MapPage> {
           const CameraPosition(target: LatLng(53.5519, 9.8682), zoom: 11.0),
       myLocationEnabled: true,
       rotateGesturesEnabled: true,
-      styleString: mapboxStyle.id,
+      styleString: _mapboxStyle.id,
       trackCameraPosition: true,
       onCameraIdle: _onCameraIdle,
       onStyleLoadedCallback: () async {
@@ -148,7 +153,7 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<void> _onSearchTab(String accessToken) async {
-    final LatLng? mapPosition = mapController?.cameraPosition?.target;
+    final LatLng? mapPosition = _mapController?.cameraPosition?.target;
     final LatLng? moveToLoc = await Navigator.push(
       context,
       NoTransitionPageRoute<LatLng>(
@@ -158,10 +163,10 @@ class _MapPageState extends State<MapPage> {
     if (moveToLoc == null) {
       return;
     }
-    mapController?.moveCamera(CameraUpdate.newCameraPosition(
+    _mapController?.moveCamera(CameraUpdate.newCameraPosition(
         CameraPosition(target: moveToLoc, zoom: 16.0)));
-    mapController?.clearCircles();
-    mapController?.addCircle(CircleOptions(
+    _mapController?.clearCircles();
+    _mapController?.addCircle(CircleOptions(
         circleRadius: 12,
         circleColor: '#FFC0CB',
         circleOpacity: 0.6,
@@ -171,13 +176,13 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _onLayerToggle() {
-    if (mapboxStyle == MabboxTileset.satellite) {
+    if (_mapboxStyle == MabboxTileset.satellite) {
       setState(() {
-        mapboxStyle = MabboxTileset.outdoor;
+        _mapboxStyle = MabboxTileset.outdoor;
       });
     } else {
       setState(() {
-        mapboxStyle = MabboxTileset.satellite;
+        _mapboxStyle = MabboxTileset.satellite;
       });
     }
   }
@@ -193,15 +198,15 @@ class _MapPageState extends State<MapPage> {
     // beforehand) we explicitly need to trigger `updateMyLocationEnabled`
     // which will be called by `updateMyLocationTrackingMode`.
     if (permissionGranted) {
-      await mapController
+      await _mapController
           ?.updateMyLocationTrackingMode(MyLocationTrackingMode.Tracking);
     }
-    final LatLng? loc = await mapController?.requestMyLocationLatLng();
+    final LatLng? loc = await _mapController?.requestMyLocationLatLng();
     if (loc != null) {
-      await mapController?.moveCamera(CameraUpdate.newCameraPosition(
+      await _mapController?.moveCamera(CameraUpdate.newCameraPosition(
           CameraPosition(target: loc, zoom: 16.0)));
       // Request location and camera position.target can slightly differ.
-      _userLocation.value = mapController?.cameraPosition?.target;
+      _userLocation.value = _mapController?.cameraPosition?.target;
     } else {
       // See https://dart-lang.github.io/linter/lints/use_build_context_synchronously.html
       if (!mounted) return;
@@ -210,10 +215,31 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
+  void _onRotationButtonPressed() {
+    final CameraPosition? position = _mapController?.cameraPosition;
+    if (position != null) {
+      _mapController?.animateCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(
+              target: position.target,
+              zoom: position.zoom,
+              bearing: 0,
+              tilt: 0)));
+    }
+  }
+
   void _onCameraIdle() {
-    final CameraPosition? cameraPosition = mapController?.cameraPosition;
+    final CameraPosition? cameraPosition = _mapController?.cameraPosition;
     if (cameraPosition == null) {
       return;
+    }
+
+    if (_rotation.value &&
+        cameraPosition.bearing == 0 &&
+        cameraPosition.tilt == 0) {
+      _rotation.value = false;
+    } else if (!_rotation.value &&
+        (cameraPosition.bearing != 0 || cameraPosition.tilt != 0)) {
+      _rotation.value = true;
     }
 
     if (_userLocation.value != null) {
