@@ -163,7 +163,7 @@ class _MapPageState extends State<MapPage> {
     if (moveToLoc == null) {
       return;
     }
-    _mapController?.moveCamera(CameraUpdate.newCameraPosition(
+    _mapController?.animateCamera(CameraUpdate.newCameraPosition(
         CameraPosition(target: moveToLoc, zoom: 16.0)));
     _mapController?.clearCircles();
     _mapController?.addCircle(CircleOptions(
@@ -203,7 +203,7 @@ class _MapPageState extends State<MapPage> {
     }
     final LatLng? loc = await _mapController?.requestMyLocationLatLng();
     if (loc != null) {
-      await _mapController?.moveCamera(CameraUpdate.newCameraPosition(
+      await _mapController?.animateCamera(CameraUpdate.newCameraPosition(
           CameraPosition(target: loc, zoom: 16.0)));
       // Request location and camera position.target can slightly differ.
       _userLocation.value = _mapController?.cameraPosition?.target;
