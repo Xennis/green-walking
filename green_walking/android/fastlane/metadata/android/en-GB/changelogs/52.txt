@@ -1,0 +1,1 @@
+* Add button to reset the rotation of the map

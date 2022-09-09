@@ -1,0 +1,1 @@
+* Button zum Zurücksetzen der Kartenrotation hinzugefügt
