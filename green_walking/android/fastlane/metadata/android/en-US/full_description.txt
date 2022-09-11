@@ -1,1 +1,8 @@
 Discover your surrounding with this detailed map. Use it to app to find trails for walking, hiking or running.
+
+## Features
+
+* Super detailed map provided by OpenStreetMap (OSM)
+* Satellite view with streets overlay
+* Search to find places and addresses (geocoding)
+* Maximum zoom to see all details
