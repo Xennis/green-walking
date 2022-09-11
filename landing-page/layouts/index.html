@@ -1,0 +1,58 @@
+{{ define "main" }}
+<header class="app__header container">
+        <div class="app__logo-wrapper">
+                <img class="app__logo" src="/images/appicon.png" alt="{{ .Site.Params.app.name }} Icon">
+        </div>
+        <div class="app__infos">
+                <h1 class="app__name">{{ .Site.Params.app.name }}</h1>
+                <p class="app__description">{{ .Site.Params.app.description }}</p>
+                <div class="app__buttons app__buttons--desktop">
+                        {{ with .Site.Params.app.android }}
+                        <a href="{{ . }}" class="app__button-play" target="_blank"><img
+                                        src="/images/google-play-badge.png" alt="Get on Google Play"></a>
+                        {{ end }}
+                        {{ with .Site.Params.app.iOS }}
+                        <a href="{{ . }}" class="app__button-ios" target="_blank"><img src="/images/ios.svg"
+                                        alt="Get on Appstore"></a>
+                        {{ end }}
+                        {{ with .Site.Params.app.web }}
+                        <a href="{{ . }}" class="app__button-web" target="_blank"><img src="/images/pwa-badge.png"
+                                        alt="Go to website"></a>
+                        {{ end }}
+                </div>
+        </div>
+</header>
+<div class="app__buttons app__buttons--mobile container">
+        {{ with .Site.Params.app.android }}
+        <a href="{{ . }}" class="app__button-play" target="_blank"><img src="/images/google-play-badge.png"
+                        alt="Get on Google Play"></a>
+        {{ end }}
+        {{ with .Site.Params.app.iOS }}
+        <a href="{{ . }}" class="app__button-ios" target="_blank"><img src="/images/ios.svg" alt="Get on Appstore"></a>
+        {{ end }}
+        {{ with .Site.Params.app.web }}
+        <a href="{{ . }}" class="app__button-web" target="_blank"><img src="/images/pwa-badge.png"
+                        alt="Go to website"></a>
+        {{ end }}
+</div>
+<section class="app__screenshots app__section">
+        <div class="container">
+                <h2 class="app__section-title">{{ .Site.Params.headline.screenshots }}</h2>
+        </div>
+        <div class="app__screenshots-wrapper container-desktop">
+                <div class="app__screenshots-list">
+                        {{ range .Site.Params.app.screenshots }}
+                        <a href="/images/screenshots/{{ . }}" class="lightbox">
+                                <img src="/images/screenshots/{{ . }}" class="app__screenshot">
+                        </a>
+                        {{ end }}
+                </div>
+        </div>
+</section>
+<section class="app__fulldescription app__section container">
+        <h2 class="app__section-title">{{ .Site.Params.headline.description }}</h2>
+        <div class="app__fulldescription-content">
+                <p>{{ .Site.Params.app.full_description | safeHTML }}</p>
+        </div>
+</section>
+{{ end }}

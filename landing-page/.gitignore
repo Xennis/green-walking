@@ -1,0 +1,7 @@
+# Hugo: Generated files
+/public/
+/resources/_gen/
+/assets/jsconfig.json
+
+# Hugo: Temporary lock file while building
+/.hugo_build.lock

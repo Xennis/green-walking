@@ -1,0 +1,48 @@
+# Hugo
+DefaultContentLanguage: en
+publishdir: public
+canonifyUrls: 'true'
+disableKinds:
+  - RSS
+  - taxonomy
+  - taxonomyTerm
+
+title: 'Detailed OSM Maps: Walk & Hike'
+params:
+  description: 'The map shows all kinds of trails for walking and hiking.'
+  meta:
+    author: Xennis
+    url: 'https://xennis.github.io/green-walking/' # the base hostname & protocol for your site, e.g. http://example.com
+    theme_color: '#efeeff'
+    #logo: images/large-logo.png
+  headline:
+    screenshots: Screenshots
+    description: Description
+  footer:
+    copyright: Made with ❤️ in Europe 🇪🇺 by <a href="https://github.com/Xennis/" target="_blank">Xennis</a>
+    links:
+      - title: Github
+        url: https://github.com/Xennis/green-walking
+        target: _blank
+      #- title: Donate
+      #  url: https://paypal.me/kanbanote
+      #  target: _blank
+      #- title: Privacy
+      #  url: /privacy
+  app:
+    name: 'Detailed OSM Maps: Walk & Hike'
+    description: The map shows all kinds of trails for walking and hiking.
+    full_description: '<p>Discover your surrounding with this detailed map. Use it to app to find trails for walking, hiking or running.</p>
+
+<p><b>Features</b>
+
+<br>- Super detailed map provided by OpenStreetMap (OSM)
+<br>- Satellite view with streets overlay
+<br>- Search to find places and addresses (geocoding)
+<br>- Maximum zoom to see all details</p>'
+    android: https://play.google.com/store/apps/details?id=org.xennis.apps.green_walking
+    screenshots:
+      - 1.png
+      - 2.png
+      - 3.png
+      - 4.png
