@@ -1,1 +1,8 @@
 Entdecke deine Umgebung mit dieser detaillierten Karte. Verwende die App, um Wege zum Spazieren, Wandern oder Laufen zu finden.
+
+## Besonderheiten
+
+* Sehr detailreiche Karte von OpenStreetMap (OSM)
+* Satelliten-Ansicht mit Straßen-Einblendung
+* Suche nach Orten und Adressen (Geocoding)
+* Maximaler Zoom, um alle Details zu sehen
