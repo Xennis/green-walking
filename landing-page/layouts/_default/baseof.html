@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.Language.Lang }}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <meta name="description" content="{{ with .Description }}{{.}}{{ else }}{{ if .IsPage }}{{ .Summary }}{{ else }}{{ .Site.Params.description }}{{ end }}{{ end }}">
+
+    <meta name="theme-color" content="{{ .Site.Params.meta.theme_color }}">
+    <meta name="msapplication-navbutton-color" content="{{ .Site.Params.meta.theme_color }}">
+    <meta name="apple-mobile-web-app-status-bar-style" content="{{ .Site.Params.meta.theme_color }}">
+    <!--<meta property="og:image" content="{{ .Site.BaseURL }}/{{ .Site.Params.meta.logo }}" />-->
+
+    <meta name="author" content="{{ .Site.Params.meta.author }}">
+    <meta name="robots" content="index,follow">
+
+    {{ $sass := resources.Get "sass/main.scss" }}
+    {{ $style := $sass | resources.ToCSS | resources.Fingerprint }}
+    <link rel="stylesheet" href="{{ $style.Permalink }}" integrity="{{ $style.Data.Integrity }}">
+
+    <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }}{{ end }}</title>
+</head>
+
+<body>
+    <main>
+        {{ block "main" . }}{{ end }}
+    </main>
+    {{ block "footer" . }}
+        {{ partial "site-footer.html" . }}
+    {{ end }}
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+<footer class="footer">
+    <div class="container">
+        <div class="footer__container">
+            <p class="footer__love">{{ .Site.Params.footer.copyright | safeHTML }}</p>
+            <ul class="footer__links">
+                {{ range .Site.Params.footer.links }}
+                <li class="footer__link"><a href="{{ .url }}" target="{{ .target }}">{{ .title }}</a></li>
+                {{ end }}
+            </ul>
+        </div>
+    </div>
+</footer>
