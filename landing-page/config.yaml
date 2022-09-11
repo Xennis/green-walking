@@ -6,13 +6,13 @@ disableKinds:
   - RSS
   - taxonomy
   - taxonomyTerm
+baseURL: https://xennis.github.io/green-walking
 
 title: 'Detailed OSM Maps: Walk & Hike'
 params:
   description: 'The map shows all kinds of trails for walking and hiking.'
   meta:
     author: Xennis
-    url: 'https://xennis.github.io/green-walking/' # the base hostname & protocol for your site, e.g. http://example.com
     theme_color: '#efeeff'
     #logo: images/large-logo.png
   headline:
