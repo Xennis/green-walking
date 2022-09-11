@@ -2,12 +2,4 @@
 
 [![Flutter](https://github.com/Xennis/green-walking/actions/workflows/flutter.yml/badge.svg)](https://github.com/Xennis/green-walking/actions/workflows/flutter.yml)
 
-<img src="web/play_store/phone_map.png" width="400">
-
-<img src="web/play_store/phone_map_park_en.png" width="400">
-
-<img src="web/play_store/phone_detail_en.png" width="400">
-
-<img src="web/play_store/phone_detail_links_en.png" width="400">
-
-<img src="web/play_store/phone_map_few.png" width="400">
+<a href='https://play.google.com/store/apps/details?id=org.xennis.apps.green_walking'><img height="80px" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
