@@ -2,18 +2,17 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:mapbox_gl/mapbox_gl.dart' show LatLng;
 
 class LocationButton extends StatefulWidget {
   const LocationButton(
       {super.key,
       required this.onOkay,
       required this.onNoPermissions,
-      required this.userLocation});
+      required this.trackUserLocation});
 
   final void Function(bool) onOkay;
   final VoidCallback onNoPermissions;
-  final ValueNotifier<LatLng?> userLocation;
+  final ValueNotifier<bool> trackUserLocation;
 
   @override
   State<LocationButton> createState() => _LocationButtonState();
@@ -23,7 +22,6 @@ class _LocationButtonState extends State<LocationButton> {
   late final Timer _timer;
 
   bool _locationServiceEnabled = true;
-  bool _locationCentered = false;
 
   @override
   void initState() {
@@ -34,50 +32,39 @@ class _LocationButtonState extends State<LocationButton> {
         (Timer result) {
       _checkLocationServiceEnabled();
     });
-
-    widget.userLocation.addListener(_checkUserLocationCentered);
   }
 
   @override
   void dispose() {
     _timer.cancel();
-    widget.userLocation.removeListener(_checkUserLocationCentered);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final IconData icon = _locationServiceEnabled
-        ? _locationCentered
-            ? Icons.my_location
-            : Icons.location_searching
-        : Icons.location_disabled;
     return Align(
       alignment: Alignment.bottomRight,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 16.0, right: 16.0),
         child: FloatingActionButton(
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-          onPressed: _onPressed,
-          child: Icon(
-            icon,
-            color: Colors.white,
-          ),
-        ),
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            onPressed: _onPressed,
+            child: ValueListenableBuilder<bool>(
+                valueListenable: widget.trackUserLocation,
+                builder: (context, value, child) {
+                  final IconData icon = _locationServiceEnabled
+                      ? value
+                          ? Icons.my_location
+                          : Icons.location_searching
+                      : Icons.location_disabled;
+
+                  return Icon(
+                    icon,
+                    color: Colors.white,
+                  );
+                })),
       ),
     );
-  }
-
-  void _checkUserLocationCentered() {
-    if (_locationCentered && widget.userLocation.value == null) {
-      setState(() {
-        _locationCentered = false;
-      });
-    } else if (!_locationCentered && widget.userLocation.value != null) {
-      setState(() {
-        _locationCentered = true;
-      });
-    }
   }
 
   Future<void> _checkLocationServiceEnabled() async {
