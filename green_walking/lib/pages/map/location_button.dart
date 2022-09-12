@@ -45,7 +45,7 @@ class _LocationButtonState extends State<LocationButton> {
     return Align(
       alignment: Alignment.bottomRight,
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 16.0, right: 16.0),
+        padding: const EdgeInsets.only(bottom: 18.0, right: 18.0),
         child: FloatingActionButton(
             backgroundColor: Theme.of(context).colorScheme.secondary,
             onPressed: _onPressed,
@@ -60,6 +60,7 @@ class _LocationButtonState extends State<LocationButton> {
 
                   return Icon(
                     icon,
+                    size: 27,
                     color: Colors.white,
                   );
                 })),

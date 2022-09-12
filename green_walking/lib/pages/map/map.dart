@@ -199,7 +199,7 @@ class _MapPageState extends State<MapPage> {
     final LatLng? loc = await _mapController?.requestMyLocationLatLng();
     if (loc != null) {
       await _mapController?.animateCamera(CameraUpdate.newCameraPosition(
-          CameraPosition(target: loc, zoom: 16.0)));
+          CameraPosition(target: loc, zoom: 16.5)));
       // Request location and camera position.target can slightly differ.
       // _userLocation.value = _mapController?.cameraPosition?.target;
       _mapController
