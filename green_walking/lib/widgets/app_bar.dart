@@ -19,21 +19,22 @@ class MapAppBar extends StatelessWidget {
     return SafeArea(
         top: true,
         child: Padding(
-            padding: const EdgeInsets.fromLTRB(15, 7, 15, 0),
+            padding: const EdgeInsets.fromLTRB(16, 11, 16, 0),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(color: Colors.grey[200]!),
+                borderRadius: BorderRadius.circular(10),
               ),
-              child: Row(
-                children: <Widget>[
-                  leading,
-                  Expanded(
-                    child: title,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: IconButton(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 6, right: 6),
+                child: Row(
+                  children: <Widget>[
+                    leading,
+                    Expanded(
+                      child: title,
+                    ),
+                    IconButton(
                       splashColor: Colors.grey,
                       icon: Icon(
                         Icons.layers,
@@ -41,8 +42,8 @@ class MapAppBar extends StatelessWidget {
                       ),
                       onPressed: onLayerToogle,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             )));
   }
