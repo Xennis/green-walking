@@ -41,7 +41,7 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final ValueNotifier<LatLng?> _userLocation = ValueNotifier<LatLng?>(null);
+  final ValueNotifier<bool> _userlocationTracking = ValueNotifier<bool>(false);
   final ValueNotifier<bool> _rotation = ValueNotifier(false);
 
   MapboxMapController? _mapController;
@@ -79,7 +79,7 @@ class _MapPageState extends State<MapPage> {
                             satelliteLayer:
                                 _mapboxStyle == MabboxTileset.satellite),
                         LocationButton(
-                            userLocation: _userLocation,
+                            trackUserLocation: _userlocationTracking,
                             onOkay: (bool permissionGranted) =>
                                 _onLocationSearchPressed(
                                     locale, permissionGranted),
@@ -143,12 +143,7 @@ class _MapPageState extends State<MapPage> {
       styleString: _mapboxStyle.id,
       trackCameraPosition: true,
       onCameraIdle: _onCameraIdle,
-      onStyleLoadedCallback: () async {
-        // TODO(Xennis): Use Icons.location_pin
-        //final ByteData bytes = await rootBundle.load('assets/place-icon.png');
-        //final Uint8List list = bytes.buffer.asUint8List();
-        //mapController?.addImage('place-marker', list);
-      },
+      onCameraTrackingDismissed: () => _userlocationTracking.value = false,
     );
   }
 
@@ -206,7 +201,10 @@ class _MapPageState extends State<MapPage> {
       await _mapController?.animateCamera(CameraUpdate.newCameraPosition(
           CameraPosition(target: loc, zoom: 16.0)));
       // Request location and camera position.target can slightly differ.
-      _userLocation.value = _mapController?.cameraPosition?.target;
+      // _userLocation.value = _mapController?.cameraPosition?.target;
+      _mapController
+          ?.updateMyLocationTrackingMode(MyLocationTrackingMode.Tracking);
+      _userlocationTracking.value = true;
     } else {
       // See https://dart-lang.github.io/linter/lints/use_build_context_synchronously.html
       if (!mounted) return;
@@ -242,24 +240,6 @@ class _MapPageState extends State<MapPage> {
       _rotation.value = true;
     }
 
-    if (_userLocation.value != null) {
-      if (cameraPosition.target != _userLocation.value) {
-        _userLocation.value = null;
-      }
-    }
-
     SharedPrefs.setCameraPosition(SharedPrefs.keyLastPosition, cameraPosition);
   }
-
-  /*
-  void _onSymbolTapped(Symbol symbol) {
-    final LatLng? geometry = symbol.options.geometry;
-    if (geometry != null) {
-      mapController?.animateCamera(CameraUpdate.newLatLng(geometry));
-      setState(() {
-        _placeCardPreview = symbol.data!['place'] as Place?;
-      });
-    }
-  }
-  */
 }
