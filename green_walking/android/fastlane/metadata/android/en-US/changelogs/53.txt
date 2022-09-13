@@ -1,0 +1,1 @@
+* Follow my location on map (if requested)
