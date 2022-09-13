@@ -41,9 +41,9 @@
         </div>
         <div class="app__screenshots-wrapper container-desktop">
                 <div class="app__screenshots-list">
-                        {{ range .Site.Params.app.screenshots }}
-                        <a href="/images/screenshots/{{ . }}" class="lightbox">
-                                <img src="/images/screenshots/{{ . }}" class="app__screenshot">
+                        {{ range $image, $alt := .Site.Params.app.screenshots }}
+                        <a href="/images/screenshots/{{ $image }}" class="lightbox">
+                                <img src="/images/screenshots/{{ $image }}" alt="{{ $alt }}" class="app__screenshot">
                         </a>
                         {{ end }}
                 </div>
