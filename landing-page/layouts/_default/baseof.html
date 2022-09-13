@@ -15,6 +15,7 @@
 
     <meta name="author" content="{{ .Site.Params.meta.author }}">
     <meta name="robots" content="index,follow">
+    {{ with .Site.Params.meta.google_site_verification }}<meta name="google-site-verification" content="{{ . }}" />{{ end }}
 
     {{ $sass := resources.Get "sass/main.scss" }}
     {{ $style := $sass | resources.ToCSS | resources.Fingerprint }}
