@@ -160,8 +160,7 @@ h1, h2 {
 .app__buttons {
   display: flex;
   flex-direction: row;
-  align-items: center;
-  margin-left: -9.8px; }
+  align-items: center; }
   .app__buttons--mobile {
     display: none; }
   @media (max-width: 768px) {
@@ -173,9 +172,6 @@ h1, h2 {
         justify-content: center; }
       .app__buttons--desktop {
         display: none; } }
-.app__button-play img {
-  width: 176.4px; }
-
 .app__button-ios img {
   width: 140px; }
 
