@@ -240,7 +240,7 @@ h1, h2 {
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin-left: -14px * 0.7;
+    //margin-left: -14px * 0.7;
 
     &--mobile {
       display: none;
@@ -261,11 +261,11 @@ h1, h2 {
     }
   }
 
-  &__button-play {
-    img {
-      width: 252px * 0.7;
-    }
-  }
+  //&__button-play {
+  //  img {
+  //    width: 252px * 0.7;
+  //  }
+  //}
 
   &__button-ios {
     img {
