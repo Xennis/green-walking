@@ -7,7 +7,7 @@ buildscript {
 
     dependencies {
         // version can be found here https://developer.android.com/studio/releases/gradle-plugin
-        classpath 'com.android.tools.build:gradle:7.2.1'
+        classpath 'com.android.tools.build:gradle:7.4.2'
         // START: FlutterFire Configuration
         // version can be found here https://mvnrepository.com/artifact/com.google.gms/google-services?repo=google
         classpath 'com.google.gms:google-services:4.3.13'
