@@ -25,7 +25,7 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  geolocator: ^9.0.1
+  geolocator: ^9.0.2
   http: ^1.0.0
   intl: ^0.18.0
   mapbox_gl:
@@ -35,6 +35,10 @@ dependencies:
       ref: ddad6562d0b3c21785b71e26dfde0d108690c1c6
   shared_preferences: ^2.0.8
   url_launcher: ^6.0.13
+
+dependency_overrides:
+  # See https://github.com/transistorsoft/flutter_background_geolocation/issues/933#issuecomment-1407797107
+  geolocator_android: 4.1.4
 
 dev_dependencies:
   #flutter_launcher_icons: ^0.8.1
