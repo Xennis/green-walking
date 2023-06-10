@@ -7,11 +7,11 @@ check: lint test
 
 format:
 	@echo ">>> Flutter format"
-	flutter format $(LIB_DIR) $(TEST_DIR)
+	dart format $(LIB_DIR) $(TEST_DIR)
 
 format-check:
 	@echo ">>> Check Dart format"
-	flutter format --set-exit-if-changed $(LIB_DIR) $(TEST_DIR)
+	dart format --set-exit-if-changed $(LIB_DIR) $(TEST_DIR)
 
 lint:
 	@echo ">>> Flutter analyze"
