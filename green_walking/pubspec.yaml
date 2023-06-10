@@ -28,7 +28,11 @@ dependencies:
   geolocator: ^9.0.1
   http: ^1.0.0
   intl: ^0.18.0
-  mapbox_gl: ^0.16.0
+  mapbox_gl:
+    # Fixes for Flutter 3 are not released yet.
+    git:
+      url: https://github.com/flutter-mapbox-gl/maps.git
+      ref: ddad6562d0b3c21785b71e26dfde0d108690c1c6
   shared_preferences: ^2.0.8
   url_launcher: ^6.0.13
 
