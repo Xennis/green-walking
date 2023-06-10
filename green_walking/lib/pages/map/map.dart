@@ -62,7 +62,7 @@ class _MapPageState extends State<MapPage> {
       // If the search in the search bar is clicked the keyboard appears. The keyboard
       // should be over the map and by that avoid resizing of the whole app / map.
       resizeToAvoidBottomInset: false,
-      drawer: const NavigationDrawer(),
+      drawer: const AppNavigationDrawer(),
       body: FutureBuilder<MapConfig>(
           future: MapConfig.create(DefaultAssetBundle.of(context)),
           builder: (BuildContext context, AsyncSnapshot<MapConfig> snapshot) {
