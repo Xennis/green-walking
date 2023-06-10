@@ -8,8 +8,8 @@ import '../config.dart';
 import '../core.dart';
 import '../routes.dart';
 
-class NavigationDrawer extends StatelessWidget {
-  const NavigationDrawer({super.key});
+class AppNavigationDrawer extends StatelessWidget {
+  const AppNavigationDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
