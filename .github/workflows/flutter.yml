@@ -5,11 +5,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.10.x'
+        flutter-version: '3.13.x'
         channel: 'stable'
     - name: Unlock secrets
       uses: sliteteam/github-action-git-crypt-unlock@1.2.0
