@@ -1,9 +1,10 @@
 import 'dart:async';
-import 'dart:developer';
+import 'dart:developer' show log;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:green_walking/map_utils.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 import '../../services/shared_prefs.dart';
 import '../../widgets/app_bar.dart';
@@ -11,23 +12,28 @@ import '../../widgets/gdpr_dialog.dart';
 import '../../widgets/navigation_drawer.dart';
 import '../../widgets/page_route.dart';
 import '../search.dart';
-import 'attribution.dart';
 import 'location_button.dart';
-import 'rotation_button.dart';
-import 'tileset.dart';
+import 'mapbox_styles.dart';
 
 class MapConfig {
   MapConfig(this.accessToken, {this.lastPosition});
 
   String accessToken;
-  CameraPosition? lastPosition;
+  CameraOptions? lastPosition;
 
   static Future<MapConfig> create(AssetBundle assetBundle) async {
     final String accessToken =
         await assetBundle.loadString('assets/mapbox-access-token.txt');
-    final CameraPosition? lastPosition =
-        await SharedPrefs.getCameraPosition(SharedPrefs.keyLastPosition);
-
+    final CameraState? lastState =
+        await SharedPrefs.getCameraState(SharedPrefs.keyLastPosition);
+    if (lastState == null) {
+      return MapConfig(accessToken, lastPosition: null);
+    }
+    final CameraOptions lastPosition = CameraOptions(
+        center: lastState.center,
+        zoom: lastState.zoom,
+        bearing: lastState.bearing,
+        pitch: lastState.pitch);
     return MapConfig(accessToken, lastPosition: lastPosition);
   }
 }
@@ -41,11 +47,12 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final ValueNotifier<bool> _userlocationTracking = ValueNotifier<bool>(false);
-  final ValueNotifier<bool> _rotation = ValueNotifier(false);
+  final ValueNotifier<UserLocationTracking> _userlocationTracking =
+      ValueNotifier<UserLocationTracking>(UserLocationTracking.no);
 
-  MapboxMapController? _mapController;
-  MabboxTileset _mapboxStyle = MabboxTileset.outdoor;
+  late MapboxMap _mapboxMap;
+  CircleAnnotationManager? _circleAnnotationManager;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -75,9 +82,9 @@ class _MapPageState extends State<MapPage> {
                         child: Stack(
                       children: <Widget>[
                         map(context, data),
-                        Attribution(
+                        /*Attribution(
                             satelliteLayer:
-                                _mapboxStyle == MabboxTileset.satellite),
+                                _mapboxStyle == MabboxTileset.satellite),*/
                         LocationButton(
                             trackUserLocation: _userlocationTracking,
                             onOkay: (bool permissionGranted) =>
@@ -89,9 +96,6 @@ class _MapPageState extends State<MapPage> {
                                       content: Text(
                                           locale.errorNoLocationPermission)),
                                 )),
-                        RotationButton(
-                            rotation: _rotation,
-                            onPressed: _onRotationButtonPressed),
                         MapAppBar(
                           onLayerToogle: _onLayerToggle,
                           leading: IconButton(
@@ -128,118 +132,150 @@ class _MapPageState extends State<MapPage> {
   }
 
   Widget map(BuildContext context, MapConfig config) {
-    return MapboxMap(
-      accessToken: config.accessToken,
-      onMapCreated: (MapboxMapController controller) {
-        controller.setTelemetryEnabled(false);
-        _mapController = controller;
+    return MapWidget(
+      key: const ValueKey('mapWidget'),
+      resourceOptions: ResourceOptions(accessToken: config.accessToken),
+      onMapCreated: (MapboxMap mapboxMap) {
+        _mapboxMap = mapboxMap;
+
+        //mapboxMap.setTelemetryEnabled(false);
+        _mapboxMap.compass.updateSettings(CompassSettings(marginTop: 400.0));
+        _mapboxMap.scaleBar.updateSettings(ScaleBarSettings(enabled: false));
         //mapController!.onSymbolTapped.add(_onSymbolTapped);
         //onPositionChanged(mapController!.cameraPosition);
+
+        _mapboxMap.annotations.createCircleAnnotationManager().then((value) {
+          _circleAnnotationManager = value;
+        });
       },
-      initialCameraPosition: config.lastPosition ??
-          const CameraPosition(target: LatLng(53.5519, 9.8682), zoom: 11.0),
-      myLocationEnabled: true,
-      rotateGesturesEnabled: true,
-      styleString: _mapboxStyle.id,
-      trackCameraPosition: true,
-      onCameraIdle: _onCameraIdle,
-      onCameraTrackingDismissed: () => _userlocationTracking.value = false,
+      cameraOptions: config.lastPosition ??
+          CameraOptions(
+              center: Point(coordinates: Position(9.8682, 53.5519)).toJson(),
+              zoom: 11.0),
+      styleUri: CustomMapboxStyles.outdoor,
+      onMapIdleListener: _onCameraIdle,
+      onScrollListener: (ScreenCoordinate coordinate) {
+        if (_userlocationTracking.value != UserLocationTracking.no) {
+          // Turn off tracking because user scrolled to another location.
+          _userlocationTracking.value = UserLocationTracking.no;
+        }
+      },
     );
+  }
+
+  Future<Position?> _getCameraPosition() async {
+    try {
+      final CameraState mapCameraState = await _mapboxMap.getCameraState();
+      final List<Object?> coordinates =
+          mapCameraState.center['coordinates'] as List<Object?>;
+      return Position(coordinates[0] as num, coordinates[1] as num);
+    } catch (e) {
+      log('failed to get camera position: $e');
+      return null;
+    }
   }
 
   Future<void> _onSearchTab(String accessToken) async {
-    final LatLng? mapPosition = _mapController?.cameraPosition?.target;
-    final LatLng? moveToLoc = await Navigator.push(
-      context,
-      NoTransitionPageRoute<LatLng>(
-          builder: (BuildContext context) =>
-              SearchPage(mapPosition: mapPosition, accessToken: accessToken)),
-    );
-    if (moveToLoc == null) {
+    final Position? cameraPosition = await _getCameraPosition();
+    if (cameraPosition == null) {
       return;
     }
-    _mapController?.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(target: moveToLoc, zoom: 16.0)));
-    _mapController?.clearCircles();
-    _mapController?.addCircle(CircleOptions(
-        circleRadius: 12,
-        circleColor: '#FFC0CB',
-        circleOpacity: 0.6,
-        circleStrokeWidth: 2,
-        circleStrokeColor: '#FFC0CB',
-        geometry: moveToLoc));
+    // See https://dart.dev/tools/linter-rules/use_build_context_synchronously
+    if (context.mounted) {
+      final Position? moveToLoc = await Navigator.push(
+        context,
+        NoTransitionPageRoute<Position>(
+            builder: (BuildContext context) => SearchPage(
+                mapPosition: cameraPosition, accessToken: accessToken)),
+      );
+      if (moveToLoc == null) {
+        return;
+      }
+      // If we keep the tracking on the map would move back to the user location.
+      _userlocationTracking.value = UserLocationTracking.no;
+      _setCameraPosition(moveToLoc, 0, 0);
+
+      // Draw circle
+      await _circleAnnotationManager?.deleteAll();
+      _circleAnnotationManager?.create(CircleAnnotationOptions(
+          geometry: Point(coordinates: moveToLoc).toJson(),
+          circleRadius: 12,
+          circleColor: const Color.fromRGBO(255, 192, 203, 1).value,
+          circleOpacity: 0.6,
+          circleStrokeWidth: 2,
+          circleStrokeColor: const Color.fromRGBO(255, 192, 203, 1).value));
+    }
   }
 
-  void _onLayerToggle() {
-    if (_mapboxStyle == MabboxTileset.satellite) {
-      setState(() {
-        _mapboxStyle = MabboxTileset.outdoor;
-      });
+  void _onLayerToggle() async {
+    String currentStyle = await _mapboxMap.style.getStyleURI();
+    if (currentStyle == CustomMapboxStyles.satellite) {
+      _mapboxMap.loadStyleURI(CustomMapboxStyles.outdoor);
     } else {
-      setState(() {
-        _mapboxStyle = MabboxTileset.satellite;
-      });
+      _mapboxMap.loadStyleURI(CustomMapboxStyles.satellite);
     }
+  }
+
+  Future<void> _setCameraPosition(
+      Position position, double? bearing, double? pitch) async {
+    return _mapboxMap.flyTo(
+        CameraOptions(
+          center: Point(coordinates: position).toJson(),
+          bearing: bearing,
+          pitch: pitch,
+          zoom: 16.5,
+        ),
+        MapAnimationOptions(duration: 900 + 100));
+  }
+
+  void refreshTrackLocation() async {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(milliseconds: 900), (timer) async {
+      if (_userlocationTracking.value == UserLocationTracking.no) {
+        _timer?.cancel();
+        return;
+      }
+
+      final PuckLocation? puckLocation = await _mapboxMap.style
+          .getPuckLocation()
+          .timeout(const Duration(milliseconds: 900 - 100));
+      if (puckLocation == null) {
+        // FIXME: Show toast if no location.
+        //  ScaffoldMessenger.of(context)
+        //      .showSnackBar(SnackBar(content: Text(locale.errorNoPositionFound)));
+        return;
+      }
+
+      switch (_userlocationTracking.value) {
+        case UserLocationTracking.positionBearing:
+          _setCameraPosition(puckLocation.location, puckLocation.bearing, 50.0);
+        case UserLocationTracking.position:
+          _setCameraPosition(puckLocation.location, 0.0, 0.0);
+        case UserLocationTracking.no:
+        // Handled above already. In case there is no location returned we would not cancel
+        // the timer otherwise.
+      }
+    });
   }
 
   Future<void> _onLocationSearchPressed(
       AppLocalizations locale, bool permissionGranted) async {
-    // mapbox-gl: `myLocationEnabled` is set to true above. Due to this the
-    // library checks on initialization if it can enable it. But if the
-    // permission are missing it can't. The result is that
-    // `requestMyLocationLatLng` returns nothing (not even null).
-    //
-    // That's why in case of granted permission (i.e. the app had no permission
-    // beforehand) we explicitly need to trigger `updateMyLocationEnabled`
-    // which will be called by `updateMyLocationTrackingMode`.
-    if (permissionGranted) {
-      await _mapController
-          ?.updateMyLocationTrackingMode(MyLocationTrackingMode.Tracking);
-    }
-    final LatLng? loc = await _mapController?.requestMyLocationLatLng();
-    if (loc != null) {
-      await _mapController?.animateCamera(CameraUpdate.newCameraPosition(
-          CameraPosition(target: loc, zoom: 16.5)));
-      // Request location and camera position.target can slightly differ.
-      // _userLocation.value = _mapController?.cameraPosition?.target;
-      _mapController
-          ?.updateMyLocationTrackingMode(MyLocationTrackingMode.Tracking);
-      _userlocationTracking.value = true;
+    if (_userlocationTracking.value == UserLocationTracking.position) {
+      _userlocationTracking.value = UserLocationTracking.positionBearing;
     } else {
-      // See https://dart-lang.github.io/linter/lints/use_build_context_synchronously.html
-      if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(locale.errorNoPositionFound)));
+      _userlocationTracking.value = UserLocationTracking.position;
     }
+    await _mapboxMap.location.updateSettings(LocationComponentSettings(
+        enabled: true,
+        pulsingEnabled: false,
+        showAccuracyRing: true,
+        puckBearingEnabled: true));
+    refreshTrackLocation();
   }
 
-  void _onRotationButtonPressed() {
-    final CameraPosition? position = _mapController?.cameraPosition;
-    if (position != null) {
-      _mapController?.animateCamera(CameraUpdate.newCameraPosition(
-          CameraPosition(
-              target: position.target,
-              zoom: position.zoom,
-              bearing: 0,
-              tilt: 0)));
-    }
-  }
-
-  void _onCameraIdle() {
-    final CameraPosition? cameraPosition = _mapController?.cameraPosition;
-    if (cameraPosition == null) {
-      return;
-    }
-
-    if (_rotation.value &&
-        cameraPosition.bearing == 0 &&
-        cameraPosition.tilt == 0) {
-      _rotation.value = false;
-    } else if (!_rotation.value &&
-        (cameraPosition.bearing != 0 || cameraPosition.tilt != 0)) {
-      _rotation.value = true;
-    }
-
-    SharedPrefs.setCameraPosition(SharedPrefs.keyLastPosition, cameraPosition);
+  Future<void> _onCameraIdle(MapIdleEventData mapIdleEventData) async {
+    // TODO: Maybe use a Timer instead of writing data that often?
+    final CameraState cameraState = await _mapboxMap.getCameraState();
+    SharedPrefs.setCameraState(SharedPrefs.keyLastPosition, cameraState);
   }
 }

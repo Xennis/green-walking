@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:mapbox_gl/mapbox_gl.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' show Position;
 
 import '../core.dart';
 import '../services/mapbox_geocoding.dart';
@@ -11,7 +11,7 @@ class SearchPage extends StatefulWidget {
       : super(key: key);
 
   final String accessToken;
-  final LatLng? mapPosition;
+  final Position? mapPosition;
 
   @override
   State<SearchPage> createState() => _SearchPageState();
