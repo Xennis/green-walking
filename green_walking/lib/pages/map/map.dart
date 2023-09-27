@@ -6,7 +6,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 import 'package:green_walking/map_utils.dart';
-import 'package:green_walking/services/mapbox_geocoding.dart';
 import '../../services/shared_prefs.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/gdpr_dialog.dart';

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' show Position;
+import 'package:url_launcher/url_launcher.dart';
 
 import '../core.dart';
-import '../services/mapbox_geocoding.dart';
+import '../services/geocoding.dart';
 import '../widgets/app_bar.dart';
 
 class SearchPage extends StatefulWidget {
@@ -23,7 +24,7 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  Future<MapboxGeocodingResult>? _result;
+  Future<GeocodingResult>? _result;
   late TextEditingController _queryFieldController;
 
   @override
@@ -108,6 +109,7 @@ class _SearchPageState extends State<SearchPage> {
     setState(() {
       if (queryPosition != null) {
         _result = mapboxReverseGeocoding(queryPosition, widget.accessToken);
+        //_result = osmReverseGeocoding(queryPosition);
       } else {
         _result = mapboxForwardGeocoding(query, widget.accessToken,
             proximity: widget.proximity);
@@ -120,11 +122,11 @@ class _SearchPageState extends State<SearchPage> {
       return Container();
     }
     final AppLocalizations locale = AppLocalizations.of(context)!;
-    return FutureBuilder<MapboxGeocodingResult>(
+    return FutureBuilder<GeocodingResult>(
         future: _result,
-        builder: (BuildContext context,
-            AsyncSnapshot<MapboxGeocodingResult> snapshot) {
-          final MapboxGeocodingResult? data = snapshot.data;
+        builder:
+            (BuildContext context, AsyncSnapshot<GeocodingResult> snapshot) {
+          final GeocodingResult? data = snapshot.data;
           if (snapshot.hasData && data != null) {
             if (data.features.isEmpty) {
               return Text(locale.searchNoResultsText);
@@ -132,7 +134,7 @@ class _SearchPageState extends State<SearchPage> {
             return ListView.builder(
               itemCount: data.features.length,
               itemBuilder: (BuildContext context, int index) {
-                final MaboxGeocodingPlace elem = data.features[index];
+                final GeocodingPlace elem = data.features[index];
                 final String subtitle = truncateString(
                         elem.placeName
                             ?.replaceFirst('${elem.text ?? ''}, ', ''),
@@ -152,6 +154,7 @@ class _SearchPageState extends State<SearchPage> {
                     },
                     title: Text(truncateString(elem.text, 25) ?? ''),
                     subtitle: Text(subtitle),
+                    trailing: trailingWidget(locale, elem.url),
                   ),
                 );
               },
@@ -161,5 +164,16 @@ class _SearchPageState extends State<SearchPage> {
           }
           return const Center(child: CircularProgressIndicator());
         });
+  }
+
+  Widget? trailingWidget(AppLocalizations locale, Uri? url) {
+    if (url == null) {
+      return null;
+    }
+    return IconButton(
+        splashColor: Colors.grey,
+        icon: Icon(Icons.open_in_new,
+            semanticLabel: locale.openInBrowserSemanticLabel),
+        onPressed: () => launchUrl(url));
   }
 }
