@@ -26,6 +26,7 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   Future<GeocodingResult>? _result;
   late TextEditingController _queryFieldController;
+  bool _allowAdvancedSearch = false;
 
   @override
   void initState() {
@@ -93,11 +94,9 @@ class _SearchPageState extends State<SearchPage> {
                   onSubmitted: _onSearchSubmitted,
                 ),
               ),
-              Expanded(
-                  child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 25, 10, 0),
-                child: _resultList(context),
-              )),
+              Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  child: _resultList(context)),
             ],
           ),
         ));
@@ -108,9 +107,10 @@ class _SearchPageState extends State<SearchPage> {
     final Position? queryPosition = _stringToPosition(query);
     setState(() {
       if (queryPosition != null) {
+        _allowAdvancedSearch = true;
         _result = mapboxReverseGeocoding(queryPosition, widget.accessToken);
-        //_result = osmReverseGeocoding(queryPosition);
       } else {
+        _allowAdvancedSearch = false;
         _result = mapboxForwardGeocoding(query, widget.accessToken,
             proximity: widget.proximity);
       }
@@ -131,33 +131,51 @@ class _SearchPageState extends State<SearchPage> {
             if (data.features.isEmpty) {
               return Text(locale.searchNoResultsText);
             }
-            return ListView.builder(
-              itemCount: data.features.length,
-              itemBuilder: (BuildContext context, int index) {
-                final GeocodingPlace elem = data.features[index];
-                final String subtitle = truncateString(
-                        elem.placeName
-                            ?.replaceFirst('${elem.text ?? ''}, ', ''),
-                        65) ??
-                    '';
-                return Card(
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      child: Text((index + 1).toString()),
-                    ),
-                    isThreeLine: true,
-                    onTap: () {
-                      Navigator.pop(
-                        context,
-                        elem.center,
-                      );
-                    },
-                    title: Text(truncateString(elem.text, 25) ?? ''),
-                    subtitle: Text(subtitle),
-                    trailing: trailingWidget(locale, elem.url),
-                  ),
-                );
-              },
+            return Column(
+              children: [
+                ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  itemCount: data.features.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final GeocodingPlace elem = data.features[index];
+                    final String subtitle = truncateString(
+                            elem.placeName
+                                ?.replaceFirst('${elem.text ?? ''}, ', ''),
+                            65) ??
+                        '';
+                    return Card(
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          child: Text((index + 1).toString()),
+                        ),
+                        isThreeLine: true,
+                        onTap: () {
+                          Navigator.pop(
+                            context,
+                            elem.center,
+                          );
+                        },
+                        title: Text(truncateString(elem.text, 25) ?? ''),
+                        subtitle: Text(subtitle),
+                        trailing: _trailingWidget(locale, elem.url),
+                      ),
+                    );
+                  },
+                ),
+                _advancedSearchButton(locale, _allowAdvancedSearch),
+                const Padding(padding: EdgeInsets.only(bottom: 20.0)),
+                const Divider(),
+                Row(
+                  children: [
+                    Flexible(
+                        child: Text(
+                            locale.geocodingResultLegalNotice(data.attribution),
+                            style: const TextStyle(
+                                color: Colors.grey, fontSize: 12.0)))
+                  ],
+                ),
+              ],
             );
           } else if (snapshot.hasError) {
             return Text(locale.errorNoConnectionToSearchServer);
@@ -166,7 +184,7 @@ class _SearchPageState extends State<SearchPage> {
         });
   }
 
-  Widget? trailingWidget(AppLocalizations locale, Uri? url) {
+  Widget? _trailingWidget(AppLocalizations locale, Uri? url) {
     if (url == null) {
       return null;
     }
@@ -175,5 +193,32 @@ class _SearchPageState extends State<SearchPage> {
         icon: Icon(Icons.open_in_new,
             semanticLabel: locale.openInBrowserSemanticLabel),
         onPressed: () => launchUrl(url));
+  }
+
+  Widget _advancedSearchButton(AppLocalizations locale, bool enable) {
+    if (!enable) {
+      return Container();
+    }
+    // Only for reverse geocoding we have an advanced search.
+    final Position? queryPosition =
+        _stringToPosition(_queryFieldController.text);
+    if (queryPosition == null) {
+      return Container();
+    }
+
+    return Column(
+      children: [
+        const Padding(padding: EdgeInsets.only(bottom: 10.0)),
+        TextButton(
+          child: Text(locale.geocodingAdvancedSearchButton),
+          onPressed: () {
+            setState(() {
+              _result = osmReverseGeocoding(queryPosition);
+              _allowAdvancedSearch = false;
+            });
+          },
+        ),
+      ],
+    );
   }
 }
