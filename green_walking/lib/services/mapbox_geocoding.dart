@@ -57,14 +57,10 @@ class MapboxGeocodingService implements Exception {
   String cause;
 }
 
-Future<MapboxGeocodingResult> mapboxGeocodingGet(
-    String query, String token, Position? loc) async {
-  final Uri url = Uri.https('api.mapbox.com',
-      '/geocoding/v5/mapbox.places/$query.json', <String, String>{
-    'access_token': token,
-    'limit': '5',
-    'proximity': loc != null ? '${loc.lng},${loc.lat}' : ''
-  });
+Future<MapboxGeocodingResult> _mapboxGeocoding(
+    String query, String token, Map<String, String> params) async {
+  final Uri url = Uri.https(
+      'api.mapbox.com', '/geocoding/v5/mapbox.places/$query.json', params);
   try {
     final http.Response response = await http.get(url);
     if (response.statusCode == 200) {
@@ -77,4 +73,36 @@ Future<MapboxGeocodingResult> mapboxGeocodingGet(
   } on SocketException catch (_) {
     throw MapboxGeocodingService('No internet connection');
   }
+}
+
+// Note For debugging https://docs.mapbox.com/playground/geocoding/ is helpful
+Future<MapboxGeocodingResult> mapboxForwardGeocoding(String query, String token,
+    {Position? proximity, int limit = 5}) async {
+  final Map<String, String> params = <String, String>{
+    'access_token': token,
+    'limit': limit.toString(),
+  };
+  if (proximity != null) {
+    params['proximity'] = _mapboxPositionToString(proximity);
+  }
+  return _mapboxGeocoding(query, token, params);
+}
+
+// Note For debugging https://docs.mapbox.com/playground/geocoding/ is helpful
+// Consider improving it: https://nominatim.openstreetmap.org/ui/reverse.html
+Future<MapboxGeocodingResult> mapboxReverseGeocoding(
+    Position query, String token,
+    {int limit = 1}) async {
+  final Map<String, String> params = <String, String>{
+    'access_token': token,
+    // Not included: country,region,postcode,district,locality,neighborhood,place,poi
+    'types': 'address',
+    // If multiple types are set the limit must not be set.
+    'limit': limit.toString(),
+  };
+  return _mapboxGeocoding(_mapboxPositionToString(query), token, params);
+}
+
+String _mapboxPositionToString(Position position, {int fractionDigits = 6}) {
+  return '${position.lng.toStringAsFixed(fractionDigits)},${position.lat.toStringAsFixed(fractionDigits)}';
 }
