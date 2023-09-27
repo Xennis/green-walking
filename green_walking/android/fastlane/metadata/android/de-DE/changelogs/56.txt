@@ -1,0 +1,2 @@
+* Feature: Karte folgt der Ausrichtung des Telefons
+* Einbindung neuer Kartenbibliothek
