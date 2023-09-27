@@ -56,11 +56,14 @@ class GeocodingPlace {
 }
 
 class GeocodingResult {
-  GeocodingResult(this.features, {this.attribution});
+  GeocodingResult(this.features, {required this.attribution});
 
   factory GeocodingResult.fromMapboxJson(Map<String, dynamic> raw) {
     final List<dynamic> features =
         raw['features'] as List<dynamic>? ?? <dynamic>[];
+    final String attribution =
+        (raw['attribution'] as String).replaceFirst('NOTICE: ', '');
+
     return GeocodingResult(
         features
             .map((dynamic e) => e as Map<String, dynamic>)
@@ -70,11 +73,13 @@ class GeocodingResult {
                 element.placeName != null &&
                 element.center != null)
             .toList(),
-        attribution: raw['attribution'] as String?);
+        attribution: attribution);
   }
 
   factory GeocodingResult.fromOsmJson(Map<String, dynamic> raw) {
     final List<GeocodingPlace> features = [GeocodingPlace.fromOsmJson(raw)];
+    final String attribution =
+        (raw['licence'] as String).replaceFirst('Data ', '');
 
     return GeocodingResult(
         features
@@ -83,11 +88,11 @@ class GeocodingResult {
                 element.placeName != null &&
                 element.center != null)
             .toList(),
-        attribution: raw['licence'] as String?);
+        attribution: attribution);
   }
 
   final List<GeocodingPlace> features;
-  final String? attribution;
+  final String attribution;
 }
 
 class GeocodingServiceException implements Exception {

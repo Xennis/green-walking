@@ -44,5 +44,7 @@
   "searchResults": "Ergebnisse",
   "searchNoResultsText": "Keine Ergebnisse gefunden",
   "mapSwitchLayerSemanticLabel": "Kartenansicht wechseln",
-  "rateApp": "Bewerte die App"
+  "rateApp": "Bewerte die App",
+  "geocodingResultLegalNotice": "Suchergebnisse: {legalNotice}",
+  "geocodingAdvancedSearchButton": "Erweiterte search"
 }

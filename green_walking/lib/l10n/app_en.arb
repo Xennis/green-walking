@@ -4,95 +4,81 @@
   "@appTitle": {
     "description": "Title of the application",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "appSlogan": "Discover your green city!",
   "@appSlogan": {
     "description": "Slogan of the application",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "website": "Website",
   "@website": {
     "description": "Website label",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "maps": "Maps",
   "@maps": {
     "description": "Maps label",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "nameless": "Nameless",
   "@nameless": {
     "description": "Places without a name",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "missingDescription": "The place has no description yet.",
   "@missingDescription": {
     "description": "Hint for a places without a description",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "fallbackDescription": "The description is only available in the locale language.",
   "@fallbackDescription": {
     "description": "Hint if a place description is not available in the users language but in the language of the country the place is located in.",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "settingsPage": "Settings",
   "@settingsPage": {
     "description": "Navigation label and title for settings page",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "settingsTrackingDescription": "Enable tracking service",
   "@settingsTrackingDescription": {
     "description": "Description for enable/disable tracking setting",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "feedbackPage": "Submit feedback",
   "@feedbackPage": {
     "description": "Navigation label and title for feedback page",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "feedbackSendLabel": "Send feedback",
   "@feedbackSendLabel": {
     "description": "Label for sending feedback",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "feedbackPageText": "You have feedback for the app? Do not hesitate to send it to us to help us improving the app. You can give us feedback on the design and usability of the app, green areas that are not displayed, desirable features, bugs or features that you particularly like.",
   "@feedbackPageText": {
     "description": "Text for the feedback page",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "feedbackSendMailToLabel": "Send mail to {mail}",
   "@feedbackSendMailToLabel": {
     "description": "Send feedback mail button label",
     "type": "text",
-    "placeholders_order": [
-      "mail"
-    ],
     "placeholders": {
       "mail": {
+        "type": "String",
         "example": "contact@example.org"
       }
     }
@@ -101,11 +87,9 @@
   "@feedbackMailSubject": {
     "description": "Feedback mail subject",
     "type": "text",
-    "placeholders_order": [
-      "appName"
-    ],
     "placeholders": {
       "appName": {
+        "type": "String",
         "example": "Green Walking"
       }
     }
@@ -114,18 +98,15 @@
   "@aboutPage": {
     "description": "Label for about page",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "aboutVersion": "Version {version}",
   "@aboutVersion": {
     "description": "Version on the about page",
     "type": "text",
-    "placeholders_order": [
-      "version"
-    ],
     "placeholders": {
       "version": {
+        "type": "String",
         "example": "1.4.0"
       }
     }
@@ -134,11 +115,9 @@
   "@aboutLegalese": {
     "description": "Developer attribution",
     "type": "text",
-    "placeholders_order": [
-      "name"
-    ],
     "placeholders": {
       "name": {
+        "type": "String",
         "example": "Xennis"
       }
     }
@@ -147,25 +126,21 @@
   "@dataPrivacyNavigationLabel": {
     "description": "Label for data privacy link",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "imprint": "Legal notice",
   "@imprint": {
     "description": "Legal notice. The required \"Impressum\" due to German law.",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "imprintTmgText": "Information in accordance with § {paragraphNumber} TMG",
   "@imprintTmgText": {
     "description": "Disclaimer headline on the imprint page",
     "type": "text",
-    "placeholders_order": [
-      "paragraphNumber"
-    ],
     "placeholders": {
       "paragraphNumber": {
+        "type": "String",
         "example": "5"
       }
     }
@@ -174,81 +149,69 @@
   "@imprintDisclaimerLabel": {
     "description": "Disclaimer headline on the imprint page",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "imprintDisclaimerText": "We decline any liability for the contents of external links, for which only the respective webmasters are responsible.",
   "@imprintDisclaimerText": {
     "description": "Disclaimer text on the imprint page",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "imprintGdprApplyText": "The following policy is applied:",
   "@imprintGdprApplyText": {
     "description": "Imprint GDPR text",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "openInBrowserSemanticLabel": "Open in browser",
   "@openInBrowserSemanticLabel": {
     "description": "Semantic label for icon to open link in browser",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "gdprDialogText": "For the best experience the app enables tracking. Further information can be found in the",
   "@gdprDialogText": {
     "description": "Text for privacy policy link",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "gdprPrivacyPolicy": "privacy policy",
   "@gdprPrivacyPolicy": {
     "description": "Privacy policy link text",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "gdprAgree": "I agree",
   "@gdprAgree": {
     "description": "GDRP agree button label",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "gdprDisagree": "No thanks",
   "@gdprDisagree": {
     "description": "GDRP disagree button label",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "improveData": "Improve the data",
   "@improveData": {
     "description": "Link text for improving the data",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "attributionInfoSemanticLabel": "Show copyright information",
   "@attributionInfoSemanticLabel": {
     "description": "Semantic label for opening attributions (e.g. map, text, image)",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "mapAttributionTitle": "{name} map",
   "@mapAttributionTitle": {
     "description": "Title for the map attribution",
     "type": "text",
-    "placeholders_order": [
-      "name"
-    ],
     "placeholders": {
       "name": {
+        "type": "String",
         "example": "Mapbox"
       }
     }
@@ -257,18 +220,15 @@
   "@metaDataAttributionTitle": {
     "description": "Title for the meta data (e.g. Wikidata) attribution",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "poweredBy": "Powered by {name}",
   "@poweredBy": {
     "description": "Powered by text",
     "type": "text",
-    "placeholders_order": [
-      "name"
-    ],
     "placeholders": {
       "name": {
+        "type": "String",
         "example": "Wikidata"
       }
     }
@@ -277,60 +237,51 @@
   "@ok": {
     "description": "Label for okay",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "details": "details",
   "@details": {
     "description": "Label for details",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "image": "Image",
   "@image": {
     "description": "Noun for an image / photo",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "text": "Text",
   "@text": {
     "description": "Noun for a text",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "errorNoLocationPermission": "Please grant the app location permissions.",
   "@errorNoLocationPermission": {
     "description": "Error message displayed to user if location permissions are missing",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "errorNoPositionFound": "No location found",
   "@errorNoPositionFound": {
     "description": "Error message displayed to user if no (GPS) location could be found",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "errorNoConnectionToSearchServer": "No connection to the search server",
   "@errorNoConnectionToSearchServer": {
     "description": "Error message displayed to user if no geocoding search results can be received from search server",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "searchBoxHintLabel": "Search{dots}",
   "@searchBoxHintLabel": {
     "description": "Hint text for the search box on the map page",
     "type": "text",
-    "placeholders_order": [
-      "dots"
-    ],
     "placeholders": {
       "dots": {
+        "type": "String",
         "example": "..."
       }
     }
@@ -339,25 +290,37 @@
   "@searchResults": {
     "description": "Search results",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "searchNoResultsText": "No results found",
   "@searchNoResultsText": {
     "description": "Message shown if no search results were found",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "mapSwitchLayerSemanticLabel": "Switch map layer",
   "@mapSwitchLayerSemanticLabel": {
     "description": "Semantic label for switching the map layer (e.g. to satellite view)",
     "type": "text",
-    "placeholders_order": [],
     "placeholders": {}
   },
   "rateApp": "Rate the app",
   "@rateApp": {
     "description": "Link text to rate the app."
+  },
+  "geocodingResultLegalNotice": "Search results: {legalNotice}",
+  "@geocodingResultLegalNotice": {
+    "description": "Legal notice for the results of the geocoding.",
+    "type": "text",
+    "placeholders": {
+      "legalNotice": {
+        "type": "String",
+        "example": "Copyright Example.com"
+      }
+    }
+  },
+  "geocodingAdvancedSearchButton": "Advanced search",
+  "@geocodingAdvancedSearchButton": {
+    "description": "Label for the button to enable/execute the advanced search."
   }
 }
