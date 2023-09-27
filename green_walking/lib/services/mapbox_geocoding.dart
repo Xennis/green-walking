@@ -4,19 +4,19 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:mapbox_gl/mapbox_gl.dart' show LatLng;
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' show Position;
 
 class MaboxGeocodingPlace {
   MaboxGeocodingPlace({this.text, this.placeName, this.center});
 
   factory MaboxGeocodingPlace.fromJson(Map<String, dynamic> raw) {
     final List<dynamic>? rawCenter = raw['center'] as List<dynamic>?;
-    LatLng? center;
+    Position? center;
     if (rawCenter != null && rawCenter.length == 2) {
       final dynamic rawLat = rawCenter[1];
       final dynamic rawLng = rawCenter[0];
-      center = LatLng(rawLat is int ? rawLat.toDouble() : rawLat as double,
-          rawLng is int ? rawLng.toDouble() : rawLng as double);
+      center = Position(rawLng is int ? rawLng.toDouble() : rawLng as double,
+          rawLat is int ? rawLat.toDouble() : rawLat as double);
     }
     return MaboxGeocodingPlace(
       text: raw['text'] as String?,
@@ -27,7 +27,7 @@ class MaboxGeocodingPlace {
 
   final String? text;
   final String? placeName;
-  final LatLng? center;
+  final Position? center;
 }
 
 class MapboxGeocodingResult {
@@ -58,12 +58,12 @@ class MapboxGeocodingService implements Exception {
 }
 
 Future<MapboxGeocodingResult> mapboxGeocodingGet(
-    String query, String token, LatLng? loc) async {
+    String query, String token, Position? loc) async {
   final Uri url = Uri.https('api.mapbox.com',
       '/geocoding/v5/mapbox.places/$query.json', <String, String>{
     'access_token': token,
     'limit': '5',
-    'proximity': loc != null ? '${loc.longitude},${loc.latitude}' : ''
+    'proximity': loc != null ? '${loc.lng},${loc.lat}' : ''
   });
   try {
     final http.Response response = await http.get(url);

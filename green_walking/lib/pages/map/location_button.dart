@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
+enum UserLocationTracking { no, position, positionBearing }
+
 class LocationButton extends StatefulWidget {
   const LocationButton(
       {super.key,
@@ -12,7 +14,7 @@ class LocationButton extends StatefulWidget {
 
   final void Function(bool) onOkay;
   final VoidCallback onNoPermissions;
-  final ValueNotifier<bool> trackUserLocation;
+  final ValueNotifier<UserLocationTracking> trackUserLocation;
 
   @override
   State<LocationButton> createState() => _LocationButtonState();
@@ -49,13 +51,15 @@ class _LocationButtonState extends State<LocationButton> {
         child: FloatingActionButton(
             backgroundColor: Theme.of(context).colorScheme.secondary,
             onPressed: _onPressed,
-            child: ValueListenableBuilder<bool>(
+            child: ValueListenableBuilder<UserLocationTracking>(
                 valueListenable: widget.trackUserLocation,
                 builder: (context, value, child) {
                   final IconData icon = _locationServiceEnabled
-                      ? value
+                      ? value == UserLocationTracking.position
                           ? Icons.my_location
-                          : Icons.location_searching
+                          : value == UserLocationTracking.positionBearing
+                              ? Icons.arrow_upward
+                              : Icons.location_searching
                       : Icons.location_disabled;
 
                   return Icon(

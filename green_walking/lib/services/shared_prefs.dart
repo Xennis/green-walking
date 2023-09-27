@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:developer';
+import 'dart:developer' show log;
 
-import 'package:mapbox_gl/mapbox_gl.dart' show CameraPosition, LatLng;
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' show CameraState;
 import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: avoid_classes_with_only_static_members
@@ -9,23 +9,14 @@ class SharedPrefs {
   static const String keyLastPosition = 'last-position';
   static const String analyticsEnabled = 'analytics-enabled';
 
-  static Future<CameraPosition?> getCameraPosition(String key) async {
+  static Future<CameraState?> getCameraState(String key) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? raw = prefs.getString(key);
     if (raw == null) {
       return null;
     }
     try {
-      final Map<String, dynamic> parsed =
-          jsonDecode(raw) as Map<String, dynamic>;
-      final List<dynamic> parsedTarget = parsed['target'] as List<dynamic>;
-
-      return CameraPosition(
-        bearing: parsed['bearing'],
-        target: LatLng(parsedTarget[0] as double, parsedTarget[1] as double),
-        tilt: parsed['tilt'],
-        zoom: parsed['zoom'],
-      );
+      return CameraState.decode(jsonDecode(raw));
     } catch (e) {
       // No last location is not critical. A raised exception on start up is.
       log('failed to load location: $e');
@@ -33,9 +24,9 @@ class SharedPrefs {
     }
   }
 
-  static void setCameraPosition(String key, CameraPosition val) {
+  static void setCameraState(String key, CameraState val) {
     try {
-      final String raw = jsonEncode(val.toMap());
+      final String raw = jsonEncode(val.encode());
       SharedPreferences.getInstance()
           .then((SharedPreferences prefs) => prefs.setString(key, raw));
     } catch (e) {
