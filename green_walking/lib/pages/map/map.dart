@@ -3,9 +3,10 @@ import 'dart:developer' show log;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:green_walking/map_utils.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
+import 'package:green_walking/map_utils.dart';
+import 'package:green_walking/services/mapbox_geocoding.dart';
 import '../../services/shared_prefs.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/gdpr_dialog.dart';
@@ -81,7 +82,7 @@ class _MapPageState extends State<MapPage> {
                     Flexible(
                         child: Stack(
                       children: <Widget>[
-                        map(context, data),
+                        _mapWidget(context, data),
                         /*Attribution(
                             satelliteLayer:
                                 _mapboxStyle == MabboxTileset.satellite),*/
@@ -131,7 +132,7 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Widget map(BuildContext context, MapConfig config) {
+  Widget _mapWidget(BuildContext context, MapConfig config) {
     return MapWidget(
       key: const ValueKey('mapWidget'),
       resourceOptions: ResourceOptions(accessToken: config.accessToken),
@@ -154,6 +155,8 @@ class _MapPageState extends State<MapPage> {
               zoom: 11.0),
       styleUri: CustomMapboxStyles.outdoor,
       onMapIdleListener: _onCameraIdle,
+      onLongTapListener: (ScreenCoordinate coordinate) =>
+          _onLongTapListener(context, config.accessToken, coordinate),
       onScrollListener: (ScreenCoordinate coordinate) {
         if (_userlocationTracking.value != UserLocationTracking.no) {
           // Turn off tracking because user scrolled to another location.
@@ -163,12 +166,33 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
+  Future<void> _onLongTapListener(BuildContext context, String accesstoken,
+      ScreenCoordinate coordinate) async {
+    try {
+      // https://github.com/mapbox/mapbox-maps-flutter/issues/81 It actual returns the position
+      // and not the coordinates.
+      final Position tapPosition = Position(coordinate.y, coordinate.x);
+
+      // See https://dart.dev/tools/linter-rules/use_build_context_synchronously
+      if (context.mounted) {
+        final Position? moveToLoc = await Navigator.push(
+          context,
+          NoTransitionPageRoute<Position>(
+              builder: (BuildContext context) => SearchPage(
+                  reversePosition: tapPosition, accessToken: accesstoken)),
+        );
+        return _displaySearchResult(moveToLoc);
+      }
+    } catch (e) {
+      log('failed to get tap position: $e');
+      return;
+    }
+  }
+
   Future<Position?> _getCameraPosition() async {
     try {
       final CameraState mapCameraState = await _mapboxMap.getCameraState();
-      final List<Object?> coordinates =
-          mapCameraState.center['coordinates'] as List<Object?>;
-      return Position(coordinates[0] as num, coordinates[1] as num);
+      return positionForCoordinate(mapCameraState.center);
     } catch (e) {
       log('failed to get camera position: $e');
       return null;
@@ -186,25 +210,29 @@ class _MapPageState extends State<MapPage> {
         context,
         NoTransitionPageRoute<Position>(
             builder: (BuildContext context) => SearchPage(
-                mapPosition: cameraPosition, accessToken: accessToken)),
+                proximity: cameraPosition, accessToken: accessToken)),
       );
-      if (moveToLoc == null) {
-        return;
-      }
-      // If we keep the tracking on the map would move back to the user location.
-      _userlocationTracking.value = UserLocationTracking.no;
-      _setCameraPosition(moveToLoc, 0, 0);
-
-      // Draw circle
-      await _circleAnnotationManager?.deleteAll();
-      _circleAnnotationManager?.create(CircleAnnotationOptions(
-          geometry: Point(coordinates: moveToLoc).toJson(),
-          circleRadius: 12,
-          circleColor: const Color.fromRGBO(255, 192, 203, 1).value,
-          circleOpacity: 0.6,
-          circleStrokeWidth: 2,
-          circleStrokeColor: const Color.fromRGBO(255, 192, 203, 1).value));
+      return _displaySearchResult(moveToLoc);
     }
+  }
+
+  Future<void> _displaySearchResult(Position? position) async {
+    if (position == null) {
+      return;
+    }
+    // If we keep the tracking on the map would move back to the user location.
+    _userlocationTracking.value = UserLocationTracking.no;
+    _setCameraPosition(position, 0, 0);
+
+    // Draw circle
+    await _circleAnnotationManager?.deleteAll();
+    _circleAnnotationManager?.create(CircleAnnotationOptions(
+        geometry: Point(coordinates: position).toJson(),
+        circleRadius: 12,
+        circleColor: const Color.fromRGBO(255, 192, 203, 1).value,
+        circleOpacity: 0.6,
+        circleStrokeWidth: 2,
+        circleStrokeColor: const Color.fromRGBO(255, 192, 203, 1).value));
   }
 
   void _onLayerToggle() async {

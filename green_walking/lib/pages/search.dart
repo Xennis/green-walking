@@ -7,11 +7,16 @@ import '../services/mapbox_geocoding.dart';
 import '../widgets/app_bar.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({Key? key, this.mapPosition, required this.accessToken})
+  const SearchPage(
+      {Key? key,
+      this.reversePosition,
+      this.proximity,
+      required this.accessToken})
       : super(key: key);
 
   final String accessToken;
-  final Position? mapPosition;
+  final Position? reversePosition;
+  final Position? proximity;
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -19,10 +24,45 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   Future<MapboxGeocodingResult>? _result;
+  late TextEditingController _queryFieldController;
+
+  @override
+  void initState() {
+    super.initState();
+    _queryFieldController = TextEditingController();
+    final initialQuery = widget.reversePosition;
+    if (initialQuery != null) {
+      _queryFieldController.text = _positionToString(initialQuery);
+    }
+  }
+
+  @override
+  void dispose() {
+    _queryFieldController.dispose();
+    super.dispose();
+  }
+
+  static String _positionToString(Position position, {int fractionDigits = 6}) {
+    return '${position.lat.toStringAsFixed(fractionDigits)},${position.lng.toStringAsFixed(fractionDigits)}';
+  }
+
+  static Position? _stringToPosition(String position) {
+    final List<String> parts = position.split(',');
+    if (parts.length != 2) {
+      return null;
+    }
+    try {
+      // Yes, [1] comes first. We are showing the lat in the beginning.
+      return Position(double.parse(parts[1]), double.parse(parts[0]));
+    } catch (e) {
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context)!;
+
     return Scaffold(
         // If the search in the search bar is clicked the keyboard appears. The keyboard
         // should be over the map and by that avoid resizing of the whole app / map.
@@ -39,6 +79,7 @@ class _SearchPageState extends State<SearchPage> {
                             .backButtonTooltip),
                     onPressed: () => Navigator.pop(context)),
                 title: TextField(
+                  controller: _queryFieldController,
                   autofocus: true,
                   cursorColor: Colors.black,
                   keyboardType: TextInputType.text,
@@ -62,9 +103,15 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Future<void> _onSearchSubmitted(String query) async {
+    _queryFieldController.text = query;
+    final Position? queryPosition = _stringToPosition(query);
     setState(() {
-      _result =
-          mapboxGeocodingGet(query, widget.accessToken, widget.mapPosition);
+      if (queryPosition != null) {
+        _result = mapboxReverseGeocoding(queryPosition, widget.accessToken);
+      } else {
+        _result = mapboxForwardGeocoding(query, widget.accessToken,
+            proximity: widget.proximity);
+      }
     });
   }
 

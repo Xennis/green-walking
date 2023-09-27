@@ -27,3 +27,8 @@ extension PuckPosition on StyleManager {
     }
   }
 }
+
+Position positionForCoordinate(Map<String?, Object?> raw) {
+  final List<Object?> coordinates = raw['coordinates'] as List<Object?>;
+  return Position(coordinates[0] as num, coordinates[1] as num);
+}
