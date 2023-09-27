@@ -26,7 +26,13 @@ platform :android do
     #gradle(task: "clean assembleRelease")
     #crashlytics
     #gradle(task: 'assemble', build_type: 'Release')
-    upload_to_play_store(track: 'alpha', aab: '../build/app/outputs/bundle/release/app-release.aab')
+    upload_to_play_store(
+      track: 'alpha',
+      aab: '../build/app/outputs/bundle/release/app-release.aab',
+      # Skip upload because otherwise Google Play needs to verify the 'new' files again.
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
   
     # sh "your_script.sh"
     # You can also use other beta testing services here

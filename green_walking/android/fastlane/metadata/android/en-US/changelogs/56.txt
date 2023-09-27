@@ -1,0 +1,2 @@
+* Feature: Map can follow the heading of the phone
+* Integrate new map library
