@@ -95,9 +95,7 @@ class _RateAppListTile extends StatelessWidget {
       return ListTile(
           leading: const Icon(Icons.star),
           title: Text(l10n.rateApp),
-          onTap: () => launchUrl(
-              Uri.https('play.google.com', '/store/apps/details',
-                  {'id': androidAppID}),
+          onTap: () => launchUrl(Uri.https('play.google.com', '/store/apps/details', {'id': androidAppID}),
               mode: LaunchMode.externalApplication));
     }
     return Container();

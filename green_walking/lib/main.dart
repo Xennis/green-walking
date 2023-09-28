@@ -26,8 +26,7 @@ class GreenWalkingApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = ThemeData();
     return MaterialApp(
-      onGenerateTitle: (BuildContext context) =>
-          AppLocalizations.of(context)!.appTitle,
+      onGenerateTitle: (BuildContext context) => AppLocalizations.of(context)!.appTitle,
       theme: theme.copyWith(
         primaryColor: Colors.green,
         colorScheme: theme.colorScheme.copyWith(secondary: Colors.blue),

@@ -9,8 +9,6 @@ void main() {
         home: SearchPage(
           accessToken: 'some-token',
         ),
-        localizationsDelegates: <LocalizationsDelegate<dynamic>>[
-          AppLocalizations.delegate
-        ]));
+        localizationsDelegates: <LocalizationsDelegate<dynamic>>[AppLocalizations.delegate]));
   });
 }

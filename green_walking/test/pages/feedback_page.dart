@@ -6,9 +6,6 @@ import 'package:green_walking/pages/feedback.dart';
 void main() {
   testWidgets('FeedbackPage() can be rendered', (WidgetTester tester) async {
     await tester.pumpWidget(const MaterialApp(
-        home: FeedbackPage(),
-        localizationsDelegates: <LocalizationsDelegate<dynamic>>[
-          AppLocalizations.delegate
-        ]));
+        home: FeedbackPage(), localizationsDelegates: <LocalizationsDelegate<dynamic>>[AppLocalizations.delegate]));
   });
 }

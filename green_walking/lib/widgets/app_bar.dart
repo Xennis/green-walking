@@ -2,12 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MapAppBar extends StatelessWidget {
-  const MapAppBar(
-      {Key? key,
-      required this.leading,
-      required this.title,
-      this.onLayerToogle})
-      : super(key: key);
+  const MapAppBar({Key? key, required this.leading, required this.title, this.onLayerToogle}) : super(key: key);
 
   final IconButton leading;
   final TextField title;

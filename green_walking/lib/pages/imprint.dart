@@ -41,8 +41,7 @@ class ImprintPage extends StatelessWidget {
                   TextSpan(
                     text: locale.gdprPrivacyPolicy,
                     style: const TextStyle(color: Colors.blue),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () => launchUrl(privacyPolicyUrl),
+                    recognizer: TapGestureRecognizer()..onTap = () => launchUrl(privacyPolicyUrl),
                   ),
                   const TextSpan(text: '.')
                 ],
