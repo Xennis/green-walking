@@ -22,18 +22,13 @@ class MapConfig {
   CameraOptions? lastPosition;
 
   static Future<MapConfig> create(AssetBundle assetBundle) async {
-    final String accessToken =
-        await assetBundle.loadString('assets/mapbox-access-token.txt');
-    final CameraState? lastState =
-        await SharedPrefs.getCameraState(SharedPrefs.keyLastPosition);
+    final String accessToken = await assetBundle.loadString('assets/mapbox-access-token.txt');
+    final CameraState? lastState = await SharedPrefs.getCameraState(SharedPrefs.keyLastPosition);
     if (lastState == null) {
       return MapConfig(accessToken, lastPosition: null);
     }
     final CameraOptions lastPosition = CameraOptions(
-        center: lastState.center,
-        zoom: lastState.zoom,
-        bearing: lastState.bearing,
-        pitch: lastState.pitch);
+        center: lastState.center, zoom: lastState.zoom, bearing: lastState.bearing, pitch: lastState.pitch);
     return MapConfig(accessToken, lastPosition: lastPosition);
   }
 }
@@ -57,8 +52,7 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => enableAnalyticsOrConsent(context));
+    WidgetsBinding.instance.addPostFrameCallback((_) => enableAnalyticsOrConsent(context));
   }
 
   @override
@@ -87,31 +81,22 @@ class _MapPageState extends State<MapPage> {
                                 _mapboxStyle == MabboxTileset.satellite),*/
                         LocationButton(
                             trackUserLocation: _userlocationTracking,
-                            onOkay: (bool permissionGranted) =>
-                                _onLocationSearchPressed(
-                                    locale, permissionGranted),
-                            onNoPermissions: () =>
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text(
-                                          locale.errorNoLocationPermission)),
+                            onOkay: (bool permissionGranted) => _onLocationSearchPressed(locale, permissionGranted),
+                            onNoPermissions: () => ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(locale.errorNoLocationPermission)),
                                 )),
                         MapAppBar(
                           onLayerToogle: _onLayerToggle,
                           leading: IconButton(
                               splashColor: Colors.grey,
                               icon: Icon(Icons.menu,
-                                  semanticLabel:
-                                      MaterialLocalizations.of(context)
-                                          .openAppDrawerTooltip),
-                              onPressed: () =>
-                                  _scaffoldKey.currentState?.openDrawer()),
+                                  semanticLabel: MaterialLocalizations.of(context).openAppDrawerTooltip),
+                              onPressed: () => _scaffoldKey.currentState?.openDrawer()),
                           title: TextField(
                             readOnly: true,
                             decoration: InputDecoration(
                                 border: InputBorder.none,
-                                contentPadding:
-                                    const EdgeInsets.symmetric(horizontal: 15),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 15),
                                 hintText: locale.searchBoxHintLabel('...')),
                             onTap: () => _onSearchTab(data.accessToken),
                           ),
@@ -149,13 +134,10 @@ class _MapPageState extends State<MapPage> {
         });
       },
       cameraOptions: config.lastPosition ??
-          CameraOptions(
-              center: Point(coordinates: Position(9.8682, 53.5519)).toJson(),
-              zoom: 11.0),
+          CameraOptions(center: Point(coordinates: Position(9.8682, 53.5519)).toJson(), zoom: 11.0),
       styleUri: CustomMapboxStyles.outdoor,
       onMapIdleListener: _onCameraIdle,
-      onLongTapListener: (ScreenCoordinate coordinate) =>
-          _onLongTapListener(context, config.accessToken, coordinate),
+      onLongTapListener: (ScreenCoordinate coordinate) => _onLongTapListener(context, config.accessToken, coordinate),
       onScrollListener: (ScreenCoordinate coordinate) {
         if (_userlocationTracking.value != UserLocationTracking.no) {
           // Turn off tracking because user scrolled to another location.
@@ -165,8 +147,7 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Future<void> _onLongTapListener(BuildContext context, String accesstoken,
-      ScreenCoordinate coordinate) async {
+  Future<void> _onLongTapListener(BuildContext context, String accesstoken, ScreenCoordinate coordinate) async {
     try {
       // https://github.com/mapbox/mapbox-maps-flutter/issues/81 It actual returns the position
       // and not the coordinates.
@@ -177,8 +158,7 @@ class _MapPageState extends State<MapPage> {
         final Position? moveToLoc = await Navigator.push(
           context,
           NoTransitionPageRoute<Position>(
-              builder: (BuildContext context) => SearchPage(
-                  reversePosition: tapPosition, accessToken: accesstoken)),
+              builder: (BuildContext context) => SearchPage(reversePosition: tapPosition, accessToken: accesstoken)),
         );
         return _displaySearchResult(moveToLoc);
       }
@@ -208,8 +188,7 @@ class _MapPageState extends State<MapPage> {
       final Position? moveToLoc = await Navigator.push(
         context,
         NoTransitionPageRoute<Position>(
-            builder: (BuildContext context) => SearchPage(
-                proximity: cameraPosition, accessToken: accessToken)),
+            builder: (BuildContext context) => SearchPage(proximity: cameraPosition, accessToken: accessToken)),
       );
       return _displaySearchResult(moveToLoc);
     }
@@ -243,8 +222,7 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  Future<void> _setCameraPosition(
-      Position position, double? bearing, double? pitch) async {
+  Future<void> _setCameraPosition(Position position, double? bearing, double? pitch) async {
     return _mapboxMap.flyTo(
         CameraOptions(
           center: Point(coordinates: position).toJson(),
@@ -263,9 +241,8 @@ class _MapPageState extends State<MapPage> {
         return;
       }
 
-      final PuckLocation? puckLocation = await _mapboxMap.style
-          .getPuckLocation()
-          .timeout(const Duration(milliseconds: 900 - 100));
+      final PuckLocation? puckLocation =
+          await _mapboxMap.style.getPuckLocation().timeout(const Duration(milliseconds: 900 - 100));
       if (puckLocation == null) {
         // FIXME: Show toast if no location.
         //  ScaffoldMessenger.of(context)
@@ -285,18 +262,14 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
-  Future<void> _onLocationSearchPressed(
-      AppLocalizations locale, bool permissionGranted) async {
+  Future<void> _onLocationSearchPressed(AppLocalizations locale, bool permissionGranted) async {
     if (_userlocationTracking.value == UserLocationTracking.position) {
       _userlocationTracking.value = UserLocationTracking.positionBearing;
     } else {
       _userlocationTracking.value = UserLocationTracking.position;
     }
     await _mapboxMap.location.updateSettings(LocationComponentSettings(
-        enabled: true,
-        pulsingEnabled: false,
-        showAccuracyRing: true,
-        puckBearingEnabled: true));
+        enabled: true, pulsingEnabled: false, showAccuracyRing: true, puckBearingEnabled: true));
     refreshTrackLocation();
   }
 

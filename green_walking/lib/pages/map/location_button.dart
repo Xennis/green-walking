@@ -7,10 +7,7 @@ enum UserLocationTracking { no, position, positionBearing }
 
 class LocationButton extends StatefulWidget {
   const LocationButton(
-      {super.key,
-      required this.onOkay,
-      required this.onNoPermissions,
-      required this.trackUserLocation});
+      {super.key, required this.onOkay, required this.onNoPermissions, required this.trackUserLocation});
 
   final void Function(bool) onOkay;
   final VoidCallback onNoPermissions;
@@ -30,8 +27,7 @@ class _LocationButtonState extends State<LocationButton> {
     super.initState();
 
     _checkLocationServiceEnabled();
-    _timer = Timer.periodic(const Duration(seconds: 1, microseconds: 500),
-        (Timer result) {
+    _timer = Timer.periodic(const Duration(seconds: 1, microseconds: 500), (Timer result) {
       _checkLocationServiceEnabled();
     });
   }
@@ -87,10 +83,8 @@ class _LocationButtonState extends State<LocationButton> {
     // Check permission
     if (await Geolocator.checkPermission() == LocationPermission.denied) {
       // TODO(Xennis): Catch exception!
-      if (<LocationPermission>[
-            LocationPermission.always,
-            LocationPermission.whileInUse
-          ].contains(await Geolocator.requestPermission()) ==
+      if (<LocationPermission>[LocationPermission.always, LocationPermission.whileInUse]
+              .contains(await Geolocator.requestPermission()) ==
           false) {
         widget.onNoPermissions();
         return;

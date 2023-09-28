@@ -13,9 +13,7 @@ void enableAnalyticsOrConsent(BuildContext context) {
       // Privacy: Only enable analytics if it is set to enabled.
       FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
     } else if (enabled == null) {
-      showDialog<dynamic>(
-          context: context,
-          builder: (BuildContext context) => const GdprDialog());
+      showDialog<dynamic>(context: context, builder: (BuildContext context) => const GdprDialog());
     }
   });
 }
@@ -31,25 +29,23 @@ class GdprDialog extends StatelessWidget {
         child: ListBody(
           children: <Widget>[
             RichText(
-              text: TextSpan(
-                  style: const TextStyle(color: Colors.grey),
-                  children: <InlineSpan>[
-                    TextSpan(
-                      text: '${locale.gdprDialogText} ',
-                    ),
-                    TextSpan(
-                      text: locale.gdprPrivacyPolicy,
-                      style: const TextStyle(color: Colors.blue),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          launchUrl(privacyPolicyUrl);
-                        },
-                    ),
-                    const TextSpan(
-                      text: '.',
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ]),
+              text: TextSpan(style: const TextStyle(color: Colors.grey), children: <InlineSpan>[
+                TextSpan(
+                  text: '${locale.gdprDialogText} ',
+                ),
+                TextSpan(
+                  text: locale.gdprPrivacyPolicy,
+                  style: const TextStyle(color: Colors.blue),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      launchUrl(privacyPolicyUrl);
+                    },
+                ),
+                const TextSpan(
+                  text: '.',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ]),
             ),
           ],
         ),

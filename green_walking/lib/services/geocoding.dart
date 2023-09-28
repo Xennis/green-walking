@@ -17,8 +17,8 @@ class GeocodingPlace {
     if (rawCenter != null && rawCenter.length == 2) {
       final dynamic rawLat = rawCenter[1];
       final dynamic rawLng = rawCenter[0];
-      center = Position(rawLng is int ? rawLng.toDouble() : rawLng as double,
-          rawLat is int ? rawLat.toDouble() : rawLat as double);
+      center = Position(
+          rawLng is int ? rawLng.toDouble() : rawLng as double, rawLat is int ? rawLat.toDouble() : rawLat as double);
     }
     return GeocodingPlace(
       text: raw['text'] as String?,
@@ -38,8 +38,8 @@ class GeocodingPlace {
     final int placeId = raw['place_id'] as int;
     final String? type = raw['type'] as String?;
     final String? name = raw['name'] as String?;
-    final Uri url = Uri.https('nominatim.openstreetmap.org', '/ui/details.html',
-        <String, String>{'place_id': placeId.toString()});
+    final Uri url =
+        Uri.https('nominatim.openstreetmap.org', '/ui/details.html', <String, String>{'place_id': placeId.toString()});
 
     return GeocodingPlace(
       text: name != null && name.isNotEmpty ? name : type,
@@ -59,34 +59,25 @@ class GeocodingResult {
   GeocodingResult(this.features, {required this.attribution});
 
   factory GeocodingResult.fromMapboxJson(Map<String, dynamic> raw) {
-    final List<dynamic> features =
-        raw['features'] as List<dynamic>? ?? <dynamic>[];
-    final String attribution =
-        (raw['attribution'] as String).replaceFirst('NOTICE: ', '');
+    final List<dynamic> features = raw['features'] as List<dynamic>? ?? <dynamic>[];
+    final String attribution = (raw['attribution'] as String).replaceFirst('NOTICE: ', '');
 
     return GeocodingResult(
         features
             .map((dynamic e) => e as Map<String, dynamic>)
             .map((Map<String, dynamic> e) => GeocodingPlace.fromMapboxJson(e))
-            .where((element) =>
-                element.text != null &&
-                element.placeName != null &&
-                element.center != null)
+            .where((element) => element.text != null && element.placeName != null && element.center != null)
             .toList(),
         attribution: attribution);
   }
 
   factory GeocodingResult.fromOsmJson(Map<String, dynamic> raw) {
     final List<GeocodingPlace> features = [GeocodingPlace.fromOsmJson(raw)];
-    final String attribution =
-        (raw['licence'] as String).replaceFirst('Data ', '');
+    final String attribution = (raw['licence'] as String).replaceFirst('Data ', '');
 
     return GeocodingResult(
         features
-            .where((element) =>
-                element.text != null &&
-                element.placeName != null &&
-                element.center != null)
+            .where((element) => element.text != null && element.placeName != null && element.center != null)
             .toList(),
         attribution: attribution);
   }
@@ -100,18 +91,14 @@ class GeocodingServiceException implements Exception {
   String cause;
 }
 
-Future<GeocodingResult> _mapboxGeocoding(
-    String query, String token, Map<String, String> params) async {
-  final Uri url = Uri.https(
-      'api.mapbox.com', '/geocoding/v5/mapbox.places/$query.json', params);
+Future<GeocodingResult> _mapboxGeocoding(String query, String token, Map<String, String> params) async {
+  final Uri url = Uri.https('api.mapbox.com', '/geocoding/v5/mapbox.places/$query.json', params);
   try {
     final http.Response response = await http.get(url);
     if (response.statusCode == 200) {
-      return GeocodingResult.fromMapboxJson(
-          json.decode(response.body) as Map<String, dynamic>);
+      return GeocodingResult.fromMapboxJson(json.decode(response.body) as Map<String, dynamic>);
     } else {
-      throw GeocodingServiceException(
-          'Invalid ${response.statusCode} response from API');
+      throw GeocodingServiceException('Invalid ${response.statusCode} response from API');
     }
   } on SocketException catch (e) {
     log('mapbox geocoding socket failed: $e');
@@ -123,8 +110,7 @@ Future<GeocodingResult> _mapboxGeocoding(
 }
 
 // Note For debugging https://docs.mapbox.com/playground/geocoding/ is helpful
-Future<GeocodingResult> mapboxForwardGeocoding(String query, String token,
-    {Position? proximity, int limit = 5}) async {
+Future<GeocodingResult> mapboxForwardGeocoding(String query, String token, {Position? proximity, int limit = 5}) async {
   final Map<String, String> params = <String, String>{
     'access_token': token,
     'limit': limit.toString(),
@@ -137,8 +123,7 @@ Future<GeocodingResult> mapboxForwardGeocoding(String query, String token,
 
 // Note For debugging https://docs.mapbox.com/playground/geocoding/ is helpful
 // Consider improving it: https://nominatim.openstreetmap.org/ui/reverse.html
-Future<GeocodingResult> mapboxReverseGeocoding(Position query, String token,
-    {int limit = 1}) async {
+Future<GeocodingResult> mapboxReverseGeocoding(Position query, String token, {int limit = 1}) async {
   final Map<String, String> params = <String, String>{
     'access_token': token,
     // Not included: country,region,postcode,district,locality,neighborhood,place,poi
@@ -153,24 +138,20 @@ String _mapboxPositionToString(Position position, {int fractionDigits = 6}) {
   return '${position.lng.toStringAsFixed(fractionDigits)},${position.lat.toStringAsFixed(fractionDigits)}';
 }
 
-Future<GeocodingResult> osmReverseGeocoding(Position position,
-    {int zoom = 18}) async {
-  final Uri url =
-      Uri.https('nominatim.openstreetmap.org', 'reverse.php', <String, String>{
+Future<GeocodingResult> osmReverseGeocoding(Position position, {int zoom = 18}) async {
+  final Uri url = Uri.https('nominatim.openstreetmap.org', 'reverse.php', <String, String>{
     'lat': position.lat.toStringAsFixed(6),
     'lon': position.lng.toStringAsFixed(6),
     'zoom': zoom.toString(),
     'format': 'jsonv2'
   });
   try {
-    final http.Response response = await http.get(url,
-        headers: <String, String>{'User-Agent': 'Android app $androidAppID'});
+    final http.Response response =
+        await http.get(url, headers: <String, String>{'User-Agent': 'Android app $androidAppID'});
     if (response.statusCode == 200) {
-      return GeocodingResult.fromOsmJson(
-          json.decode(response.body) as Map<String, dynamic>);
+      return GeocodingResult.fromOsmJson(json.decode(response.body) as Map<String, dynamic>);
     } else {
-      throw GeocodingServiceException(
-          'Invalid ${response.statusCode} response from API');
+      throw GeocodingServiceException('Invalid ${response.statusCode} response from API');
     }
   } on SocketException catch (e) {
     log('osm geocoding socket failed: $e');

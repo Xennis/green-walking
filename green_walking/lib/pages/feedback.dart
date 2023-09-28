@@ -32,8 +32,7 @@ class FeedbackPage extends StatelessWidget {
               children: <Widget>[
                 ElevatedButton(
                   onPressed: () => _onPressed(locale),
-                  child:
-                      Text(locale.feedbackSendMailToLabel('code@xennis.org')),
+                  child: Text(locale.feedbackSendMailToLabel('code@xennis.org')),
                 ),
               ],
             ),

@@ -33,8 +33,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      const Text('Google Analytics',
-                          style: TextStyle(fontSize: 16.0)),
+                      const Text('Google Analytics', style: TextStyle(fontSize: 16.0)),
                       Text(
                         locale.settingsTrackingDescription,
                         style: const TextStyle(color: Colors.grey),
@@ -44,18 +43,15 @@ class _SettingsPageState extends State<SettingsPage> {
                   FutureBuilder<bool?>(
                       future: SharedPrefs.getBool(SharedPrefs.analyticsEnabled),
                       initialData: _analyticsEnabled,
-                      builder: (BuildContext context,
-                          AsyncSnapshot<bool?> snapshot) {
+                      builder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
                         return Switch(
                           value: snapshot.data ?? false,
                           onChanged: (bool? value) {
                             if (value == null) {
                               return;
                             }
-                            SharedPrefs.setBool(
-                                SharedPrefs.analyticsEnabled, value);
-                            FirebaseAnalytics.instance
-                                .setAnalyticsCollectionEnabled(value);
+                            SharedPrefs.setBool(SharedPrefs.analyticsEnabled, value);
+                            FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(value);
                             setState(() {
                               _analyticsEnabled = value;
                             });

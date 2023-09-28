@@ -8,12 +8,7 @@ import '../services/geocoding.dart';
 import '../widgets/app_bar.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage(
-      {Key? key,
-      this.reversePosition,
-      this.proximity,
-      required this.accessToken})
-      : super(key: key);
+  const SearchPage({Key? key, this.reversePosition, this.proximity, required this.accessToken}) : super(key: key);
 
   final String accessToken;
   final Position? reversePosition;
@@ -76,9 +71,7 @@ class _SearchPageState extends State<SearchPage> {
               MapAppBar(
                 leading: IconButton(
                     splashColor: Colors.grey,
-                    icon: Icon(Icons.arrow_back,
-                        semanticLabel: MaterialLocalizations.of(context)
-                            .backButtonTooltip),
+                    icon: Icon(Icons.arrow_back, semanticLabel: MaterialLocalizations.of(context).backButtonTooltip),
                     onPressed: () => Navigator.pop(context)),
                 title: TextField(
                   controller: _queryFieldController,
@@ -88,15 +81,12 @@ class _SearchPageState extends State<SearchPage> {
                   textInputAction: TextInputAction.go,
                   decoration: InputDecoration(
                       border: InputBorder.none,
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 15),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 15),
                       hintText: locale.searchBoxHintLabel('...')),
                   onSubmitted: _onSearchSubmitted,
                 ),
               ),
-              Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                  child: _resultList(context)),
+              Padding(padding: const EdgeInsets.fromLTRB(10, 0, 10, 0), child: _resultList(context)),
             ],
           ),
         ));
@@ -111,8 +101,7 @@ class _SearchPageState extends State<SearchPage> {
         _result = mapboxReverseGeocoding(queryPosition, widget.accessToken);
       } else {
         _allowAdvancedSearch = false;
-        _result = mapboxForwardGeocoding(query, widget.accessToken,
-            proximity: widget.proximity);
+        _result = mapboxForwardGeocoding(query, widget.accessToken, proximity: widget.proximity);
       }
     });
   }
@@ -124,8 +113,7 @@ class _SearchPageState extends State<SearchPage> {
     final AppLocalizations locale = AppLocalizations.of(context)!;
     return FutureBuilder<GeocodingResult>(
         future: _result,
-        builder:
-            (BuildContext context, AsyncSnapshot<GeocodingResult> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<GeocodingResult> snapshot) {
           final GeocodingResult? data = snapshot.data;
           if (snapshot.hasData && data != null) {
             if (data.features.isEmpty) {
@@ -139,11 +127,8 @@ class _SearchPageState extends State<SearchPage> {
                   itemCount: data.features.length,
                   itemBuilder: (BuildContext context, int index) {
                     final GeocodingPlace elem = data.features[index];
-                    final String subtitle = truncateString(
-                            elem.placeName
-                                ?.replaceFirst('${elem.text ?? ''}, ', ''),
-                            65) ??
-                        '';
+                    final String subtitle =
+                        truncateString(elem.placeName?.replaceFirst('${elem.text ?? ''}, ', ''), 65) ?? '';
                     return Card(
                       child: ListTile(
                         leading: CircleAvatar(
@@ -169,10 +154,8 @@ class _SearchPageState extends State<SearchPage> {
                 Row(
                   children: [
                     Flexible(
-                        child: Text(
-                            locale.geocodingResultLegalNotice(data.attribution),
-                            style: const TextStyle(
-                                color: Colors.grey, fontSize: 12.0)))
+                        child: Text(locale.geocodingResultLegalNotice(data.attribution),
+                            style: const TextStyle(color: Colors.grey, fontSize: 12.0)))
                   ],
                 ),
               ],
@@ -190,8 +173,7 @@ class _SearchPageState extends State<SearchPage> {
     }
     return IconButton(
         splashColor: Colors.grey,
-        icon: Icon(Icons.open_in_new,
-            semanticLabel: locale.openInBrowserSemanticLabel),
+        icon: Icon(Icons.open_in_new, semanticLabel: locale.openInBrowserSemanticLabel),
         onPressed: () => launchUrl(url));
   }
 
@@ -200,8 +182,7 @@ class _SearchPageState extends State<SearchPage> {
       return Container();
     }
     // Only for reverse geocoding we have an advanced search.
-    final Position? queryPosition =
-        _stringToPosition(_queryFieldController.text);
+    final Position? queryPosition = _stringToPosition(_queryFieldController.text);
     if (queryPosition == null) {
       return Container();
     }

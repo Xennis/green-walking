@@ -6,9 +6,6 @@ import 'package:green_walking/pages/settings.dart';
 void main() {
   testWidgets('SettingsPage() can be rendered', (WidgetTester tester) async {
     await tester.pumpWidget(const MaterialApp(
-        home: SettingsPage(),
-        localizationsDelegates: <LocalizationsDelegate<dynamic>>[
-          AppLocalizations.delegate
-        ]));
+        home: SettingsPage(), localizationsDelegates: <LocalizationsDelegate<dynamic>>[AppLocalizations.delegate]));
   });
 }

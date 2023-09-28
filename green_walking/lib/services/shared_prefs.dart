@@ -27,8 +27,7 @@ class SharedPrefs {
   static void setCameraState(String key, CameraState val) {
     try {
       final String raw = jsonEncode(val.encode());
-      SharedPreferences.getInstance()
-          .then((SharedPreferences prefs) => prefs.setString(key, raw));
+      SharedPreferences.getInstance().then((SharedPreferences prefs) => prefs.setString(key, raw));
     } catch (e) {
       log('failed to store location: $e');
     }
@@ -40,7 +39,6 @@ class SharedPrefs {
   }
 
   static void setBool(String key, bool val) {
-    SharedPreferences.getInstance()
-        .then((SharedPreferences prefs) => prefs.setBool(key, val));
+    SharedPreferences.getInstance().then((SharedPreferences prefs) => prefs.setBool(key, val));
   }
 }
