@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' show Position;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../core.dart';
 import '../services/geocoding.dart';
@@ -131,9 +132,6 @@ class _SearchPageState extends State<SearchPage> {
                         truncateString(elem.placeName?.replaceFirst('${elem.text ?? ''}, ', ''), 65) ?? '';
                     return Card(
                       child: ListTile(
-                        leading: CircleAvatar(
-                          child: Text((index + 1).toString()),
-                        ),
                         isThreeLine: true,
                         onTap: () {
                           Navigator.pop(
@@ -143,7 +141,7 @@ class _SearchPageState extends State<SearchPage> {
                         },
                         title: Text(truncateString(elem.text, 25) ?? ''),
                         subtitle: Text(subtitle),
-                        trailing: _trailingWidget(locale, elem.url),
+                        trailing: _trailingWidget(locale, elem),
                       ),
                     );
                   },
@@ -167,14 +165,26 @@ class _SearchPageState extends State<SearchPage> {
         });
   }
 
-  Widget? _trailingWidget(AppLocalizations locale, Uri? url) {
-    if (url == null) {
-      return null;
+  Widget? _trailingWidget(AppLocalizations locale, GeocodingPlace place) {
+    final List<Widget> children = [
+      IconButton(
+          color: Theme.of(context).colorScheme.secondary,
+          tooltip: locale.openLocationInDefaultAppSemanticLabel,
+          icon: Icon(Icons.open_in_new, semanticLabel: locale.openLocationInDefaultAppSemanticLabel),
+          onPressed: () => launchUrlString(
+              'geo:${place.center!.lat.toStringAsFixed(6)},${place.center!.lng.toStringAsFixed(6)}?q=${Uri.encodeComponent(place.placeName!)}'))
+    ];
+    final Uri? url = place.url;
+    if (url != null) {
+      children.insert(
+          0,
+          IconButton(
+              color: Theme.of(context).primaryColor,
+              tooltip: locale.openLocationDetailsSemanticLabel,
+              icon: Icon(Icons.info_outline, semanticLabel: locale.openLocationDetailsSemanticLabel),
+              onPressed: () => launchUrl(url)));
     }
-    return IconButton(
-        splashColor: Colors.grey,
-        icon: Icon(Icons.open_in_new, semanticLabel: locale.openInBrowserSemanticLabel),
-        onPressed: () => launchUrl(url));
+    return Wrap(spacing: 1.0, children: children);
   }
 
   Widget _advancedSearchButton(AppLocalizations locale, bool enable) {

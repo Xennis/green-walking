@@ -322,5 +322,13 @@
   "geocodingAdvancedSearchButton": "Advanced search",
   "@geocodingAdvancedSearchButton": {
     "description": "Label for the button to enable/execute the advanced search."
+  },
+  "openLocationInDefaultAppSemanticLabel": "Open with default app",
+  "@openLocationInDefaultAppSemanticLabel": {
+    "description": "Semantic label to open a location with the phones default app."
+  },
+  "openLocationDetailsSemanticLabel": "Show details",
+  "@openLocationDetailsSemanticLabel": {
+    "description": "Semantic label to open details of a location."
   }
 }

@@ -46,5 +46,7 @@
   "mapSwitchLayerSemanticLabel": "Kartenansicht wechseln",
   "rateApp": "Bewerte die App",
   "geocodingResultLegalNotice": "Suchergebnisse: {legalNotice}",
-  "geocodingAdvancedSearchButton": "Erweiterte search"
+  "geocodingAdvancedSearchButton": "Erweiterte Suche",
+  "openLocationInDefaultAppSemanticLabel": "Öffnen mit Standardapp",
+  "openLocationDetailsSemanticLabel": "Details anzeigen"
 }
