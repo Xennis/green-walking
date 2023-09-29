@@ -30,6 +30,7 @@ dependencies:
   intl: ^0.18.0
   mapbox_maps_flutter: ^0.4.4
   shared_preferences: ^2.0.8
+  turf: ^0.0.8
   url_launcher: ^6.0.13
 
 dependency_overrides:
