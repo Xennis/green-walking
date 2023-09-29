@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' show Position;
+import 'package:turf/turf.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -9,9 +9,11 @@ import '../services/geocoding.dart';
 import '../widgets/app_bar.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({Key? key, this.reversePosition, this.proximity, required this.accessToken}) : super(key: key);
+  const SearchPage({Key? key, this.userPosition, this.reversePosition, this.proximity, required this.accessToken})
+      : super(key: key);
 
   final String accessToken;
+  final Position? userPosition;
   final Position? reversePosition;
   final Position? proximity;
 
@@ -107,6 +109,27 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
+  Widget _distanceToUserWidget(Position position) {
+    final Position? userPosition = widget.userPosition;
+    if (userPosition == null) {
+      return Container();
+    }
+    final num distance = distanceRaw(position, userPosition, Unit.kilometers);
+    String distanceString = '';
+    if (distance >= 1) {
+      distanceString = '${distance.toStringAsFixed(1)} km';
+    } else {
+      distanceString = '${(convertLength(distance, Unit.kilometers, Unit.meters)).toStringAsFixed(0)} m';
+    }
+
+    return Row(
+      children: [
+        const Icon(Icons.directions_run, size: 11.0),
+        Text(distanceString, style: const TextStyle(fontSize: 11.0)),
+      ],
+    );
+  }
+
   Widget _resultList(BuildContext context) {
     if (_result == null) {
       return Container();
@@ -140,7 +163,11 @@ class _SearchPageState extends State<SearchPage> {
                           );
                         },
                         title: Text(truncateString(elem.text, 25) ?? ''),
-                        subtitle: Text(subtitle),
+                        subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text(subtitle),
+                          const Padding(padding: EdgeInsets.only(bottom: 8.0)),
+                          _distanceToUserWidget(elem.center!)
+                        ]),
                         trailing: _trailingWidget(locale, elem),
                       ),
                     );

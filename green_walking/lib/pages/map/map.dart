@@ -152,13 +152,15 @@ class _MapPageState extends State<MapPage> {
       // https://github.com/mapbox/mapbox-maps-flutter/issues/81 It actual returns the position
       // and not the coordinates.
       final Position tapPosition = Position(coordinate.y, coordinate.x);
+      final Position? userPosition = (await _mapboxMap.getPuckLocation())?.position;
 
       // See https://dart.dev/tools/linter-rules/use_build_context_synchronously
       if (context.mounted) {
         final Position? moveToLoc = await Navigator.push(
           context,
           NoTransitionPageRoute<Position>(
-              builder: (BuildContext context) => SearchPage(reversePosition: tapPosition, accessToken: accesstoken)),
+              builder: (BuildContext context) =>
+                  SearchPage(userPosition: userPosition, reversePosition: tapPosition, accessToken: accesstoken)),
         );
         return _displaySearchResult(moveToLoc);
       }
@@ -168,27 +170,20 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  Future<Position?> _getCameraPosition() async {
-    try {
-      final CameraState mapCameraState = await _mapboxMap.getCameraState();
-      return positionForCoordinate(mapCameraState.center);
-    } catch (e) {
-      log('failed to get camera position: $e');
-      return null;
-    }
-  }
-
   Future<void> _onSearchTab(String accessToken) async {
-    final Position? cameraPosition = await _getCameraPosition();
+    final Position? cameraPosition = await _mapboxMap.getCameraPosition();
     if (cameraPosition == null) {
       return;
     }
+    final Position? userPosition = (await _mapboxMap.getPuckLocation())?.position;
+
     // See https://dart.dev/tools/linter-rules/use_build_context_synchronously
     if (context.mounted) {
       final Position? moveToLoc = await Navigator.push(
         context,
         NoTransitionPageRoute<Position>(
-            builder: (BuildContext context) => SearchPage(proximity: cameraPosition, accessToken: accessToken)),
+            builder: (BuildContext context) =>
+                SearchPage(userPosition: userPosition, proximity: cameraPosition, accessToken: accessToken)),
       );
       return _displaySearchResult(moveToLoc);
     }
@@ -242,7 +237,7 @@ class _MapPageState extends State<MapPage> {
       }
 
       final PuckLocation? puckLocation =
-          await _mapboxMap.style.getPuckLocation().timeout(const Duration(milliseconds: 900 - 100));
+          await _mapboxMap.getPuckLocation().timeout(const Duration(milliseconds: 900 - 100));
       if (puckLocation == null) {
         // FIXME: Show toast if no location.
         //  ScaffoldMessenger.of(context)
@@ -252,9 +247,9 @@ class _MapPageState extends State<MapPage> {
 
       switch (_userlocationTracking.value) {
         case UserLocationTracking.positionBearing:
-          _setCameraPosition(puckLocation.location, puckLocation.bearing, 50.0);
+          _setCameraPosition(puckLocation.position, puckLocation.bearing, 50.0);
         case UserLocationTracking.position:
-          _setCameraPosition(puckLocation.location, 0.0, 0.0);
+          _setCameraPosition(puckLocation.position, 0.0, 0.0);
         case UserLocationTracking.no:
         // Handled above already. In case there is no location returned we would not cancel
         // the timer otherwise.

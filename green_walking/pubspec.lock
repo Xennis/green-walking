@@ -507,7 +507,7 @@ packages:
     source: hosted
     version: "0.6.0"
   turf:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: turf
       sha256: "2be48cc7ed7e9acccaeee18e06d1ce183f3f7eee7abc0622371880951d41a0d6"
