@@ -4,7 +4,7 @@ import 'package:turf/turf.dart';
 
 import '../services/geocoding.dart';
 import '../widgets/app_bar.dart';
-import '../widgets/search/card.dart';
+import '../widgets/search_result_card.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key, this.userPosition, this.reversePosition, this.proximity, required this.accessToken})

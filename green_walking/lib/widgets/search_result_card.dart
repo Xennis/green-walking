@@ -4,8 +4,8 @@ import 'package:turf/turf.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-import '../../library/util.dart';
-import '../../services/geocoding.dart';
+import '../library/util.dart';
+import '../services/geocoding.dart';
 
 class SearchResultCard extends StatelessWidget {
   const SearchResultCard({super.key, required this.place, required this.userPosition, required this.onTap});
