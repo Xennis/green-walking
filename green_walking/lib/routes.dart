@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import 'pages/feedback.dart';
 import 'pages/imprint.dart';
-import 'pages/map/map.dart';
+import 'pages/map.dart';
 import 'pages/settings.dart';
 
 class Routes {

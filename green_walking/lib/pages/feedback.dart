@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../config.dart';
+
 class FeedbackPage extends StatelessWidget {
   const FeedbackPage({super.key});
 
@@ -32,7 +34,7 @@ class FeedbackPage extends StatelessWidget {
               children: <Widget>[
                 ElevatedButton(
                   onPressed: () => _onPressed(locale),
-                  child: Text(locale.feedbackSendMailToLabel('code@xennis.org')),
+                  child: Text(locale.feedbackSendMailToLabel(supportMail)),
                 ),
               ],
             ),
@@ -45,7 +47,7 @@ class FeedbackPage extends StatelessWidget {
   void _onPressed(AppLocalizations locale) {
     final Uri mailTo = Uri(
       scheme: 'mailto',
-      path: 'code@xennis.org',
+      path: supportMail,
       queryParameters: <String, String>{
         'subject': locale.feedbackMailSubject(locale.appTitle),
         //'body': 'App Version xx',

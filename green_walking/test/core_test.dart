@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:green_walking/core.dart';
+import 'package:green_walking/library/util.dart';
 
 void main() {
   group('truncate() input', () {
