@@ -26,19 +26,19 @@ class SearchResultCard extends StatelessWidget {
         subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(subtitle),
           const Padding(padding: EdgeInsets.only(bottom: 8.0)),
-          _PlaceCardFooterRow(
+          _FooterRow(
             userPosition: userPosition,
             place: place,
           )
         ]),
-        trailing: _PlaceCardTrailingWidget(place: place),
+        trailing: _TrailingWidget(place: place),
       ),
     );
   }
 }
 
-class _PlaceCardTrailingWidget extends StatelessWidget {
-  const _PlaceCardTrailingWidget({required this.place});
+class _TrailingWidget extends StatelessWidget {
+  const _TrailingWidget({required this.place});
 
   final GeocodingPlace place;
 
@@ -68,8 +68,8 @@ class _PlaceCardTrailingWidget extends StatelessWidget {
   }
 }
 
-class _PlaceCardFooterRow extends StatelessWidget {
-  const _PlaceCardFooterRow({required this.place, required this.userPosition});
+class _FooterRow extends StatelessWidget {
+  const _FooterRow({required this.place, required this.userPosition});
 
   final GeocodingPlace place;
   final Position? userPosition;

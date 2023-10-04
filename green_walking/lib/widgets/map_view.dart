@@ -9,7 +9,6 @@ import '../library/map_utils.dart';
 import '../pages/search.dart';
 import '../services/shared_prefs.dart';
 import '../widgets/app_bar.dart';
-import '../widgets/gdpr_dialog.dart';
 import '../widgets/page_route.dart';
 import '../widgets/location_button.dart';
 import '../config.dart';
@@ -34,20 +33,11 @@ class _MapViewState extends State<MapView> {
   Timer? _timer;
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => enableAnalyticsOrConsent(context));
-  }
-
-  @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context)!;
     return Stack(
       children: <Widget>[
         _mapWidget(),
-        /*Attribution(
-                            satelliteLayer:
-                                _mapboxStyle == MabboxTileset.satellite),*/
         LocationButton(
             trackUserLocation: _userlocationTracking,
             onOkay: (bool permissionGranted) => _onLocationSearchPressed(locale, permissionGranted),
@@ -80,12 +70,9 @@ class _MapViewState extends State<MapView> {
       onMapCreated: (MapboxMap mapboxMap) {
         _mapboxMap = mapboxMap;
 
-        //mapboxMap.setTelemetryEnabled(false);
+        //_mapboxMap.setTelemetryEnabled(false);
         _mapboxMap.compass.updateSettings(CompassSettings(marginTop: 400.0));
         _mapboxMap.scaleBar.updateSettings(ScaleBarSettings(enabled: false));
-        //mapController!.onSymbolTapped.add(_onSymbolTapped);
-        //onPositionChanged(mapController!.cameraPosition);
-
         _mapboxMap.annotations.createCircleAnnotationManager().then((value) {
           _circleAnnotationManager = value;
         });
@@ -212,7 +199,7 @@ class _MapViewState extends State<MapView> {
     });
   }
 
-  Future<void> _displaySearchResult(Position? position) async {
+  void _displaySearchResult(Position? position) async {
     if (position == null) {
       return;
     }
