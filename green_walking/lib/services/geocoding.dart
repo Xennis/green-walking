@@ -4,9 +4,10 @@ import 'dart:convert';
 import 'dart:developer' show log;
 import 'dart:io';
 
-import 'package:green_walking/config.dart';
 import 'package:http/http.dart' as http;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' show Position;
+
+import '../config.dart';
 
 class GeocodingPlace {
   GeocodingPlace({this.text, this.placeName, this.center, this.url});

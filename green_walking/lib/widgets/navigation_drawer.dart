@@ -5,7 +5,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../config.dart';
-import '../core.dart';
 import '../routes.dart';
 
 class AppNavigationDrawer extends StatelessWidget {

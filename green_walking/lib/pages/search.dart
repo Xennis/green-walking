@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:turf/turf.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
-import '../core.dart';
 import '../services/geocoding.dart';
 import '../widgets/app_bar.dart';
+import '../widgets/search/card.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key, this.userPosition, this.reversePosition, this.proximity, required this.accessToken})
@@ -22,14 +20,14 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  final TextEditingController _queryFieldController = TextEditingController();
+
   Future<GeocodingResult>? _result;
-  late TextEditingController _queryFieldController;
   bool _allowAdvancedSearch = false;
 
   @override
   void initState() {
     super.initState();
-    _queryFieldController = TextEditingController();
     final initialQuery = widget.reversePosition;
     if (initialQuery != null) {
       _queryFieldController.text = _positionToString(initialQuery);
@@ -40,23 +38,6 @@ class _SearchPageState extends State<SearchPage> {
   void dispose() {
     _queryFieldController.dispose();
     super.dispose();
-  }
-
-  static String _positionToString(Position position, {int fractionDigits = 6}) {
-    return '${position.lat.toStringAsFixed(fractionDigits)},${position.lng.toStringAsFixed(fractionDigits)}';
-  }
-
-  static Position? _stringToPosition(String position) {
-    final List<String> parts = position.split(',');
-    if (parts.length != 2) {
-      return null;
-    }
-    try {
-      // Yes, [1] comes first. We are showing the lat in the beginning.
-      return Position(double.parse(parts[1]), double.parse(parts[0]));
-    } catch (e) {
-      return null;
-    }
   }
 
   @override
@@ -109,27 +90,6 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
-  Widget _distanceToUserWidget(Position position) {
-    final Position? userPosition = widget.userPosition;
-    if (userPosition == null) {
-      return Container();
-    }
-    final num distance = distanceRaw(position, userPosition, Unit.kilometers);
-    String distanceString = '';
-    if (distance >= 1) {
-      distanceString = '${distance.toStringAsFixed(1)} km';
-    } else {
-      distanceString = '${(convertLength(distance, Unit.kilometers, Unit.meters)).toStringAsFixed(0)} m';
-    }
-
-    return Row(
-      children: [
-        const Icon(Icons.directions_run, size: 11.0),
-        Text(distanceString, style: const TextStyle(fontSize: 11.0)),
-      ],
-    );
-  }
-
   Widget _resultList(BuildContext context) {
     if (_result == null) {
       return Container();
@@ -151,25 +111,15 @@ class _SearchPageState extends State<SearchPage> {
                   itemCount: data.features.length,
                   itemBuilder: (BuildContext context, int index) {
                     final GeocodingPlace elem = data.features[index];
-                    final String subtitle =
-                        truncateString(elem.placeName?.replaceFirst('${elem.text ?? ''}, ', ''), 65) ?? '';
-                    return Card(
-                      child: ListTile(
-                        isThreeLine: true,
-                        onTap: () {
-                          Navigator.pop(
-                            context,
-                            elem.center,
-                          );
-                        },
-                        title: Text(truncateString(elem.text, 25) ?? ''),
-                        subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(subtitle),
-                          const Padding(padding: EdgeInsets.only(bottom: 8.0)),
-                          _distanceToUserWidget(elem.center!)
-                        ]),
-                        trailing: _trailingWidget(locale, elem),
-                      ),
+                    return SearchResultCard(
+                      place: data.features[index],
+                      userPosition: widget.userPosition,
+                      onTap: () {
+                        Navigator.pop(
+                          context,
+                          elem.center,
+                        );
+                      },
                     );
                   },
                 ),
@@ -190,28 +140,6 @@ class _SearchPageState extends State<SearchPage> {
           }
           return const Center(child: CircularProgressIndicator());
         });
-  }
-
-  Widget? _trailingWidget(AppLocalizations locale, GeocodingPlace place) {
-    final List<Widget> children = [
-      IconButton(
-          color: Theme.of(context).colorScheme.secondary,
-          tooltip: locale.openLocationInDefaultAppSemanticLabel,
-          icon: Icon(Icons.open_in_new, semanticLabel: locale.openLocationInDefaultAppSemanticLabel),
-          onPressed: () => launchUrlString(
-              'geo:${place.center!.lat.toStringAsFixed(6)},${place.center!.lng.toStringAsFixed(6)}?q=${Uri.encodeComponent(place.placeName!)}'))
-    ];
-    final Uri? url = place.url;
-    if (url != null) {
-      children.insert(
-          0,
-          IconButton(
-              color: Theme.of(context).primaryColor,
-              tooltip: locale.openLocationDetailsSemanticLabel,
-              icon: Icon(Icons.info_outline, semanticLabel: locale.openLocationDetailsSemanticLabel),
-              onPressed: () => launchUrl(url)));
-    }
-    return Wrap(spacing: 1.0, children: children);
   }
 
   Widget _advancedSearchButton(AppLocalizations locale, bool enable) {
@@ -238,5 +166,22 @@ class _SearchPageState extends State<SearchPage> {
         ),
       ],
     );
+  }
+}
+
+String _positionToString(Position position, {int fractionDigits = 6}) {
+  return '${position.lat.toStringAsFixed(fractionDigits)},${position.lng.toStringAsFixed(fractionDigits)}';
+}
+
+Position? _stringToPosition(String position) {
+  final List<String> parts = position.split(',');
+  if (parts.length != 2) {
+    return null;
+  }
+  try {
+    // Yes, [1] comes first. We are showing the lat in the beginning.
+    return Position(double.parse(parts[1]), double.parse(parts[0]));
+  } catch (e) {
+    return null;
   }
 }

@@ -5,33 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
-import 'package:green_walking/map_utils.dart';
-import '../../services/shared_prefs.dart';
-import '../../widgets/app_bar.dart';
-import '../../widgets/gdpr_dialog.dart';
-import '../../widgets/navigation_drawer.dart';
-import '../../widgets/page_route.dart';
-import '../search.dart';
-import 'location_button.dart';
-import 'mapbox_styles.dart';
-
-class MapConfig {
-  MapConfig(this.accessToken, {this.lastPosition});
-
-  String accessToken;
-  CameraOptions? lastPosition;
-
-  static Future<MapConfig> create(AssetBundle assetBundle) async {
-    final String accessToken = await assetBundle.loadString('assets/mapbox-access-token.txt');
-    final CameraState? lastState = await SharedPrefs.getCameraState(SharedPrefs.keyLastPosition);
-    if (lastState == null) {
-      return MapConfig(accessToken, lastPosition: null);
-    }
-    final CameraOptions lastPosition = CameraOptions(
-        center: lastState.center, zoom: lastState.zoom, bearing: lastState.bearing, pitch: lastState.pitch);
-    return MapConfig(accessToken, lastPosition: lastPosition);
-  }
-}
+import '../library/map_utils.dart';
+import '../services/shared_prefs.dart';
+import '../widgets/app_bar.dart';
+import '../widgets/gdpr_dialog.dart';
+import '../widgets/navigation_drawer.dart';
+import '../widgets/page_route.dart';
+import 'search.dart';
+import '../widgets/location_button.dart';
+import '../config.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -64,10 +46,10 @@ class _MapPageState extends State<MapPage> {
       // should be over the map and by that avoid resizing of the whole app / map.
       resizeToAvoidBottomInset: false,
       drawer: const AppNavigationDrawer(),
-      body: FutureBuilder<MapConfig>(
-          future: MapConfig.create(DefaultAssetBundle.of(context)),
-          builder: (BuildContext context, AsyncSnapshot<MapConfig> snapshot) {
-            final MapConfig? data = snapshot.data;
+      body: FutureBuilder<_MapConfig>(
+          future: _MapConfig.create(DefaultAssetBundle.of(context)),
+          builder: (BuildContext context, AsyncSnapshot<_MapConfig> snapshot) {
+            final _MapConfig? data = snapshot.data;
             if (snapshot.hasData && data != null) {
               return Center(
                 child: Column(
@@ -116,7 +98,7 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Widget _mapWidget(BuildContext context, MapConfig config) {
+  Widget _mapWidget(BuildContext context, _MapConfig config) {
     return MapWidget(
       key: const ValueKey('mapWidget'),
       resourceOptions: ResourceOptions(accessToken: config.accessToken),
@@ -272,5 +254,23 @@ class _MapPageState extends State<MapPage> {
     // TODO: Maybe use a Timer instead of writing data that often?
     final CameraState cameraState = await _mapboxMap.getCameraState();
     SharedPrefs.setCameraState(SharedPrefs.keyLastPosition, cameraState);
+  }
+}
+
+class _MapConfig {
+  _MapConfig(this.accessToken, {this.lastPosition});
+
+  String accessToken;
+  CameraOptions? lastPosition;
+
+  static Future<_MapConfig> create(AssetBundle assetBundle) async {
+    final String accessToken = await assetBundle.loadString('assets/mapbox-access-token.txt');
+    final CameraState? lastState = await SharedPrefs.getCameraState(SharedPrefs.keyLastPosition);
+    if (lastState == null) {
+      return _MapConfig(accessToken, lastPosition: null);
+    }
+    final CameraOptions lastPosition = CameraOptions(
+        center: lastState.center, zoom: lastState.zoom, bearing: lastState.bearing, pitch: lastState.pitch);
+    return _MapConfig(accessToken, lastPosition: lastPosition);
   }
 }
