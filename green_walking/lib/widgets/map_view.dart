@@ -82,6 +82,8 @@ class _MapViewState extends State<MapView> {
       resourceOptions: ResourceOptions(accessToken: widget.accessToken),
       onMapCreated: (MapboxMap mapboxMap) {
         _mapboxMap = mapboxMap;
+        _mapboxMap.style.setProjection('globe');
+        // _mapboxMap.style.localizeLabels('en', null);
         //_mapboxMap.setTelemetryEnabled(false);
         _mapboxMap.compass.updateSettings(CompassSettings(marginTop: 400.0, marginRight: 35.0));
         // By default the logo and attribution have little margin to the bottom
