@@ -21,7 +21,7 @@ class MapView extends StatefulWidget {
 
   final String accessToken;
   final CameraOptions? lastCameraOption;
-  final void Function() onOpenDrawer;
+  final VoidCallback onOpenDrawer;
   final Future<Position?> Function({Position? userPosition, Position? reversePosition, Position? proximity})
       onSearchPage;
 

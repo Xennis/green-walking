@@ -4,6 +4,7 @@ String appAuthor = 'Xennis';
 String supportMail = 'code@xennis.org';
 Uri privacyPolicyUrl =
     Uri.https('raw.githubusercontent.com', '/Xennis/green-walking/main/web/privacy/privacy-policy.md');
+Uri appPlayStoreUrl = Uri.https('play.google.com', '/store/apps/details', {'id': androidAppID});
 
 class CustomMapboxStyles {
   static const String outdoor = 'mapbox://styles/xennis/ckfbioyul1iln1ap0pm5hrcgy';

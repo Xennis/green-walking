@@ -68,7 +68,7 @@ class _LocationButtonState extends State<LocationButton> {
     );
   }
 
-  Future<void> _checkLocationServiceEnabled() async {
+  void _checkLocationServiceEnabled() async {
     final bool enabled = await Geolocator.isLocationServiceEnabled();
     if (enabled != _locationServiceEnabled) {
       setState(() {
@@ -77,7 +77,7 @@ class _LocationButtonState extends State<LocationButton> {
     }
   }
 
-  Future<void> _onPressed() async {
+  void _onPressed() async {
     bool permissionGranted = false;
 
     // Check permission
