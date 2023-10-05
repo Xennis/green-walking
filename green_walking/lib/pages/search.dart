@@ -7,8 +7,7 @@ import '../widgets/app_bar.dart';
 import '../widgets/search_result_card.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({Key? key, this.userPosition, this.reversePosition, this.proximity, required this.accessToken})
-      : super(key: key);
+  const SearchPage({super.key, this.userPosition, this.reversePosition, this.proximity, required this.accessToken});
 
   final String accessToken;
   final Position? userPosition;

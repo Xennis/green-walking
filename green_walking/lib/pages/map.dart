@@ -1,9 +1,9 @@
-import 'dart:async';
 import 'dart:developer' show log;
 
 import 'package:flutter/material.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' show CameraOptions, CameraState;
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' show CameraOptions, CameraState, Position;
 
+import 'search.dart';
 import '../services/shared_prefs.dart';
 import '../widgets/gdpr_dialog.dart';
 import '../widgets/map_view.dart';
@@ -46,6 +46,17 @@ class _MapPageState extends State<MapPage> {
                       accessToken: data.accessToken,
                       lastCameraOption: data.lastPosition,
                       onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
+                      onSearchPage: ({Position? userPosition, Position? reversePosition, Position? proximity}) {
+                        return Navigator.push(
+                          context,
+                          _NoTransitionPageRoute<Position>(
+                              builder: (BuildContext context) => SearchPage(
+                                  userPosition: userPosition,
+                                  reversePosition: reversePosition,
+                                  proximity: proximity,
+                                  accessToken: data.accessToken)),
+                        );
+                      },
                     )),
                   ],
                 ),
@@ -76,5 +87,15 @@ class _MapConfig {
     final CameraOptions lastPosition = CameraOptions(
         center: lastState.center, zoom: lastState.zoom, bearing: lastState.bearing, pitch: lastState.pitch);
     return _MapConfig(accessToken, lastPosition: lastPosition);
+  }
+}
+
+class _NoTransitionPageRoute<T> extends MaterialPageRoute<T> {
+  _NoTransitionPageRoute({required WidgetBuilder builder, super.settings}) : super(builder: builder);
+
+  @override
+  Widget buildTransitions(
+      BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+    return child;
   }
 }
