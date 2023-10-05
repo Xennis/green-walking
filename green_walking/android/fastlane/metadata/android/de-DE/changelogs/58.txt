@@ -1,0 +1,3 @@
+* Anzeigen der Entfernung zu einem Suchergebnis (wenn Position aktiviert ist)
+* Anzeigen eines Maßstabs auf der Karte
+* Link hinzugefügt, um Suchergebnis in einer anderen App zu öffnen
