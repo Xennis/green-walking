@@ -91,7 +91,7 @@ class _MapConfig {
 }
 
 class _NoTransitionPageRoute<T> extends MaterialPageRoute<T> {
-  _NoTransitionPageRoute({required WidgetBuilder builder, super.settings}) : super(builder: builder);
+  _NoTransitionPageRoute({required super.builder, super.settings});
 
   @override
   Widget buildTransitions(
