@@ -4,5 +4,5 @@ Discover your surrounding with this detailed map. Use it to app to find trails f
 
 * Super detailed map provided by OpenStreetMap (OSM)
 * Satellite view with streets overlay
-* Search to find places and addresses (geocoding)
-* Maximum zoom to see all details
+* Search to find places and addresses (geocoding & reverse geocoding)
+* Maximum zoom level to see all details
