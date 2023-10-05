@@ -1,0 +1,3 @@
+* Show distance to a search result (if location is enabled)
+* Show a scale bar on the map
+* Allow opening a search result in another app
