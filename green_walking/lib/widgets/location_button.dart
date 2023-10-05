@@ -18,7 +18,7 @@ class LocationButton extends StatefulWidget {
 }
 
 class _LocationButtonState extends State<LocationButton> {
-  late final Timer _timer;
+  late final Timer _updateEnabled;
 
   bool _locationServiceEnabled = true;
 
@@ -27,14 +27,14 @@ class _LocationButtonState extends State<LocationButton> {
     super.initState();
 
     _checkLocationServiceEnabled();
-    _timer = Timer.periodic(const Duration(seconds: 1, microseconds: 500), (Timer result) {
+    _updateEnabled = Timer.periodic(const Duration(seconds: 1, microseconds: 500), (Timer result) {
       _checkLocationServiceEnabled();
     });
   }
 
   @override
   void dispose() {
-    _timer.cancel();
+    _updateEnabled.cancel();
     super.dispose();
   }
 
