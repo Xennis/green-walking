@@ -6,19 +6,24 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 import '../library/map_utils.dart';
-import '../pages/search.dart';
 import '../services/shared_prefs.dart';
 import '../widgets/app_bar.dart';
-import '../widgets/page_route.dart';
 import '../widgets/location_button.dart';
 import '../config.dart';
 
 class MapView extends StatefulWidget {
-  const MapView({super.key, required this.accessToken, required this.lastCameraOption, required this.onOpenDrawer});
+  const MapView(
+      {super.key,
+      required this.accessToken,
+      required this.lastCameraOption,
+      required this.onOpenDrawer,
+      required this.onSearchPage});
 
   final String accessToken;
   final CameraOptions? lastCameraOption;
-  final Function()? onOpenDrawer;
+  final void Function() onOpenDrawer;
+  final Future<Position?> Function({Position? userPosition, Position? reversePosition, Position? proximity})
+      onSearchPage;
 
   @override
   State<MapView> createState() => _MapViewState();
@@ -98,16 +103,7 @@ class _MapViewState extends State<MapView> {
       final Position tapPosition = Position(coordinate.y, coordinate.x);
       final Position? userPosition = (await _mapboxMap.getPuckLocation())?.position;
 
-      // See https://dart.dev/tools/linter-rules/use_build_context_synchronously
-      if (context.mounted) {
-        final Position? moveToLoc = await Navigator.push(
-          context,
-          NoTransitionPageRoute<Position>(
-              builder: (BuildContext context) =>
-                  SearchPage(userPosition: userPosition, reversePosition: tapPosition, accessToken: accesstoken)),
-        );
-        return _displaySearchResult(moveToLoc);
-      }
+      return _displaySearchResult(await widget.onSearchPage(userPosition: userPosition, reversePosition: tapPosition));
     } catch (e) {
       log('failed to get tap position: $e');
       return;
@@ -120,17 +116,7 @@ class _MapViewState extends State<MapView> {
       return;
     }
     final Position? userPosition = (await _mapboxMap.getPuckLocation())?.position;
-
-    // See https://dart.dev/tools/linter-rules/use_build_context_synchronously
-    if (context.mounted) {
-      final Position? moveToLoc = await Navigator.push(
-        context,
-        NoTransitionPageRoute<Position>(
-            builder: (BuildContext context) =>
-                SearchPage(userPosition: userPosition, proximity: cameraPosition, accessToken: accessToken)),
-      );
-      return _displaySearchResult(moveToLoc);
-    }
+    return _displaySearchResult(await widget.onSearchPage(userPosition: userPosition, proximity: cameraPosition));
   }
 
   void _onLayerToggle() async {
