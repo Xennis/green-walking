@@ -30,12 +30,13 @@ class MapView extends StatefulWidget {
 }
 
 class _MapViewState extends State<MapView> {
-  final ValueNotifier<UserLocationTracking> _userlocationTracking =
+  final ValueNotifier<UserLocationTracking> _userLocationTracking =
       ValueNotifier<UserLocationTracking>(UserLocationTracking.no);
   late MapboxMap _mapboxMap;
 
   CircleAnnotationManager? _circleAnnotationManager;
-  Timer? _timer;
+  Timer? _updateUserLocation;
+  Timer? _hideScaleBar;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +45,7 @@ class _MapViewState extends State<MapView> {
       children: <Widget>[
         _mapWidget(),
         LocationButton(
-            trackUserLocation: _userlocationTracking,
+            trackUserLocation: _userLocationTracking,
             onOkay: (bool permissionGranted) => _onLocationSearchPressed(locale, permissionGranted),
             onNoPermissions: () => ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(locale.errorNoLocationPermission)),
@@ -68,16 +69,32 @@ class _MapViewState extends State<MapView> {
     );
   }
 
+  @override
+  void dispose() {
+    _updateUserLocation?.cancel();
+    _hideScaleBar?.cancel();
+    super.dispose();
+  }
+
   Widget _mapWidget() {
     return MapWidget(
       key: const ValueKey('mapWidget'),
       resourceOptions: ResourceOptions(accessToken: widget.accessToken),
       onMapCreated: (MapboxMap mapboxMap) {
         _mapboxMap = mapboxMap;
-
         //_mapboxMap.setTelemetryEnabled(false);
-        _mapboxMap.compass.updateSettings(CompassSettings(marginTop: 400.0));
-        _mapboxMap.scaleBar.updateSettings(ScaleBarSettings(enabled: false));
+        _mapboxMap.compass.updateSettings(CompassSettings(marginTop: 400.0, marginRight: 35.0));
+        // By default the logo and attribution have little margin to the bottom
+        _mapboxMap.logo.updateSettings(LogoSettings(marginBottom: 22.0));
+        _mapboxMap.attribution.updateSettings(AttributionSettings(marginBottom: 22.0));
+        // By default the scaleBar has a black primary colors which is pretty flashy.
+        _mapboxMap.scaleBar.updateSettings(ScaleBarSettings(
+            enabled: false,
+            position: OrnamentPosition.BOTTOM_LEFT,
+            marginBottom: 115.0,
+            marginLeft: 20.0,
+            isMetricUnits: true,
+            primaryColor: Colors.blueGrey.value));
         _mapboxMap.annotations.createCircleAnnotationManager().then((value) {
           _circleAnnotationManager = value;
         });
@@ -87,10 +104,13 @@ class _MapViewState extends State<MapView> {
       styleUri: CustomMapboxStyles.outdoor,
       onMapIdleListener: _onCameraIdle,
       onLongTapListener: (ScreenCoordinate coordinate) => _onLongTapListener(widget.accessToken, coordinate),
+      onCameraChangeListener: (CameraChangedEventData cameraChangedEventData) {
+        _mapboxMap.scaleBar.updateSettings(ScaleBarSettings(enabled: true));
+      },
       onScrollListener: (ScreenCoordinate coordinate) {
-        if (_userlocationTracking.value != UserLocationTracking.no) {
+        if (_userLocationTracking.value != UserLocationTracking.no) {
           // Turn off tracking because user scrolled to another location.
-          _userlocationTracking.value = UserLocationTracking.no;
+          _userLocationTracking.value = UserLocationTracking.no;
         }
       },
     );
@@ -129,10 +149,10 @@ class _MapViewState extends State<MapView> {
   }
 
   Future<void> _onLocationSearchPressed(AppLocalizations locale, bool permissionGranted) async {
-    if (_userlocationTracking.value == UserLocationTracking.position) {
-      _userlocationTracking.value = UserLocationTracking.positionBearing;
+    if (_userLocationTracking.value == UserLocationTracking.position) {
+      _userLocationTracking.value = UserLocationTracking.positionBearing;
     } else {
-      _userlocationTracking.value = UserLocationTracking.position;
+      _userLocationTracking.value = UserLocationTracking.position;
     }
     await _mapboxMap.location.updateSettings(LocationComponentSettings(
         enabled: true, pulsingEnabled: false, showAccuracyRing: true, puckBearingEnabled: true));
@@ -140,6 +160,11 @@ class _MapViewState extends State<MapView> {
   }
 
   Future<void> _onCameraIdle(MapIdleEventData mapIdleEventData) async {
+    // Delay hiding the scale bar.
+    _hideScaleBar?.cancel();
+    _hideScaleBar =
+        Timer(const Duration(seconds: 1), () => _mapboxMap.scaleBar.updateSettings(ScaleBarSettings(enabled: false)));
+
     // TODO: Maybe use a Timer instead of writing data that often?
     final CameraState cameraState = await _mapboxMap.getCameraState();
     SharedPrefs.setCameraState(SharedPrefs.keyLastPosition, cameraState);
@@ -157,10 +182,10 @@ class _MapViewState extends State<MapView> {
   }
 
   void _refreshTrackLocation() async {
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(milliseconds: 900), (timer) async {
-      if (_userlocationTracking.value == UserLocationTracking.no) {
-        _timer?.cancel();
+    _updateUserLocation?.cancel();
+    _updateUserLocation = Timer.periodic(const Duration(milliseconds: 900), (timer) async {
+      if (_userLocationTracking.value == UserLocationTracking.no) {
+        _updateUserLocation?.cancel();
         return;
       }
 
@@ -173,7 +198,7 @@ class _MapViewState extends State<MapView> {
         return;
       }
 
-      switch (_userlocationTracking.value) {
+      switch (_userLocationTracking.value) {
         case UserLocationTracking.positionBearing:
           _setCameraPosition(puckLocation.position, puckLocation.bearing, 50.0);
         case UserLocationTracking.position:
@@ -190,7 +215,7 @@ class _MapViewState extends State<MapView> {
       return;
     }
     // If we keep the tracking on the map would move back to the user location.
-    _userlocationTracking.value = UserLocationTracking.no;
+    _userLocationTracking.value = UserLocationTracking.no;
     _setCameraPosition(position, 0, 0);
 
     // Draw circle
