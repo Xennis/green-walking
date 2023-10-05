@@ -18,24 +18,20 @@ environment:
   sdk: ">=3.1.0 <4.0.0"
 
 dependencies:
-  firebase_analytics: ^10.4.2
-  firebase_core: ^2.13.1
-  firebase_crashlytics: ^3.3.2
+  firebase_analytics: ^10.5.1
+  firebase_core: ^2.17.0
+  firebase_crashlytics: ^3.3.7
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  geolocator: ^9.0.2
-  http: ^1.0.0
-  intl: ^0.18.0
+  geolocator: ^10.1.0
+  http: ^1.1.0
+  intl: ^0.18.1
   mapbox_maps_flutter: ^0.4.4
-  shared_preferences: ^2.0.8
+  shared_preferences: ^2.2.1
   turf: ^0.0.8
-  url_launcher: ^6.0.13
-
-dependency_overrides:
-  # See https://github.com/transistorsoft/flutter_background_geolocation/issues/933#issuecomment-1407797107
-  geolocator_android: 4.1.4
+  url_launcher: ^6.1.14
 
 dev_dependencies:
   #flutter_launcher_icons: ^0.8.1
@@ -47,7 +43,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.1
+  flutter_lints: ^2.0.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
