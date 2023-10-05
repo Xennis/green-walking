@@ -43,7 +43,10 @@ params:
 <br>- Maximum zoom to see all details</p>'
     android: https://play.google.com/store/apps/details?id=org.xennis.apps.green_walking
     screenshots:
-      1.png: Screenshot app overview
-      2.png: Screenshot app satellite layer
-      3.png: Screenshot app 3d view
-      4.png: Screenshot app overview
+      1.png: Screenshot app satellite layer
+      2.png: Screenshot app street layer
+      3.png: Screenshot app street detailed
+      4.png: Screenshot app satellite detailed
+      #5.png: Screenshot app overview
+      #6.png: Screenshot app overview
+      #7.png: Screenshot app overview
