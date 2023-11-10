@@ -11,6 +11,8 @@ class ImprintPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(locale.imprint),
@@ -22,7 +24,7 @@ class ImprintPage extends StatelessWidget {
           children: <Widget>[
             RichText(
               text: TextSpan(
-                style: const TextStyle(color: Colors.black),
+                style: TextStyle(color: theme.unselectedWidgetColor),
                 children: <InlineSpan>[
                   TextSpan(
                     text: '${locale.imprintTmgText('5')}:\n\n',
@@ -40,7 +42,7 @@ class ImprintPage extends StatelessWidget {
                   TextSpan(text: '${locale.imprintGdprApplyText} '),
                   TextSpan(
                     text: locale.gdprPrivacyPolicy,
-                    style: const TextStyle(color: Colors.blue),
+                    style: TextStyle(color: theme.primaryColor),
                     recognizer: TapGestureRecognizer()..onTap = () => launchUrl(privacyPolicyUrl),
                   ),
                   const TextSpan(text: '.')

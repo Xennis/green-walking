@@ -338,5 +338,22 @@
   "followLocationOffToast": "Follow location off",
   "@followLocationOffToast": {
     "description": "Toast message if the map stops following the users location."
-  }
+  },
+  "optionTheme": "Theme",
+  "@optionDarkTheme": {
+    "description": "Option to select the theme of the application."
+  },
+  "optionDarkTheme": "Dark",
+  "@optionDarkTheme": {
+    "description": "Label for the dark theme."
+  },
+  "optionLightTheme": "Light",
+  "@optionLightTheme": {
+    "description": "Label for the light theme."
+  },
+  "optionSystem": "System",
+  "@optionSystem": {
+    "description": "Label for using the language/theme/... of the operating system."
+  },
+  "language": "Language"
 }

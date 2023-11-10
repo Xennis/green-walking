@@ -13,13 +13,15 @@ class AppNavigationDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.secondary,
+              color: theme.primaryColor,
             ),
             child: Column(children: <Widget>[
               Row(children: <Widget>[

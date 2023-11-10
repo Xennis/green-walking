@@ -5,10 +5,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../config.dart';
-import '../services/shared_prefs.dart';
+import '../services/app_prefs.dart';
 
 void enableAnalyticsOrConsent(BuildContext context) {
-  SharedPrefs.getBool(SharedPrefs.analyticsEnabled).then((bool? enabled) {
+  AppPrefs.getBool(AppPrefs.analyticsEnabled).then((bool? enabled) {
     if (enabled == true) {
       // Privacy: Only enable analytics if it is set to enabled.
       FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
@@ -24,26 +24,28 @@ class GdprDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+
     return AlertDialog(
       content: SingleChildScrollView(
         child: ListBody(
           children: <Widget>[
             RichText(
-              text: TextSpan(style: const TextStyle(color: Colors.grey), children: <InlineSpan>[
+              text: TextSpan(style: TextStyle(color: theme.hintColor), children: <InlineSpan>[
                 TextSpan(
                   text: '${locale.gdprDialogText} ',
                 ),
                 TextSpan(
                   text: locale.gdprPrivacyPolicy,
-                  style: const TextStyle(color: Colors.blue),
+                  style: TextStyle(color: theme.primaryColor),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
                       launchUrl(privacyPolicyUrl);
                     },
                 ),
-                const TextSpan(
+                TextSpan(
                   text: '.',
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(color: theme.hintColor),
                 ),
               ]),
             ),
@@ -54,14 +56,14 @@ class GdprDialog extends StatelessWidget {
         TextButton(
             child: Text(locale.gdprDisagree.toUpperCase()),
             onPressed: () {
-              SharedPrefs.setBool(SharedPrefs.analyticsEnabled, false);
+              AppPrefs.setBool(AppPrefs.analyticsEnabled, false);
               FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(false);
               Navigator.of(context).pop();
             }),
         TextButton(
             child: Text(locale.gdprAgree.toUpperCase()),
             onPressed: () {
-              SharedPrefs.setBool(SharedPrefs.analyticsEnabled, true);
+              AppPrefs.setBool(AppPrefs.analyticsEnabled, true);
               FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
               Navigator.of(context).pop();
             }),

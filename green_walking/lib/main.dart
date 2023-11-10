@@ -3,8 +3,10 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
+import 'provider/prefs_provider.dart';
 import 'routes.dart';
 
 Future<void> main() async {
@@ -24,29 +26,35 @@ class GreenWalkingApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = ThemeData();
-    return MaterialApp(
-      onGenerateTitle: (BuildContext context) => AppLocalizations.of(context)!.appTitle,
-      theme: theme.copyWith(
-        primaryColor: Colors.green,
-        colorScheme: theme.colorScheme.copyWith(secondary: Colors.blue),
-        // This makes the visual density adapt to the platform that you run
-        // the app on. For desktop platforms, the controls will be smaller and
-        // closer together (more dense) than on mobile platforms.
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      initialRoute: Routes.map,
-      routes: () {
-        final Map<String, WidgetBuilder> routes = getRoutes(context);
-        return routes;
-      }(),
-      localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: AppLocalizations.supportedLocales,
-    );
+    return ChangeNotifierProvider<AppPrefsProvider>(
+        create: (_) => AppPrefsProvider(true),
+        child: Builder(builder: (context) {
+          final AppPrefsProvider prefsProvider = Provider.of<AppPrefsProvider>(context);
+          return MaterialApp(
+            onGenerateTitle: (BuildContext context) => AppLocalizations.of(context)!.appTitle,
+            theme: ThemeData(
+              brightness: Brightness.light,
+              primaryColor: Colors.blue,
+            ),
+            darkTheme: ThemeData(
+              brightness: Brightness.dark,
+              primaryColor: Colors.blue,
+            ),
+            themeMode: prefsProvider.themeMode,
+            initialRoute: Routes.map,
+            routes: () {
+              final Map<String, WidgetBuilder> routes = getRoutes(context);
+              return routes;
+            }(),
+            locale: prefsProvider.locale,
+            localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+          );
+        }));
   }
 }

@@ -45,10 +45,11 @@ class _TrailingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
 
     final List<Widget> children = [
       IconButton(
-          color: Theme.of(context).colorScheme.secondary,
+          color: theme.primaryColor,
           tooltip: locale.openLocationInDefaultAppSemanticLabel,
           icon: Icon(Icons.open_in_new, semanticLabel: locale.openLocationInDefaultAppSemanticLabel),
           onPressed: () => launchUrlString(
@@ -59,7 +60,7 @@ class _TrailingWidget extends StatelessWidget {
       children.insert(
           0,
           IconButton(
-              color: Theme.of(context).primaryColor,
+              color: Colors.green,
               tooltip: locale.openLocationDetailsSemanticLabel,
               icon: Icon(Icons.info_outline, semanticLabel: locale.openLocationDetailsSemanticLabel),
               onPressed: () => launchUrl(url)));
