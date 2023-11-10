@@ -50,5 +50,11 @@
   "openLocationInDefaultAppSemanticLabel": "Öffnen mit Standardapp",
   "openLocationDetailsSemanticLabel": "Details anzeigen",
   "followLocationToast": "Position folgen",
-  "followLocationOffToast": "Position folgen aus"
+  "followLocationOffToast": "Position folgen aus",
+  "optionDarkTheme": "Dark Theme",
+  "optionTheme": "Design",
+  "optionDarkTheme": "Dunkel",
+  "optionLightTheme": "Hell",
+  "optionSystem": "System",
+  "language": "Sprache"
 }

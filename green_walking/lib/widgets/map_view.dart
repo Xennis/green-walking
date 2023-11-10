@@ -7,7 +7,7 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../library/map_utils.dart';
-import '../services/shared_prefs.dart';
+import '../services/app_prefs.dart';
 import '../widgets/app_bar.dart';
 import '../widgets/location_button.dart';
 import '../config.dart';
@@ -54,7 +54,6 @@ class _MapViewState extends State<MapView> {
         MapAppBar(
           onLayerToogle: _onLayerToggle,
           leading: IconButton(
-              splashColor: Colors.grey,
               icon: Icon(Icons.menu, semanticLabel: MaterialLocalizations.of(context).openAppDrawerTooltip),
               onPressed: widget.onOpenDrawer),
           title: TextField(
@@ -178,7 +177,7 @@ class _MapViewState extends State<MapView> {
 
     // TODO: Maybe use a Timer instead of writing data that often?
     final CameraState cameraState = await _mapboxMap.getCameraState();
-    SharedPrefs.setCameraState(SharedPrefs.keyLastPosition, cameraState);
+    AppPrefs.setCameraState(AppPrefs.keyLastPosition, cameraState);
   }
 
   Future<void> _setCameraPosition(Position position, double? bearing, double? pitch) async {

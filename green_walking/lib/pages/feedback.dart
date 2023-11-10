@@ -10,6 +10,8 @@ class FeedbackPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(locale.feedbackPage),
@@ -21,7 +23,7 @@ class FeedbackPage extends StatelessWidget {
           children: <Widget>[
             RichText(
               text: TextSpan(
-                style: const TextStyle(color: Colors.black),
+                style: TextStyle(color: theme.unselectedWidgetColor),
                 children: <InlineSpan>[
                   TextSpan(
                     text: '${locale.feedbackPageText}\n',

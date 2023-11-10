@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' show CameraOptions, CameraState, Position;
 
 import 'search.dart';
-import '../services/shared_prefs.dart';
+import '../services/app_prefs.dart';
 import '../widgets/gdpr_dialog.dart';
 import '../widgets/map_view.dart';
 import '../widgets/navigation_drawer.dart';
@@ -80,7 +80,7 @@ class _MapConfig {
 
   static Future<_MapConfig> create(AssetBundle assetBundle) async {
     final String accessToken = await assetBundle.loadString('assets/mapbox-access-token.txt');
-    final CameraState? lastState = await SharedPrefs.getCameraState(SharedPrefs.keyLastPosition);
+    final CameraState? lastState = await AppPrefs.getCameraState(AppPrefs.keyLastPosition);
     if (lastState == null) {
       return _MapConfig(accessToken, lastPosition: null);
     }

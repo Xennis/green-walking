@@ -1,69 +1,32 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
 
-import '../services/shared_prefs.dart';
+import '../provider/prefs_provider.dart';
+import '../widgets/settings/analytics_list_tile.dart';
+import '../widgets/settings/language_list_tile.dart';
+import '../widgets/settings/theme_list_tile.dart';
 
-class SettingsPage extends StatefulWidget {
+class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
-
-  @override
-  State<SettingsPage> createState() => _SettingsPageState();
-}
-
-class _SettingsPageState extends State<SettingsPage> {
-  bool _analyticsEnabled = false;
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context)!;
+    final AppPrefsProvider prefsProvider = Provider.of<AppPrefsProvider>(context);
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(locale.settingsPage),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(15, 25, 15, 25),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      const Text('Google Analytics', style: TextStyle(fontSize: 16.0)),
-                      Text(
-                        locale.settingsTrackingDescription,
-                        style: const TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                  FutureBuilder<bool?>(
-                      future: SharedPrefs.getBool(SharedPrefs.analyticsEnabled),
-                      initialData: _analyticsEnabled,
-                      builder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
-                        return Switch(
-                          value: snapshot.data ?? false,
-                          onChanged: (bool? value) {
-                            if (value == null) {
-                              return;
-                            }
-                            SharedPrefs.setBool(SharedPrefs.analyticsEnabled, value);
-                            FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(value);
-                            setState(() {
-                              _analyticsEnabled = value;
-                            });
-                          },
-                        );
-                      }),
-                ],
-              ),
-            )
-          ],
+        appBar: AppBar(
+          title: Text(locale.settingsPage),
         ),
-      ),
-    );
+        body: SingleChildScrollView(
+            child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
+                child: Column(children: [
+                  ThemeListTile(prefsProvider.themeMode),
+                  LanguageListTile(prefsProvider.locale),
+                  const Divider(),
+                  const AnalyticsListTile()
+                ]))));
   }
 }

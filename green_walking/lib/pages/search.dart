@@ -42,6 +42,7 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
 
     return Scaffold(
         // If the search in the search bar is clicked the keyboard appears. The keyboard
@@ -53,13 +54,12 @@ class _SearchPageState extends State<SearchPage> {
             children: <Widget>[
               MapAppBar(
                 leading: IconButton(
-                    splashColor: Colors.grey,
                     icon: Icon(Icons.arrow_back, semanticLabel: MaterialLocalizations.of(context).backButtonTooltip),
                     onPressed: () => Navigator.pop(context)),
                 title: TextField(
                   controller: _queryFieldController,
                   autofocus: true,
-                  cursorColor: Colors.black,
+                  cursorColor: theme.hintColor,
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.go,
                   decoration: InputDecoration(
@@ -94,6 +94,8 @@ class _SearchPageState extends State<SearchPage> {
       return Container();
     }
     final AppLocalizations locale = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+
     return FutureBuilder<GeocodingResult>(
         future: _result,
         builder: (BuildContext context, AsyncSnapshot<GeocodingResult> snapshot) {
@@ -129,7 +131,7 @@ class _SearchPageState extends State<SearchPage> {
                   children: [
                     Flexible(
                         child: Text(locale.geocodingResultLegalNotice(data.attribution),
-                            style: const TextStyle(color: Colors.grey, fontSize: 12.0)))
+                            style: TextStyle(color: theme.hintColor, fontSize: 12.0)))
                   ],
                 ),
               ],

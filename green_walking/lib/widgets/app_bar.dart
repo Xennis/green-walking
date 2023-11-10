@@ -11,13 +11,15 @@ class MapAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context)!;
+    final ThemeData theme = Theme.of(context);
+
     return SafeArea(
         top: true,
         child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 11, 16, 0),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.scaffoldBackgroundColor,
                 border: Border.all(color: Colors.grey[200]!),
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -30,7 +32,6 @@ class MapAppBar extends StatelessWidget {
                       child: title,
                     ),
                     IconButton(
-                      splashColor: Colors.grey,
                       icon: Icon(
                         Icons.layers,
                         semanticLabel: locale.mapSwitchLayerSemanticLabel,

@@ -40,12 +40,14 @@ class _LocationButtonState extends State<LocationButton> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     return Align(
       alignment: Alignment.bottomRight,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 18.0, right: 18.0),
         child: FloatingActionButton(
-            backgroundColor: Theme.of(context).colorScheme.secondary,
+            backgroundColor: theme.primaryColor,
             onPressed: _onPressed,
             child: ValueListenableBuilder<UserLocationTracking>(
                 valueListenable: widget.trackUserLocation,
