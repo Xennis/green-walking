@@ -34,3 +34,5 @@ release-web:
 upgrade:
 	@echo ">>> Upgrade Flutter dependencies"
 	flutter pub upgrade --major-versions
+	@echo ">>> Upgrade Fastlane dependencies"
+	cd android/ && bundle update
