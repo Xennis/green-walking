@@ -1,0 +1,2 @@
+* Bildschirm bleibt an, wenn die Karte der Position folgt
+* Abhängigkeiten aktualisiert
