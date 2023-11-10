@@ -30,3 +30,7 @@ release-android:
 release-web:
 	@echo ">>> [Web] Flutter build release"
 	flutter build web
+
+upgrade:
+	@echo ">>> Upgrade Flutter dependencies"
+	flutter pub upgrade --major-versions
