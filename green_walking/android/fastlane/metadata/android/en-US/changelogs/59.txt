@@ -1,0 +1,2 @@
+* Keep screen on if the map follows the users location
+* Update dependencies
