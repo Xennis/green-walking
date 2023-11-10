@@ -48,5 +48,7 @@
   "geocodingResultLegalNotice": "Suchergebnisse: {legalNotice}",
   "geocodingAdvancedSearchButton": "Erweiterte Suche",
   "openLocationInDefaultAppSemanticLabel": "Öffnen mit Standardapp",
-  "openLocationDetailsSemanticLabel": "Details anzeigen"
+  "openLocationDetailsSemanticLabel": "Details anzeigen",
+  "followLocationToast": "Position folgen",
+  "followLocationOffToast": "Position folgen aus"
 }

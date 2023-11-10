@@ -4,6 +4,7 @@ import 'dart:developer' show log;
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../library/map_utils.dart';
 import '../services/shared_prefs.dart';
@@ -43,7 +44,7 @@ class _MapViewState extends State<MapView> {
     final AppLocalizations locale = AppLocalizations.of(context)!;
     return Stack(
       children: <Widget>[
-        _mapWidget(),
+        _mapWidget(locale),
         LocationButton(
             trackUserLocation: _userLocationTracking,
             onOkay: (bool permissionGranted) => _onLocationSearchPressed(locale, permissionGranted),
@@ -76,7 +77,7 @@ class _MapViewState extends State<MapView> {
     super.dispose();
   }
 
-  Widget _mapWidget() {
+  Widget _mapWidget(AppLocalizations locale) {
     return MapWidget(
       key: const ValueKey('mapWidget'),
       resourceOptions: ResourceOptions(accessToken: widget.accessToken),
@@ -113,6 +114,10 @@ class _MapViewState extends State<MapView> {
         if (_userLocationTracking.value != UserLocationTracking.no) {
           // Turn off tracking because user scrolled to another location.
           _userLocationTracking.value = UserLocationTracking.no;
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(locale.followLocationOffToast),
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.fromLTRB(20.0, 0.0, 92.0, 22.0)));
         }
       },
     );
@@ -154,6 +159,10 @@ class _MapViewState extends State<MapView> {
     if (_userLocationTracking.value == UserLocationTracking.position) {
       _userLocationTracking.value = UserLocationTracking.positionBearing;
     } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(locale.followLocationToast),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.fromLTRB(20.0, 0.0, 92.0, 22.0)));
       _userLocationTracking.value = UserLocationTracking.position;
     }
     await _mapboxMap.location.updateSettings(LocationComponentSettings(
@@ -185,8 +194,10 @@ class _MapViewState extends State<MapView> {
 
   void _refreshTrackLocation() async {
     _updateUserLocation?.cancel();
+    WakelockPlus.enable();
     _updateUserLocation = Timer.periodic(const Duration(milliseconds: 900), (timer) async {
       if (_userLocationTracking.value == UserLocationTracking.no) {
+        WakelockPlus.disable();
         _updateUserLocation?.cancel();
         return;
       }

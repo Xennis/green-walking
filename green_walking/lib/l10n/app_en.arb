@@ -330,5 +330,13 @@
   "openLocationDetailsSemanticLabel": "Show details",
   "@openLocationDetailsSemanticLabel": {
     "description": "Semantic label to open details of a location."
+  },
+  "followLocationToast": "Follow location",
+  "@followLocationToast": {
+    "description": "Toast message if the map follows the user location."
+  },
+  "followLocationOffToast": "Follow location off",
+  "@followLocationOffToast": {
+    "description": "Toast message if the map stops following the users location."
   }
 }
