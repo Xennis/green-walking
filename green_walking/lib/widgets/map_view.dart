@@ -85,16 +85,16 @@ class _MapViewState extends State<MapView> {
         _mapboxMap.style.setProjection('globe');
         // _mapboxMap.style.localizeLabels('en', null);
         //_mapboxMap.setTelemetryEnabled(false);
-        _mapboxMap.compass.updateSettings(CompassSettings(marginTop: 400.0, marginRight: 35.0));
+        _mapboxMap.compass.updateSettings(CompassSettings(marginTop: 125.0, marginRight: 13.0));
         // By default the logo and attribution have little margin to the bottom
-        _mapboxMap.logo.updateSettings(LogoSettings(marginBottom: 22.0));
-        _mapboxMap.attribution.updateSettings(AttributionSettings(marginBottom: 22.0));
+        _mapboxMap.logo.updateSettings(LogoSettings(marginBottom: 13.0));
+        _mapboxMap.attribution.updateSettings(AttributionSettings(marginBottom: 13.0));
         // By default the scaleBar has a black primary colors which is pretty flashy.
         _mapboxMap.scaleBar.updateSettings(ScaleBarSettings(
             enabled: false,
             position: OrnamentPosition.BOTTOM_LEFT,
-            marginBottom: 115.0,
-            marginLeft: 20.0,
+            marginBottom: 48.0,
+            marginLeft: 13.0,
             isMetricUnits: true,
             primaryColor: Colors.blueGrey.value));
         _mapboxMap.annotations.createCircleAnnotationManager().then((value) {
