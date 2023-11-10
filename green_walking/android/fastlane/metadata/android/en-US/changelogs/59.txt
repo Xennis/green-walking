@@ -1,2 +1,3 @@
 * Keep screen on if the map follows the users location
+* Allow setting the theme and language
 * Update dependencies
