@@ -1,2 +1,3 @@
 * Bildschirm bleibt an, wenn die Karte der Position folgt
+* Einstellungen für Theme and Sprache hinzugefügt
 * Abhängigkeiten aktualisiert
