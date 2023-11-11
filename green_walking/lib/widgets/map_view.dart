@@ -48,9 +48,7 @@ class _MapViewState extends State<MapView> {
         LocationButton(
             trackUserLocation: _userLocationTracking,
             onOkay: (bool permissionGranted) => _onLocationSearchPressed(locale, permissionGranted),
-            onNoPermissions: () => ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(locale.errorNoLocationPermission)),
-                )),
+            onNoPermissions: () => _displaySnackBar(locale.errorNoLocationPermission)),
         MapAppBar(
           onLayerToogle: _onLayerToggle,
           leading: IconButton(
@@ -113,10 +111,7 @@ class _MapViewState extends State<MapView> {
         if (_userLocationTracking.value != UserLocationTracking.no) {
           // Turn off tracking because user scrolled to another location.
           _userLocationTracking.value = UserLocationTracking.no;
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(locale.followLocationOffToast),
-              behavior: SnackBarBehavior.floating,
-              margin: const EdgeInsets.fromLTRB(20.0, 0.0, 92.0, 22.0)));
+          _displaySnackBar(locale.followLocationOffToast);
         }
       },
     );
@@ -158,10 +153,10 @@ class _MapViewState extends State<MapView> {
     if (_userLocationTracking.value == UserLocationTracking.position) {
       _userLocationTracking.value = UserLocationTracking.positionBearing;
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(locale.followLocationToast),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.fromLTRB(20.0, 0.0, 92.0, 22.0)));
+      // Display toast only once and not multiple times if button is pressed multiple times.
+      if (_userLocationTracking.value == UserLocationTracking.no) {
+        _displaySnackBar(locale.followLocationToast);
+      }
       _userLocationTracking.value = UserLocationTracking.position;
     }
     await _mapboxMap.location.updateSettings(LocationComponentSettings(
@@ -239,5 +234,15 @@ class _MapViewState extends State<MapView> {
         circleOpacity: 0.6,
         circleStrokeWidth: 2,
         circleStrokeColor: const Color.fromRGBO(255, 192, 203, 1).value));
+  }
+
+  void _displaySnackBar(String text) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(text),
+        // Otherwise you can't click the custom floating button.
+        dismissDirection: DismissDirection.none,
+        duration: const Duration(seconds: 1, milliseconds: 200),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.fromLTRB(20.0, 0.0, 92.0, 22.0)));
   }
 }
