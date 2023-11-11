@@ -29,8 +29,11 @@ class _AnalyticsListTileState extends State<AnalyticsListTile> {
           initialData: _enabled,
           builder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
             return Switch(
-                value: _enabled,
-                onChanged: (bool newValue) {
+                value: snapshot.data ?? false,
+                onChanged: (bool? newValue) {
+                  if (newValue == null) {
+                    return;
+                  }
                   AppPrefs.setBool(AppPrefs.analyticsEnabled, newValue);
                   FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(newValue);
                   setState(() {
