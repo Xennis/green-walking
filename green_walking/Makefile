@@ -27,10 +27,6 @@ release-android:
 	@echo ">>> [Android] Fastlane upload to Play Store"
 	cd android && bundle exec fastlane alpha
 
-release-web:
-	@echo ">>> [Web] Flutter build release"
-	flutter build web
-
 upgrade:
 	@echo ">>> Upgrade Flutter dependencies"
 	flutter pub upgrade --major-versions
