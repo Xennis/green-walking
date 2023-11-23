@@ -28,6 +28,10 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- Privacy: Disable crash reporting by default. -->
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
         <!-- Privacy: Disable tracking by default. -->
         <meta-data
             android:name="firebase_analytics_collection_enabled"

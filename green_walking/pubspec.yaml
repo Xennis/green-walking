@@ -18,7 +18,6 @@ environment:
   sdk: ">=3.1.0 <4.0.0"
 
 dependencies:
-  firebase_analytics: ^10.6.4
   firebase_core: ^2.22.0
   firebase_crashlytics: ^3.4.4
   flutter:
