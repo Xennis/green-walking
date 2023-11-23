@@ -5,7 +5,7 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' show CameraOptions
 
 import 'search.dart';
 import '../services/app_prefs.dart';
-import '../widgets/gdpr_dialog.dart';
+import '../widgets/user_consent_dialog.dart';
 import '../widgets/map_view.dart';
 import '../widgets/navigation_drawer.dart';
 
@@ -22,7 +22,7 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => enableAnalyticsOrConsent(context));
+    WidgetsBinding.instance.addPostFrameCallback((_) => enableCrashReportingOrConsent(context));
   }
 
   @override

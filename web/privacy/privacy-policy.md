@@ -19,9 +19,9 @@ Unsere Datenschutzerklärung ist wie folgt gegliedert:
 Verantwortlicher Anbieter dieser App im datenschutzrechtlichen Sinne ist:
 
     Fabian Rosenthal
-    Schäferkampsallee 61
-    20357 Hamburg
-    DE – Germany
+    Methfesselstraße 96
+    20255 Hamburg
+    Germany
     code [at] xennis.org
 
 Datenschutzbeauftragte/r beim Anbieter ist:
@@ -45,30 +45,6 @@ Darüber hinaus ist der Anbieter dazu verpflichtet, alle Empfänger, denen gegen
 ## III. Informationen zur Datenverarbeitung
 
 Ihre bei Nutzung unserer App verarbeiteten Daten werden gelöscht oder gesperrt, sobald der Zweck der Speicherung entfällt, der Löschung der Daten keine gesetzlichen Aufbewahrungspflichten entgegenstehen und nachfolgend keine anderslautenden Angaben zu einzelnen Verarbeitungsverfahren gemacht werden.
-
-### Google Analytics
-
-In unserer App setzen wir Google Analytics ein. Hierbei handelt es sich um einen Webanalysedienst der Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland, nachfolgend nur „Google“ genannt.
-
-Durch die Zertifizierung nach dem EU-US-Datenschutzschild („EU-US Privacy Shield“)
-
-https://www.privacyshield.gov/participant?id=a2zt000000001L5AAI&status=Active
-
-garantiert Google, dass die Datenschutzvorgaben der EU auch bei der Verarbeitung von Daten in den USA eingehalten werden.
-
-Der Dienst Google Analytics dient zur Analyse des Nutzungsverhaltens unserer App. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f) DSGVO. Unser berechtigtes Interesse liegt in der Analyse, Optimierung und dem wirtschaftlichen Betrieb unserer App.
-
-Nutzungs- und nutzerbezogene Informationen, wie bspw. IP-Adresse, Ort, Zeit oder Häufigkeit des Besuchs unserer App, werden dabei an einen Server von Google in den USA übertragen und dort gespeichert. Allerdings nutzen wir Google Analytics mit der sog. Anonymisierungsfunktion. Durch diese Funktion kürzt Google die IP-Adresse schon innerhalb der EU bzw. des EWR.
-
-Die so erhobenen Daten werden wiederum von Google genutzt, um uns eine Auswertung über den Besuch unseres App sowie über die dortigen Nutzungsaktivitäten zur Verfügung zu stellen. Auch können diese Daten genutzt werden, um weitere Dienstleistungen zu erbringen, die mit der Nutzung unseres App und der Nutzung des Internets zusammenhängen.
-
-Google gibt an, Ihre IP-Adresse nicht mit anderen Daten zu verbinden. Zudem hält Google unter
-
-https://www.google.com/intl/de/policies/privacy/partners
-
-weitere datenschutzrechtliche Informationen für Sie bereit, so bspw. auch zu den Möglichkeiten, die Datennutzung zu unterbinden.
-
-In der App erfolgt die Deaktivierung in den Einstellungen. Öffnen Sie hierzu die Einstellungen der App. Auf dieser Seite können Sie den Dienst deaktiveren.
 
 ### Firebase Crashlytics
 
@@ -113,10 +89,9 @@ Our privacy policy is structured as follows:
 The party responsible for this app (the "controller") for purposes of data protection law is:
 
     Fabian Rosenthal
-    c/o skriptspektor e. U.
-    Robert-Preußler-Straße 13 / TOP 1
-    5020 Salzburg
-    AT – Österreich
+    Methfesselstraße 96
+    20255 Hamburg
+    Germany
     code [at] xennis.org
 
 The controller's data protection officer is:
@@ -140,30 +115,6 @@ In addition, the controller is obliged to inform all recipients to whom it discl
 ## III. Information about the data processing
 
 Your data processed when using our app will be deleted or blocked as soon as the purpose for its storage ceases to apply, provided the deletion of the same is not in breach of any statutory storage obligations or unless otherwise stipulated below.
-
-### Google Analytics
-
-We use Google Analytics on our app. This is a web analytics service provided by Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland (hereinafter: Google).
-
-Through certification according to the EU-US Privacy Shield
-
-https://www.privacyshield.gov/participant?id=a2zt000000001L5AAI&status=Active
-
-Google guarantees that it will follow the EU's data protection regulations when processing data in the United States.
-
-The Google Analytics service is used to analyze how our app is used. The legal basis is Art. 6 Para. 1 lit. f) GDPR. Our legitimate interest lies in the analysis, optimization, and economic operation of our site.
-
-Usage and user-related information, such as IP address, place, time, or frequency of your visits to our app will be transmitted to a Google server in the United States and stored there. However, we use Google Analytics with the so-called anonymization function, whereby Google truncates the IP address within the EU or the EEA before it is transmitted to the US.
-
-The data collected in this way is in turn used by Google to provide us with an evaluation of visits to our app and what visitors do once there. This data can also be used to provide other services related to the use of our app and of the internet in general.
-
-Google states that it will not connect your IP address to other data. In addition, Google provides further information with regard to its data protection practices at
-
-https://www.google.com/intl/en/policies/privacy/partners,
-
-including options you can exercise to prevent such use of your data.
-
-Deactivation takes place in the app in the settings. To do this, open the settings of the app. You can deactivate the service on this page.
 
 ### Firebase Crashlytics
 

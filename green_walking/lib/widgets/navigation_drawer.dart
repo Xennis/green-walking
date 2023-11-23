@@ -80,7 +80,7 @@ class AppNavigationDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.info),
             title: Text(locale.imprint),
-            onTap: () => Navigator.of(context).pushNamed(Routes.imprint),
+            onTap: () => Navigator.of(context).pushNamed(Routes.legalNotice),
           ),
         ],
       ),

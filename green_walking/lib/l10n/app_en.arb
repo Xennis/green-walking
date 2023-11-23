@@ -48,9 +48,15 @@
     "type": "text",
     "placeholders": {}
   },
-  "settingsTrackingDescription": "Enable tracking service",
-  "@settingsTrackingDescription": {
-    "description": "Description for enable/disable tracking setting",
+  "settingsCrashReportingTitle": "Crash reporting",
+  "@settingsCrashReportingTitle": {
+    "description": "Title for enable/disable sending crash reports",
+    "type": "text",
+    "placeholders": {}
+  },
+  "settingsCrashReportingDescription": "Enable sending report in case of an error",
+  "@settingsCrashReportingDescription": {
+    "description": "Description for enable/disable sending crash reports",
     "type": "text",
     "placeholders": {}
   },
@@ -169,7 +175,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "gdprDialogText": "For the best experience the app enables tracking. Further information can be found in the",
+  "gdprDialogText": "For the best experience the app sends crash reports if such errors occur. Further information can be found in the",
   "@gdprDialogText": {
     "description": "Text for privacy policy link",
     "type": "text",

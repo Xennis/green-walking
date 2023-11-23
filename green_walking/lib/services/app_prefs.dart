@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // ignore: avoid_classes_with_only_static_members
 class AppPrefs {
   static const String keyLastPosition = 'last-position';
-  static const String analyticsEnabled = 'analytics-enabled';
+  static const String crashReportingEnabled = 'crash-reporting-enabled';
 
   static const String _keyThemeMode = 'themeMode';
   static const String _keyLanguage = 'language';

@@ -5,8 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../config.dart';
 
-class ImprintPage extends StatelessWidget {
-  const ImprintPage({super.key});
+class LegalNoticePage extends StatelessWidget {
+  const LegalNoticePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,8 +30,7 @@ class ImprintPage extends StatelessWidget {
                     text: '${locale.imprintTmgText('5')}:\n\n',
                   ),
                   const TextSpan(
-                      text:
-                          'Fabian Rosenthal\nSchäferkampsallee 61\n20357\nHamburg\nGermany\ncode [at] xennis.org\n\n'),
+                      text: 'Fabian Rosenthal\nMethfesselstraße 96\n20255\nHamburg\nGermany\ncode [at] xennis.org\n\n'),
                   TextSpan(
                     text: '${locale.imprintDisclaimerLabel}:',
                     style: const TextStyle(fontWeight: FontWeight.bold),

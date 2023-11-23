@@ -1,17 +1,17 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../services/app_prefs.dart';
 
-class AnalyticsListTile extends StatefulWidget {
-  const AnalyticsListTile({super.key});
+class CrashReportingListTile extends StatefulWidget {
+  const CrashReportingListTile({super.key});
 
   @override
-  State<AnalyticsListTile> createState() => _AnalyticsListTileState();
+  State<CrashReportingListTile> createState() => _CrashReportingListTileState();
 }
 
-class _AnalyticsListTileState extends State<AnalyticsListTile> {
+class _CrashReportingListTileState extends State<CrashReportingListTile> {
   bool _enabled = false;
 
   @override
@@ -20,12 +20,12 @@ class _AnalyticsListTileState extends State<AnalyticsListTile> {
 
     return ListTile(
       leading: const Icon(Icons.analytics_outlined),
-      title: const Text("Google Analytics"),
+      title: Text(locale.settingsCrashReportingTitle),
       subtitle: Text(
-        locale.settingsTrackingDescription,
+        locale.settingsCrashReportingDescription,
       ),
       trailing: FutureBuilder<bool?>(
-          future: AppPrefs.getBool(AppPrefs.analyticsEnabled),
+          future: AppPrefs.getBool(AppPrefs.crashReportingEnabled),
           initialData: _enabled,
           builder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
             return Switch(
@@ -34,8 +34,8 @@ class _AnalyticsListTileState extends State<AnalyticsListTile> {
                   if (newValue == null) {
                     return;
                   }
-                  AppPrefs.setBool(AppPrefs.analyticsEnabled, newValue);
-                  FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(newValue);
+                  AppPrefs.setBool(AppPrefs.crashReportingEnabled, newValue);
+                  FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(newValue);
                   setState(() {
                     _enabled = newValue;
                   });
