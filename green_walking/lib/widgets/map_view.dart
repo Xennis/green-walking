@@ -75,12 +75,13 @@ class _MapViewState extends State<MapView> {
   }
 
   Widget _mapWidget(AppLocalizations locale) {
+    // TODO: Move it up in the stack, see: https://github.com/mapbox/mapbox-maps-flutter/blob/main/example/lib/main.dart#L120
+    MapboxOptions.setAccessToken(widget.accessToken);
     return MapWidget(
       key: const ValueKey('mapWidget'),
-      resourceOptions: ResourceOptions(accessToken: widget.accessToken),
       onMapCreated: (MapboxMap mapboxMap) {
         _mapboxMap = mapboxMap;
-        _mapboxMap.style.setProjection('globe');
+        _mapboxMap.style.setProjection(StyleProjection(name: StyleProjectionName.globe));
         // _mapboxMap.style.localizeLabels('en', null);
         //_mapboxMap.setTelemetryEnabled(false);
         _mapboxMap.compass.updateSettings(CompassSettings(marginTop: 125.0, marginRight: 13.0));
@@ -99,15 +100,16 @@ class _MapViewState extends State<MapView> {
           _circleAnnotationManager = value;
         });
       },
-      cameraOptions: widget.lastCameraOption ??
-          CameraOptions(center: Point(coordinates: Position(9.8682, 53.5519)).toJson(), zoom: 11.0),
+      cameraOptions:
+          widget.lastCameraOption ?? CameraOptions(center: Point(coordinates: Position(9.8682, 53.5519)), zoom: 11.0),
       styleUri: CustomMapboxStyles.outdoor,
       onMapIdleListener: _onCameraIdle,
-      onLongTapListener: (ScreenCoordinate coordinate) => _onLongTapListener(widget.accessToken, coordinate),
+      onLongTapListener: (MapContentGestureContext context) =>
+          _onLongTapListener(widget.accessToken, context.touchPosition),
       onCameraChangeListener: (CameraChangedEventData cameraChangedEventData) {
         _mapboxMap.scaleBar.updateSettings(ScaleBarSettings(enabled: true));
       },
-      onScrollListener: (ScreenCoordinate coordinate) {
+      onScrollListener: (MapContentGestureContext context) {
         if (_userLocationTracking.value != UserLocationTracking.no) {
           // Turn off tracking because user scrolled to another location.
           _userLocationTracking.value = UserLocationTracking.no;
@@ -178,7 +180,7 @@ class _MapViewState extends State<MapView> {
   Future<void> _setCameraPosition(Position position, double? bearing, double? pitch) async {
     return _mapboxMap.flyTo(
         CameraOptions(
-          center: Point(coordinates: position).toJson(),
+          center: Point(coordinates: position),
           bearing: bearing,
           pitch: pitch,
           zoom: 16.5,
@@ -228,7 +230,7 @@ class _MapViewState extends State<MapView> {
     // Draw circle
     await _circleAnnotationManager?.deleteAll();
     _circleAnnotationManager?.create(CircleAnnotationOptions(
-        geometry: Point(coordinates: position).toJson(),
+        geometry: Point(coordinates: position),
         circleRadius: 12,
         circleColor: const Color.fromRGBO(255, 192, 203, 1).value,
         circleOpacity: 0.6,
