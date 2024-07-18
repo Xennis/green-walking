@@ -9,7 +9,7 @@ jobs:
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.13.x'
+        flutter-version: '3.22.x'
         channel: 'stable'
     - name: Unlock secrets
       uses: sliteteam/github-action-git-crypt-unlock@1.3.0
