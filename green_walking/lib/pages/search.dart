@@ -67,7 +67,7 @@ class _SearchPageState extends State<SearchPage> {
                   onSubmitted: _onSearchSubmitted,
                 ),
               ),
-              Padding(padding: const EdgeInsets.fromLTRB(10, 0, 10, 0), child: _resultList(context)),
+              Padding(padding: const EdgeInsets.symmetric(horizontal: 10), child: _resultList(context)),
             ],
           ),
         ));
