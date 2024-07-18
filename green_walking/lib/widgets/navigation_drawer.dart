@@ -44,6 +44,11 @@ class AppNavigationDrawer extends StatelessWidget {
             ]),
           ),
           ListTile(
+            leading: const Icon(Icons.cloud_off),
+            title: Text(locale.offlineMapsPage),
+            onTap: () => Navigator.of(context).pushNamed(Routes.offlineMaps),
+          ),
+          ListTile(
             leading: const Icon(Icons.feedback),
             title: Text(locale.feedbackPage),
             onTap: () => Navigator.of(context).pushNamed(Routes.feedback),

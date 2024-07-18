@@ -361,5 +361,9 @@
   "@optionSystem": {
     "description": "Label for using the language/theme/... of the operating system."
   },
+  "offlineMapsPage": "Offline maps",
+  "@offlineMapsPage": {
+    "description": "Navigation label and title for offline maps page"
+  },
   "language": "Language"
 }
