@@ -16,7 +16,7 @@ class SearchResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String subtitle = truncateString(place.placeName?.replaceFirst('${place.text ?? ''}, ', ''), 65) ?? '';
+    final String subtitle = truncateString(place.placeName?.replaceFirst('${place.text ?? ''}, ', ''), 70) ?? '';
 
     return Card(
       child: ListTile(
@@ -94,7 +94,10 @@ class _FooterRow extends StatelessWidget {
     return Row(
       children: [
         const Icon(Icons.directions_run, size: 11.0),
-        Text(distanceString, style: const TextStyle(fontSize: 11.0)),
+        Padding(
+          padding: const EdgeInsets.only(left: 1.0),
+          child: Text(distanceString, style: const TextStyle(fontSize: 11.0)),
+        )
       ],
     );
   }
