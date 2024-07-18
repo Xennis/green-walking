@@ -92,11 +92,16 @@ class _RateAppListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (Platform.isAndroid) {
-      final AppLocalizations l10n = AppLocalizations.of(context)!;
+      final AppLocalizations locale = AppLocalizations.of(context)!;
       return ListTile(
-          leading: const Icon(Icons.star),
-          title: Text(l10n.rateApp),
-          onTap: () => launchUrl(appPlayStoreUrl, mode: LaunchMode.externalApplication));
+        leading: const Icon(Icons.star),
+        title: Text(locale.rateApp),
+        onTap: () => launchUrl(appPlayStoreUrl, mode: LaunchMode.externalApplication),
+        trailing: Icon(
+          Icons.open_in_new,
+          semanticLabel: locale.openInBrowserSemanticLabel,
+        ),
+      );
     }
     return Container();
   }
