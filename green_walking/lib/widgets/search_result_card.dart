@@ -49,7 +49,7 @@ class _TrailingWidget extends StatelessWidget {
 
     final List<Widget> children = [
       IconButton(
-          color: theme.primaryColor,
+          color: theme.colorScheme.primary,
           tooltip: locale.openLocationInDefaultAppSemanticLabel,
           icon: Icon(Icons.open_in_new, semanticLabel: locale.openLocationInDefaultAppSemanticLabel),
           onPressed: () => launchUrlString(

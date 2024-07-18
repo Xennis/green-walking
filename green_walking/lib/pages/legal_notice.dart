@@ -24,7 +24,7 @@ class LegalNoticePage extends StatelessWidget {
           children: <Widget>[
             RichText(
               text: TextSpan(
-                style: TextStyle(color: theme.unselectedWidgetColor),
+                style: TextStyle(color: theme.colorScheme.secondary),
                 children: <InlineSpan>[
                   TextSpan(
                     text: '${locale.imprintTmgText('5')}:\n\n',
@@ -41,7 +41,7 @@ class LegalNoticePage extends StatelessWidget {
                   TextSpan(text: '${locale.imprintGdprApplyText} '),
                   TextSpan(
                     text: locale.gdprPrivacyPolicy,
-                    style: TextStyle(color: theme.primaryColor),
+                    style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
                     recognizer: TapGestureRecognizer()..onTap = () => launchUrl(privacyPolicyUrl),
                   ),
                   const TextSpan(text: '.')

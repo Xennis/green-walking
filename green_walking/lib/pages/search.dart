@@ -42,7 +42,6 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations locale = AppLocalizations.of(context)!;
-    final ThemeData theme = Theme.of(context);
 
     return Scaffold(
         // If the search in the search bar is clicked the keyboard appears. The keyboard
@@ -59,7 +58,6 @@ class _SearchPageState extends State<SearchPage> {
                 title: TextField(
                   controller: _queryFieldController,
                   autofocus: true,
-                  cursorColor: theme.hintColor,
                   keyboardType: TextInputType.text,
                   textInputAction: TextInputAction.go,
                   decoration: InputDecoration(
@@ -131,7 +129,7 @@ class _SearchPageState extends State<SearchPage> {
                   children: [
                     Flexible(
                         child: Text(locale.geocodingResultLegalNotice(data.attribution),
-                            style: TextStyle(color: theme.hintColor, fontSize: 12.0)))
+                            style: TextStyle(color: theme.colorScheme.secondary, fontSize: 12.0)))
                   ],
                 ),
               ],

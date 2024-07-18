@@ -33,12 +33,16 @@ class GreenWalkingApp extends StatelessWidget {
           return MaterialApp(
             onGenerateTitle: (BuildContext context) => AppLocalizations.of(context)!.appTitle,
             theme: ThemeData(
-              brightness: Brightness.light,
-              primaryColor: Colors.blue,
+              colorScheme: ColorScheme.fromSeed(
+                brightness: Brightness.light,
+                seedColor: Colors.blue,
+              ),
             ),
             darkTheme: ThemeData(
-              brightness: Brightness.dark,
-              primaryColor: Colors.blue,
+              colorScheme: ColorScheme.fromSeed(
+                brightness: Brightness.dark,
+                seedColor: Colors.blue,
+              ),
             ),
             themeMode: prefsProvider.themeMode,
             initialRoute: Routes.map,
