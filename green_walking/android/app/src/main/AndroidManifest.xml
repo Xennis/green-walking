@@ -1,7 +1,6 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="org.xennis.apps.green_walking">
+    xmlns:tools="http://schemas.android.com/tools">
     <application
         android:label="Green Walking"
         android:name="${applicationName}"
