@@ -14,7 +14,7 @@ extension MapboxMapPosition on MapboxMap {
   Future<Position?> getCameraPosition() async {
     try {
       final CameraState mapCameraState = await getCameraState();
-      return _positionForCoordinate(mapCameraState.center);
+      return mapCameraState.center.coordinates;
     } catch (e) {
       log('failed to get camera position: $e');
       return null;
@@ -33,9 +33,4 @@ extension MapboxMapPosition on MapboxMap {
       return null;
     }
   }
-}
-
-Position _positionForCoordinate(Map<String?, Object?> raw) {
-  final List<Object?> coordinates = raw['coordinates'] as List<Object?>;
-  return Position(coordinates[0] as num, coordinates[1] as num);
 }
