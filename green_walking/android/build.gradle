@@ -1,39 +1,7 @@
-buildscript {
-    ext.kotlin_version = '1.8.22'
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        // version can be found here https://developer.android.com/studio/releases/gradle-plugin
-        classpath 'com.android.tools.build:gradle:8.5.1'
-        // START: FlutterFire Configuration
-        // version can be found here https://mvnrepository.com/artifact/com.google.gms/google-services?repo=google
-        classpath 'com.google.gms:google-services:4.3.15'
-        // details see https://firebase.google.com/docs/crashlytics/get-started?platform=android#java
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.5'
-        // END: FlutterFire Configuration
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
 allprojects {
     repositories {
         google()
-        maven {
-            url 'https://api.mapbox.com/downloads/v2/releases/maven'
-            authentication {
-                basic(BasicAuthentication)
-            }
-            credentials {
-                // Do not change the username below.
-                // This should always be `mapbox` (not your username).
-                username = "mapbox"
-                // Use the secret token you stored in gradle.properties as the password
-                password = project.properties['MAPBOX_DOWNLOADS_TOKEN'] ?: ""
-            }
-        }
+        mavenCentral()
     }
 }
 
