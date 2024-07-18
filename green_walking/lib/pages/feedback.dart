@@ -23,7 +23,7 @@ class FeedbackPage extends StatelessWidget {
           children: <Widget>[
             RichText(
               text: TextSpan(
-                style: TextStyle(color: theme.unselectedWidgetColor),
+                style: TextStyle(color: theme.colorScheme.secondary),
                 children: <InlineSpan>[
                   TextSpan(
                     text: '${locale.feedbackPageText}\n',

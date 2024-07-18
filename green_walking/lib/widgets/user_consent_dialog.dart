@@ -31,13 +31,13 @@ class UserConsentDialog extends StatelessWidget {
         child: ListBody(
           children: <Widget>[
             RichText(
-              text: TextSpan(style: TextStyle(color: theme.hintColor), children: <InlineSpan>[
+              text: TextSpan(style: TextStyle(color: theme.colorScheme.secondary), children: <InlineSpan>[
                 TextSpan(
                   text: '${locale.gdprDialogText} ',
                 ),
                 TextSpan(
                   text: locale.gdprPrivacyPolicy,
-                  style: TextStyle(color: theme.primaryColor),
+                  style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
                       launchUrl(privacyPolicyUrl);
@@ -45,7 +45,7 @@ class UserConsentDialog extends StatelessWidget {
                 ),
                 TextSpan(
                   text: '.',
-                  style: TextStyle(color: theme.hintColor),
+                  style: TextStyle(color: theme.colorScheme.secondary),
                 ),
               ]),
             ),

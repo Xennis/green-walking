@@ -47,7 +47,7 @@ class _LocationButtonState extends State<LocationButton> {
       child: Padding(
         padding: const EdgeInsets.only(bottom: 18.0, right: 18.0),
         child: FloatingActionButton(
-            backgroundColor: theme.primaryColor,
+            backgroundColor: theme.colorScheme.primary,
             onPressed: _onPressed,
             child: ValueListenableBuilder<UserLocationTracking>(
                 valueListenable: widget.trackUserLocation,
@@ -63,7 +63,7 @@ class _LocationButtonState extends State<LocationButton> {
                   return Icon(
                     icon,
                     size: 27,
-                    color: Colors.white,
+                    color: theme.colorScheme.onPrimary,
                   );
                 })),
       ),

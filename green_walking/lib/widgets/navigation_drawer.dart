@@ -21,14 +21,14 @@ class AppNavigationDrawer extends StatelessWidget {
         children: <Widget>[
           DrawerHeader(
             decoration: BoxDecoration(
-              color: theme.primaryColor,
+              color: theme.colorScheme.primary,
             ),
             child: Column(children: <Widget>[
               Row(children: <Widget>[
                 Text(
                   locale.appTitle,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: theme.colorScheme.onPrimary,
                     fontSize: 22,
                   ),
                 ),
@@ -36,8 +36,8 @@ class AppNavigationDrawer extends StatelessWidget {
               Row(
                 children: <Widget>[
                   Text(locale.appSlogan,
-                      style: const TextStyle(
-                        color: Colors.white70,
+                      style: TextStyle(
+                        color: theme.colorScheme.onPrimary,
                       )),
                 ],
               )
