@@ -104,8 +104,7 @@ class _MapViewState extends State<MapView> {
           widget.lastCameraOption ?? CameraOptions(center: Point(coordinates: Position(9.8682, 53.5519)), zoom: 11.0),
       styleUri: CustomMapboxStyles.outdoor,
       onMapIdleListener: _onCameraIdle,
-      onLongTapListener: (MapContentGestureContext context) =>
-          _onLongTapListener(widget.accessToken, context.touchPosition),
+      onLongTapListener: _onLongTapListener,
       onCameraChangeListener: (CameraChangedEventData cameraChangedEventData) {
         _mapboxMap.scaleBar.updateSettings(ScaleBarSettings(enabled: true));
       },
@@ -119,11 +118,9 @@ class _MapViewState extends State<MapView> {
     );
   }
 
-  Future<void> _onLongTapListener(String accesstoken, ScreenCoordinate coordinate) async {
+  Future<void> _onLongTapListener(MapContentGestureContext context) async {
     try {
-      // https://github.com/mapbox/mapbox-maps-flutter/issues/81 It actual returns the position
-      // and not the coordinates.
-      final Position tapPosition = Position(coordinate.y, coordinate.x);
+      final Position tapPosition = context.point.coordinates;
       final Position? userPosition = (await _mapboxMap.getPuckLocation())?.position;
 
       return _displaySearchResult(await widget.onSearchPage(userPosition: userPosition, reversePosition: tapPosition));
