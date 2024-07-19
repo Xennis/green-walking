@@ -44,17 +44,17 @@ class AppNavigationDrawer extends StatelessWidget {
             ]),
           ),
           ListTile(
-            leading: const Icon(Icons.cloud_off),
-            title: Text(locale.offlineMapsPage),
-            onTap: () => Navigator.of(context).pushNamed(Routes.offlineMaps),
-          ),
-          ListTile(
             leading: const Icon(Icons.feedback),
             title: Text(locale.feedbackPage),
             onTap: () => Navigator.of(context).pushNamed(Routes.feedback),
           ),
           _RateAppListTile(),
           const Divider(),
+          ListTile(
+            leading: const Icon(Icons.download_for_offline),
+            title: Text(locale.offlineMapsPage),
+            onTap: () => Navigator.of(context).pushNamed(Routes.offlineMaps),
+          ),
           ListTile(
             leading: const Icon(Icons.settings),
             title: Text(locale.settingsPage),

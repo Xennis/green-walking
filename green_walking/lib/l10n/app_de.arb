@@ -57,6 +57,8 @@
   "optionDarkTheme": "Dunkel",
   "optionLightTheme": "Hell",
   "optionSystem": "System",
-  "offlineMapsPage": "Offline Karten",
+  "offlineMapsPage": "Offline Karten (Beta)",
+  "downloadNewOfflineMapButton": "Neue Karte herunterladen",
+  "downloadMapTitle": "Offline-Karte herunterladen",
   "language": "Sprache"
 }

@@ -361,9 +361,17 @@
   "@optionSystem": {
     "description": "Label for using the language/theme/... of the operating system."
   },
-  "offlineMapsPage": "Offline maps",
+  "offlineMapsPage": "Offline maps (Beta)",
   "@offlineMapsPage": {
     "description": "Navigation label and title for offline maps page"
+  },
+  "downloadNewOfflineMapButton": "Download new map",
+  "@downloadNewOfflineMapButton": {
+    "description": "Button label for opening the page to download a new offline map."
+  },
+  "downloadMapTitle": "Download offline map",
+  "@downloadMapTitle": {
+    "description": "Title for download map page"
   },
   "language": "Language"
 }
