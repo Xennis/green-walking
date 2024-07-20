@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../widgets/offline/offline_map_card.dart';
 import 'download_map.dart';
 
 class OfflineMapsPage extends StatefulWidget {
@@ -18,6 +19,7 @@ class OfflineMapsPage extends StatefulWidget {
 class _OfflineMapsPageState extends State<OfflineMapsPage> {
   late OfflineManager _offlineManager;
   late TileStore _tileStore;
+
   List<StylePack> _stylePacks = [];
   List<TileRegion> _regions = [];
   StreamController<double>? _downloadProgress;
@@ -29,12 +31,9 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
   }
 
   void _setAsyncState() async {
-    final offlineManager = await OfflineManager.create();
     final tmpDir = await getTemporaryDirectory();
-    final tileStore = await TileStore.createAt(tmpDir.uri);
-
-    final stylePacks = await offlineManager.allStylePacks();
-    final regions = await tileStore.allTileRegions();
+    final (offlineManager, tileStore) = await (OfflineManager.create(), TileStore.createAt(tmpDir.uri)).wait;
+    final (stylePacks, regions) = await (offlineManager.allStylePacks(), tileStore.allTileRegions()).wait;
 
     setState(() {
       _offlineManager = offlineManager;
@@ -74,15 +73,10 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                   itemCount: _regions.length,
                   itemBuilder: (context, index) {
                     final region = _regions[index];
-                    //final expire = DateTime.fromMillisecondsSinceEpoch(pack.expires!)
-                    return Card(
-                      child: ListTile(
-                        title: Text('Map: ${region.id}'),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () => _onDeleteRegion(region.id, index),
-                        ),
-                      ),
+                    return OfflineMapCard(
+                      region: region,
+                      tileStore: _tileStore,
+                      onDelete: () => _onDeleteRegion(region.id, index),
                     );
                   },
                 ),
@@ -92,18 +86,10 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                   itemCount: _stylePacks.length,
                   itemBuilder: (context, index) {
                     final pack = _stylePacks[index];
-                    //final name = pack.styleURI == CustomMapboxStyles.outdoor ? "outdoor" : "satellite";
-                    //final expire = DateTime.fromMillisecondsSinceEpoch(pack.expires!)
-                    return Card(
-                      child: ListTile(
-                        title: const Text("Map Style: Outdoor"),
-                        subtitle: const Text("Style (e.g. fonts, icons) of the map."),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: _regions.isEmpty ? () => _onDeleteStylePack(pack.styleURI, index) : null,
-                        ),
-                      ),
-                    );
+                    return OfflineMapStyleCard(
+                        stylePack: pack,
+                        canBeDeleted: _regions.isEmpty,
+                        onDelete: () => _onDeleteStylePack(pack.styleURI, index));
                   },
                 ),
               ],
@@ -122,6 +108,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
         initialData: 0.0,
         builder: (context, snapshot) {
           return Column(mainAxisSize: MainAxisSize.min, children: [
+            // TODO: Translate
             Text("Progress: ${(snapshot.requireData * 100).toStringAsFixed(0)}%"),
             LinearProgressIndicator(
               value: snapshot.requireData,
@@ -144,15 +131,12 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
     if (styleURI == null) {
       return;
     }
+    final regionId = DateTime.now().millisecondsSinceEpoch.toString();
     try {
       await _downloadStylePack(styleURI);
       // Get all style packs because we most likely downloaded the same again.
       final stylePacks = await _offlineManager.allStylePacks();
-      //setState(() {
-      //          _stylePacks = stylePacks;
-      //});
-      final tileRegion = await _downloadTileRegion(
-          regionId: DateTime.now().millisecondsSinceEpoch.toString(), regionLoadOptions: regionLoadOptions);
+      final tileRegion = await _downloadTileRegion(regionId: regionId, regionLoadOptions: regionLoadOptions);
       setState(() {
         _stylePacks = stylePacks;
         _regions = [..._regions, tileRegion];
@@ -160,7 +144,8 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
       });
     } catch (e) {
       log('failed to download map: $e');
-      _displaySnackBar("Failed to map");
+      // TODO: Translate
+      _displaySnackBar("Failed to download map");
       setState(() => _downloadProgress = null);
     }
   }
@@ -205,6 +190,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
       setState(() {
         _stylePacks.removeAt(index);
       });
+      // TODO: Add translation
       _displaySnackBar("Deleted map style");
     } catch (e) {
       log('failed to delete downloaded style pack: $e');
@@ -218,6 +204,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
       setState(() {
         _regions.removeAt(index);
       });
+      // TODO: Add translation
       _displaySnackBar("Deleted map");
     } catch (e) {
       log('failed to remove downloaded region: $e');

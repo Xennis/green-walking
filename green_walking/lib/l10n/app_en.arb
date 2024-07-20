@@ -371,7 +371,63 @@
   },
   "downloadMapTitle": "Download offline map",
   "@downloadMapTitle": {
-    "description": "Title for download map page"
+    "description": "Title for download map page."
+  },
+  "downloadMapButton": "Download area",
+  "@downloadMapButton": {
+    "description": "Title for download map button."
+  },
+  "offlineMapCardTitle": "Map",
+  "@offlineMapCardTitle": {
+    "description": "Title of a offline map card."
+  },
+  "offlineMapCardDownloadTime": "Download: {dateTime}",
+  "@offlineMapCardDownloadTime": {
+    "description": "Label of the displayed download time.",
+    "placeholders": {
+      "dateTime": {
+        "type": "String",
+        "example": "2024-07-20 12:11:02"
+      }
+    }
+  },
+  "offlineMapStyleCardTitle": "Map Style: Outdoor",
+  "@offlineMapStyleCardTitle": {
+    "description": "Title of a offline map style card."
+  },
+  "offlineMapStyleCardSubtitle": "Style (e.g. fonts, icons) of the map.",
+  "@offlineMapStyleCardSubtitle": {
+    "description": "Subtitle of a offline map style card."
+  },
+  "downloadMapDialogTitle": "Download area?",
+  "@downloadMapDialogTitle": {
+    "description": "Title of the download map dialog."
+  },
+  "downloadMapDialogCancel": "Cancel",
+  "@downloadMapDialogCancel": {
+    "description": "Action button to cancel the dialog."
+  },
+  "downloadMapDialogConfirm": "Download",
+  "@downloadMapDialogConfirm": {
+    "description": "Action button to confirm the dialog."
+  },
+  "downloadMapDialogEstimateLoading": "Estimate storage space.",
+  "@downloadMapDialogEstimateLoading": {
+    "description": "Text shown while estimating the required storage space."
+  },
+  "downloadMapDialogEstimateResult": "Estimation:\n{storageSize} storage\n{networkTransferSize} network transfer",
+  "@downloadMapDialogEstimateResult": {
+    "description": "Text shown while estimating the required storage space.",
+    "placeholders": {
+      "storageSize": {
+        "type": "String",
+        "example": "102 MB"
+      },
+      "networkTransferSize": {
+        "type": "String",
+        "example": "80 MB"
+      }
+    }
   },
   "language": "Language"
 }
