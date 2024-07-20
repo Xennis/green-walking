@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' show log;
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -5,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../routes.dart';
+import 'download_map.dart';
 
 class OfflineMapsPage extends StatefulWidget {
   const OfflineMapsPage({super.key});
@@ -19,6 +20,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
   late TileStore _tileStore;
   List<StylePack> _stylePacks = [];
   List<TileRegion> _regions = [];
+  StreamController<double>? _downloadProgress;
 
   @override
   void initState() {
@@ -28,10 +30,12 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
 
   void _setAsyncState() async {
     final offlineManager = await OfflineManager.create();
-    final stylePacks = await offlineManager.allStylePacks();
     final tmpDir = await getTemporaryDirectory();
     final tileStore = await TileStore.createAt(tmpDir.uri);
+
+    final stylePacks = await offlineManager.allStylePacks();
     final regions = await tileStore.allTileRegions();
+
     setState(() {
       _offlineManager = offlineManager;
       _stylePacks = stylePacks;
@@ -57,12 +61,13 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                   alignment: MainAxisAlignment.center,
                   children: <Widget>[
                     ElevatedButton(
-                      onPressed: () => Navigator.of(context).pushNamed(Routes.downloadMap),
+                      onPressed: _onDownloadNewMap,
                       child: Text(locale.downloadNewOfflineMapButton),
                     ),
                   ],
                 ),
                 const Divider(),
+                _downloadProgressWidget(),
                 ListView.builder(
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
@@ -105,6 +110,93 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
             )),
       ),
     );
+  }
+
+  Widget _downloadProgressWidget() {
+    final progress = _downloadProgress;
+    if (progress == null) {
+      return Container();
+    }
+    return StreamBuilder(
+        stream: progress.stream,
+        initialData: 0.0,
+        builder: (context, snapshot) {
+          return Column(mainAxisSize: MainAxisSize.min, children: [
+            Text("Progress: ${(snapshot.requireData * 100).toStringAsFixed(0)}%"),
+            LinearProgressIndicator(
+              value: snapshot.requireData,
+            )
+          ]);
+        });
+  }
+
+  Future<void> _onDownloadNewMap() async {
+    final regionLoadOptions = await Navigator.push<TileRegionLoadOptions>(
+        context,
+        MaterialPageRoute(
+            builder: (context) => DownloadMapPage(
+                  tileStore: _tileStore,
+                )));
+    if (regionLoadOptions == null) {
+      return;
+    }
+    final styleURI = regionLoadOptions.descriptorsOptions?.first?.styleURI;
+    if (styleURI == null) {
+      return;
+    }
+    try {
+      await _downloadStylePack(styleURI);
+      // Get all style packs because we most likely downloaded the same again.
+      final stylePacks = await _offlineManager.allStylePacks();
+      //setState(() {
+      //          _stylePacks = stylePacks;
+      //});
+      final tileRegion = await _downloadTileRegion(
+          regionId: DateTime.now().millisecondsSinceEpoch.toString(), regionLoadOptions: regionLoadOptions);
+      setState(() {
+        _stylePacks = stylePacks;
+        _regions = [..._regions, tileRegion];
+        _downloadProgress = null;
+      });
+    } catch (e) {
+      log('failed to download map: $e');
+      _displaySnackBar("Failed to map");
+      setState(() => _downloadProgress = null);
+    }
+  }
+
+  Future<StylePack> _downloadStylePack(String styleURI) async {
+    final stylePackLoadOptions = StylePackLoadOptions(
+        glyphsRasterizationMode: GlyphsRasterizationMode.IDEOGRAPHS_RASTERIZED_LOCALLY,
+        // metadata: {"tag": "test"},
+        acceptExpired: false);
+
+    final downloadProgress = StreamController<double>.broadcast();
+    setState(() => _downloadProgress = downloadProgress);
+    final stylePack = await _offlineManager.loadStylePack(styleURI, stylePackLoadOptions, (progress) {
+      final percentage = progress.completedResourceCount / progress.requiredResourceCount;
+      if (!downloadProgress.isClosed) {
+        downloadProgress.sink.add(percentage);
+      }
+    });
+    downloadProgress.sink.add(1);
+    downloadProgress.sink.close();
+    return stylePack;
+  }
+
+  Future<TileRegion> _downloadTileRegion(
+      {required String regionId, required TileRegionLoadOptions regionLoadOptions}) async {
+    final downloadProgress = StreamController<double>.broadcast();
+    setState(() => _downloadProgress = downloadProgress);
+    final tileRegion = await _tileStore.loadTileRegion(regionId, regionLoadOptions, (progress) {
+      final percentage = progress.completedResourceCount / progress.requiredResourceCount;
+      if (!downloadProgress.isClosed) {
+        downloadProgress.sink.add(percentage);
+      }
+    });
+    downloadProgress.sink.add(1);
+    downloadProgress.sink.close();
+    return tileRegion;
   }
 
   Future<void> _onDeleteStylePack(String styleURI, int index) async {

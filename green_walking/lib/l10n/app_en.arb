@@ -346,7 +346,7 @@
     "description": "Toast message if the map stops following the users location."
   },
   "optionTheme": "Theme",
-  "@optionDarkTheme": {
+  "@optionTheme": {
     "description": "Option to select the theme of the application."
   },
   "optionDarkTheme": "Dark",
