@@ -363,7 +363,7 @@
   },
   "offlineMapsPage": "Offline maps (Beta)",
   "@offlineMapsPage": {
-    "description": "Navigation label and title for offline maps page"
+    "description": "Navigation label and title for the offline maps page"
   },
   "downloadNewOfflineMapButton": "Download new map",
   "@downloadNewOfflineMapButton": {
@@ -371,11 +371,11 @@
   },
   "downloadMapTitle": "Download offline map",
   "@downloadMapTitle": {
-    "description": "Title for download map page."
+    "description": "Title for the download map page."
   },
   "downloadMapButton": "Download area",
   "@downloadMapButton": {
-    "description": "Title for download map button."
+    "description": "Title for the download map button."
   },
   "offlineMapCardTitle": "Map",
   "@offlineMapCardTitle": {
@@ -417,7 +417,7 @@
   },
   "downloadMapDialogEstimateResult": "Estimation:\n{storageSize} storage\n{networkTransferSize} network transfer",
   "@downloadMapDialogEstimateResult": {
-    "description": "Text shown while estimating the required storage space.",
+    "description": "Displayed estimates to download the selected map area.",
     "placeholders": {
       "storageSize": {
         "type": "String",

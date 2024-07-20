@@ -29,7 +29,7 @@ class DownloadMapDialog extends StatelessWidget {
                 }
                 if (snapshot.hasError) {
                   // TODO: Translate
-                  return Text('Failed to estimate amount of storage: ${snapshot.error}');
+                  return Text('Failed to estimate storage space: ${snapshot.error}');
                 }
                 return Row(
                   children: [

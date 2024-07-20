@@ -9,7 +9,7 @@ class OfflineMapCard extends StatelessWidget {
 
   final TileRegion region;
   final TileStore tileStore;
-  final void Function()? onDelete;
+  final void Function() onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,7 @@ class OfflineMapStyleCard extends StatelessWidget {
 
   final StylePack stylePack;
   final bool canBeDeleted;
-  final void Function()? onDelete;
+  final void Function() onDelete;
 
   @override
   Widget build(BuildContext context) {
