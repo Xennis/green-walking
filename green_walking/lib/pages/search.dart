@@ -178,8 +178,8 @@ Position? _stringToPosition(String position) {
     return null;
   }
   try {
-    // Yes, [1] comes first. We are showing the lat in the beginning.
-    return Position(double.parse(parts[1]), double.parse(parts[0]));
+    // String format is: lat,lng
+    return Position.named(lat: double.parse(parts[0]), lng: double.parse(parts[1]));
   } catch (e) {
     return null;
   }
