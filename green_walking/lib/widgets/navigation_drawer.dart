@@ -51,6 +51,11 @@ class AppNavigationDrawer extends StatelessWidget {
           _RateAppListTile(),
           const Divider(),
           ListTile(
+            leading: const Icon(Icons.download_for_offline),
+            title: Text(locale.offlineMapsPage),
+            onTap: () => Navigator.of(context).pushNamed(Routes.offlineMaps),
+          ),
+          ListTile(
             leading: const Icon(Icons.settings),
             title: Text(locale.settingsPage),
             onTap: () => Navigator.of(context).pushNamed(Routes.settings),

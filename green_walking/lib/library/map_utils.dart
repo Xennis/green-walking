@@ -13,8 +13,8 @@ class PuckLocation {
 extension MapboxMapPosition on MapboxMap {
   Future<Position?> getCameraPosition() async {
     try {
-      final CameraState mapCameraState = await getCameraState();
-      return mapCameraState.center.coordinates;
+      final CameraState cameraState = await getCameraState();
+      return cameraState.center.coordinates;
     } catch (e) {
       log('failed to get camera position: $e');
       return null;
@@ -32,5 +32,11 @@ extension MapboxMapPosition on MapboxMap {
       log('failed to get puck location: $e');
       return null;
     }
+  }
+
+  Future<CoordinateBounds> getCameraBounds() async {
+    final CameraState cameraState = await getCameraState();
+    return coordinateBoundsForCamera(CameraOptions(
+        center: cameraState.center, zoom: cameraState.zoom, bearing: cameraState.bearing, pitch: cameraState.pitch));
   }
 }
