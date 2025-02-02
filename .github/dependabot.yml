@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: "bundler"
+    directory: "green_walking/android/"
+    schedule:
+      interval: "monthly"
+    groups:
+      all:
+        patterns:
+          - "*"
