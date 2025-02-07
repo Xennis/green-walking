@@ -31,7 +31,7 @@ class _DownloadMapPageState extends State<DownloadMapPage> {
       body: Center(
         child: Column(
           children: [
-            ButtonBar(
+            OverflowBar(
               alignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
