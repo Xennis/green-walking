@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
+import 'config.dart';
 import 'firebase_options.dart';
 import 'provider/prefs_provider.dart';
 import 'routes.dart';
@@ -19,7 +20,7 @@ Future<void> main() async {
   // Pass all uncaught errors from the framework to Crashlytics.
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
 
-  MapboxOptions.setAccessToken(const String.fromEnvironment("MAPBOX_ACCESS_TOKEN"));
+  MapboxOptions.setAccessToken(mapboxAccessToken);
 
   runApp(const GreenWalkingApp());
 }
