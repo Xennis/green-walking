@@ -4,6 +4,5 @@ GoogleService-Info.plist filter=git-crypt diff=git-crypt
 firebase_options.dart filter=git-crypt diff=git-crypt
 key.jks filter=git-crypt diff=git-crypt
 key.properties filter=git-crypt diff=git-crypt
-mapbox-access-token.txt filter=git-crypt diff=git-crypt
 # Fastlane
 google-play-store.json filter=git-crypt diff=git-crypt

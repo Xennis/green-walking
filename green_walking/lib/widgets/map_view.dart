@@ -13,14 +13,8 @@ import '../widgets/location_button.dart';
 import '../config.dart';
 
 class MapView extends StatefulWidget {
-  const MapView(
-      {super.key,
-      required this.accessToken,
-      required this.lastCameraOption,
-      required this.onOpenDrawer,
-      required this.onSearchPage});
+  const MapView({super.key, required this.lastCameraOption, required this.onOpenDrawer, required this.onSearchPage});
 
-  final String accessToken;
   final CameraOptions? lastCameraOption;
   final VoidCallback onOpenDrawer;
   final Future<Position?> Function({Position? userPosition, Position? reversePosition, Position? proximity})
@@ -60,7 +54,7 @@ class _MapViewState extends State<MapView> {
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 15),
                 hintText: locale.searchBoxHintLabel('...')),
-            onTap: () => _onSearchTap(widget.accessToken),
+            onTap: () => _onSearchTap(),
           ),
         ),
       ],
@@ -75,8 +69,6 @@ class _MapViewState extends State<MapView> {
   }
 
   Widget _mapWidget(AppLocalizations locale) {
-    // TODO: Move it up in the stack, see: https://github.com/mapbox/mapbox-maps-flutter/blob/main/example/lib/main.dart#L120
-    MapboxOptions.setAccessToken(widget.accessToken);
     return MapWidget(
       key: const ValueKey('mapWidget'),
       onMapCreated: (MapboxMap mapboxMap) {
@@ -130,7 +122,7 @@ class _MapViewState extends State<MapView> {
     }
   }
 
-  Future<void> _onSearchTap(String accessToken) async {
+  Future<void> _onSearchTap() async {
     final Position? cameraPosition = await _mapboxMap.getCameraPosition();
     if (cameraPosition == null) {
       return;

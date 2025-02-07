@@ -43,7 +43,6 @@ class _MapPageState extends State<MapPage> {
                   children: <Widget>[
                     Flexible(
                         child: MapView(
-                      accessToken: data.accessToken,
                       lastCameraOption: data.lastPosition,
                       onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
                       onSearchPage: ({Position? userPosition, Position? reversePosition, Position? proximity}) {
@@ -51,10 +50,7 @@ class _MapPageState extends State<MapPage> {
                           context,
                           _NoTransitionPageRoute<Position>(
                               builder: (BuildContext context) => SearchPage(
-                                  userPosition: userPosition,
-                                  reversePosition: reversePosition,
-                                  proximity: proximity,
-                                  accessToken: data.accessToken)),
+                                  userPosition: userPosition, reversePosition: reversePosition, proximity: proximity)),
                         );
                       },
                     )),
@@ -73,20 +69,18 @@ class _MapPageState extends State<MapPage> {
 }
 
 class _MapConfig {
-  _MapConfig(this.accessToken, {this.lastPosition});
+  _MapConfig({this.lastPosition});
 
-  String accessToken;
   CameraOptions? lastPosition;
 
   static Future<_MapConfig> create(AssetBundle assetBundle) async {
-    final String accessToken = await assetBundle.loadString('assets/mapbox-access-token.txt');
     final CameraState? lastState = await AppPrefs.getCameraState(AppPrefs.keyLastPosition);
     if (lastState == null) {
-      return _MapConfig(accessToken, lastPosition: null);
+      return _MapConfig(lastPosition: null);
     }
     final CameraOptions lastPosition = CameraOptions(
         center: lastState.center, zoom: lastState.zoom, bearing: lastState.bearing, pitch: lastState.pitch);
-    return _MapConfig(accessToken, lastPosition: lastPosition);
+    return _MapConfig(lastPosition: lastPosition);
   }
 }
 
