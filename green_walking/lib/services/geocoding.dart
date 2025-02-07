@@ -1,5 +1,3 @@
-library mapbox_geocoding;
-
 import 'dart:convert';
 import 'dart:developer' show log;
 import 'dart:io';
