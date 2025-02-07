@@ -1,7 +1,6 @@
 # Credentials
 google-services.json filter=git-crypt diff=git-crypt
 GoogleService-Info.plist filter=git-crypt diff=git-crypt
-firebase_options.dart filter=git-crypt diff=git-crypt
 key.jks filter=git-crypt diff=git-crypt
 key.properties filter=git-crypt diff=git-crypt
 # Fastlane
