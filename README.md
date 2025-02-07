@@ -18,7 +18,7 @@ Build the app
 flutter build <platform> --dart-define MAPBOX_ACCESS_TOKEN=...
 ```
 
-Copy the Firebase config from https://console.firebase.google.com/project/<project-id>/settings/general/ and use it the same way:
+Copy the Firebase config from `https://console.firebase.google.com/project/<project-id>/settings/general/` and use it the same way:
 
 ```shell
 --dart-define FIREBASE_API_KEY=...
