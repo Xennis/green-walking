@@ -13,6 +13,7 @@ void enableCrashReportingOrConsent(BuildContext context) {
       // Privacy: Only enable if it is set to enabled.
       FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
     } else if (enabled == null) {
+      if (!context.mounted) return;
       showDialog<dynamic>(context: context, builder: (BuildContext context) => const UserConsentDialog());
     }
   });

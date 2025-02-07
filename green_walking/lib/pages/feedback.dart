@@ -31,7 +31,7 @@ class FeedbackPage extends StatelessWidget {
                 ],
               ),
             ),
-            ButtonBar(
+            OverflowBar(
               alignment: MainAxisAlignment.center,
               children: <Widget>[
                 ElevatedButton(

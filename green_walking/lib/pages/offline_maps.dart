@@ -56,7 +56,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Column(
               children: <Widget>[
-                ButtonBar(
+                OverflowBar(
                   alignment: MainAxisAlignment.center,
                   children: <Widget>[
                     ElevatedButton(
