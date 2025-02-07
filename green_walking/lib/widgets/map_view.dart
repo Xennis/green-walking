@@ -3,6 +3,7 @@ import 'dart:developer' show log;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:green_walking/library/color_ex.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -87,7 +88,7 @@ class _MapViewState extends State<MapView> {
             marginBottom: 48.0,
             marginLeft: 13.0,
             isMetricUnits: true,
-            primaryColor: Colors.blueGrey.value));
+            primaryColor: Colors.blueGrey.toInt32));
         _mapboxMap.annotations.createCircleAnnotationManager().then((value) {
           _circleAnnotationManager = value;
         });
@@ -221,10 +222,10 @@ class _MapViewState extends State<MapView> {
     _circleAnnotationManager?.create(CircleAnnotationOptions(
         geometry: Point(coordinates: position),
         circleRadius: 12,
-        circleColor: const Color.fromRGBO(255, 192, 203, 1).value,
+        circleColor: const Color.fromRGBO(255, 192, 203, 1).toInt32,
         circleOpacity: 0.6,
         circleStrokeWidth: 2,
-        circleStrokeColor: const Color.fromRGBO(255, 192, 203, 1).value));
+        circleStrokeColor: const Color.fromRGBO(255, 192, 203, 1).toInt32));
   }
 
   void _displaySnackBar(String text) {
