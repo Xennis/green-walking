@@ -5,7 +5,7 @@ import 'dart:developer' show log;
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' show Position;
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' show Position, MapboxOptions;
 
 import '../config.dart';
 
@@ -92,7 +92,7 @@ class GeocodingServiceException implements Exception {
   String cause;
 }
 
-Future<GeocodingResult> _mapboxGeocoding(String query, String token, Map<String, String> params) async {
+Future<GeocodingResult> _mapboxGeocoding(String query, Map<String, String> params) async {
   final Uri url = Uri.https('api.mapbox.com', '/geocoding/v5/mapbox.places/$query.json', params);
   try {
     final http.Response response = await http.get(url);
@@ -111,28 +111,28 @@ Future<GeocodingResult> _mapboxGeocoding(String query, String token, Map<String,
 }
 
 // Note For debugging https://docs.mapbox.com/playground/geocoding/ is helpful
-Future<GeocodingResult> mapboxForwardGeocoding(String query, String token, {Position? proximity, int limit = 5}) async {
+Future<GeocodingResult> mapboxForwardGeocoding(String query, {Position? proximity, int limit = 5}) async {
   final Map<String, String> params = <String, String>{
-    'access_token': token,
+    'access_token': await MapboxOptions.getAccessToken(),
     'limit': limit.toString(),
   };
   if (proximity != null) {
     params['proximity'] = _mapboxPositionToString(proximity);
   }
-  return _mapboxGeocoding(query, token, params);
+  return _mapboxGeocoding(query, params);
 }
 
 // Note For debugging https://docs.mapbox.com/playground/geocoding/ is helpful
 // Consider improving it: https://nominatim.openstreetmap.org/ui/reverse.html
-Future<GeocodingResult> mapboxReverseGeocoding(Position query, String token, {int limit = 1}) async {
+Future<GeocodingResult> mapboxReverseGeocoding(Position query, {int limit = 1}) async {
   final Map<String, String> params = <String, String>{
-    'access_token': token,
+    'access_token': await MapboxOptions.getAccessToken(),
     // Not included: country,region,postcode,district,locality,neighborhood,place,poi
     'types': 'address',
     // If multiple types are set the limit must not be set.
     'limit': limit.toString(),
   };
-  return _mapboxGeocoding(_mapboxPositionToString(query), token, params);
+  return _mapboxGeocoding(_mapboxPositionToString(query), params);
 }
 
 String _mapboxPositionToString(Position position, {int fractionDigits = 6}) {

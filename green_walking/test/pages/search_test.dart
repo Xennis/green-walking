@@ -6,9 +6,6 @@ import 'package:green_walking/pages/search.dart';
 void main() {
   testWidgets('SearchPage() can be rendered', (WidgetTester tester) async {
     await tester.pumpWidget(const MaterialApp(
-        home: SearchPage(
-          accessToken: 'some-token',
-        ),
-        localizationsDelegates: <LocalizationsDelegate<dynamic>>[AppLocalizations.delegate]));
+        home: SearchPage(), localizationsDelegates: <LocalizationsDelegate<dynamic>>[AppLocalizations.delegate]));
   });
 }

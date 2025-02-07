@@ -7,9 +7,8 @@ import '../widgets/app_bar.dart';
 import '../widgets/search_result_card.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({super.key, this.userPosition, this.reversePosition, this.proximity, required this.accessToken});
+  const SearchPage({super.key, this.userPosition, this.reversePosition, this.proximity});
 
-  final String accessToken;
   final Position? userPosition;
   final Position? reversePosition;
   final Position? proximity;
@@ -79,10 +78,10 @@ class _SearchPageState extends State<SearchPage> {
     setState(() {
       if (queryPosition != null) {
         _allowAdvancedSearch = true;
-        _result = mapboxReverseGeocoding(queryPosition, widget.accessToken);
+        _result = mapboxReverseGeocoding(queryPosition);
       } else {
         _allowAdvancedSearch = false;
-        _result = mapboxForwardGeocoding(query, widget.accessToken, proximity: widget.proximity);
+        _result = mapboxForwardGeocoding(query, proximity: widget.proximity);
       }
     });
   }
