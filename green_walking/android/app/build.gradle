@@ -40,7 +40,7 @@ android {
         jvmTarget = '1.8'
     }
 
-    compileSdkVersion 34
+    compileSdkVersion 35
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -51,11 +51,9 @@ android {
         // Unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "org.xennis.apps.green_walking"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        // enabled by default for minSdkVersion >= 21
-        multiDexEnabled true
     }
 
     signingConfigs {
