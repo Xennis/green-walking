@@ -14,6 +14,15 @@ jobs:
     - name: Install dependencies
       run: flutter pub get
       working-directory: green_walking
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.3'
+    - name: Install bundler
+      run: gem install bundler
+    - name: Install gems
+      run: bundle install
+      working-directory: green_walking/android
     - name: Build appbundle
       run: |
         flutter build appbundle \
@@ -23,3 +32,6 @@ jobs:
           --dart-define FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID }} \
           --dart-define FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}
       working-directory: green_walking
+    #- name: Run Fastlane
+    #  run: bundle exec fastlane alpha
+    #  working-directory: green_walking/android
