@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer' show log;
 
 import 'package:flutter/material.dart' show Locale, ThemeMode;
+import 'package:green_walking/services/app_prefs_camera_state.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' show CameraState;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,7 +21,7 @@ class AppPrefs {
       return null;
     }
     try {
-      return CameraState.decode(jsonDecode(raw));
+      return CameraStatePrefs.fromJson(jsonDecode(raw));
     } catch (e) {
       // No last location is not critical. A raised exception on start up is.
       log('failed to load location: $e');
@@ -28,12 +29,14 @@ class AppPrefs {
     }
   }
 
-  static void setCameraState(String key, CameraState val) {
+  static Future<bool> setCameraState(String key, CameraState val) {
     try {
-      final String raw = jsonEncode(val.encode());
+      final String raw = jsonEncode(val.toJson());
       SharedPreferences.getInstance().then((SharedPreferences prefs) => prefs.setString(key, raw));
+      return Future.value(true);
     } catch (e) {
       log('failed to store location: $e');
+      return Future.value(false);
     }
   }
 
