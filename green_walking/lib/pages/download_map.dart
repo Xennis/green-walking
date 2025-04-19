@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:green_walking/services/app_prefs.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 import '../config.dart';
@@ -41,7 +42,16 @@ class _DownloadMapPageState extends State<DownloadMapPage> {
               ],
             ),
             Expanded(
-              child: Padding(padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20), child: _mapWidget()),
+              child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                  child: FutureBuilder<CameraState?>(
+                      future: AppPrefs.getCameraState(AppPrefs.keyLastPosition),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return _mapWidget(snapshot.data);
+                        }
+                        return const Center(child: CircularProgressIndicator());
+                      })),
             ),
           ],
         ),
@@ -49,11 +59,11 @@ class _DownloadMapPageState extends State<DownloadMapPage> {
     );
   }
 
-  Widget _mapWidget() {
+  Widget _mapWidget(CameraState? lastCameraState) {
     return MapWidget(
         key: const ValueKey('downloadMapWidget'),
         styleUri: CustomMapboxStyles.outdoor,
-        cameraOptions: CameraOptions(center: Point(coordinates: Position(9.8682, 53.5519)), zoom: 11.0),
+        cameraOptions: CameraOptions(center: lastCameraState?.center, zoom: 11.0),
         onMapCreated: (MapboxMap mapboxMap) {
           _mapboxMap = mapboxMap;
           // Disable

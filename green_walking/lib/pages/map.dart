@@ -34,7 +34,7 @@ class _MapPageState extends State<MapPage> {
       resizeToAvoidBottomInset: false,
       drawer: const AppNavigationDrawer(),
       body: FutureBuilder<_MapConfig>(
-          future: _MapConfig.create(DefaultAssetBundle.of(context)),
+          future: _MapConfig.create(),
           builder: (BuildContext context, AsyncSnapshot<_MapConfig> snapshot) {
             final _MapConfig? data = snapshot.data;
             if (snapshot.hasData && data != null) {
@@ -73,7 +73,7 @@ class _MapConfig {
 
   CameraOptions? lastPosition;
 
-  static Future<_MapConfig> create(AssetBundle assetBundle) async {
+  static Future<_MapConfig> create() async {
     final CameraState? lastState = await AppPrefs.getCameraState(AppPrefs.keyLastPosition);
     if (lastState == null) {
       return _MapConfig(lastPosition: null);
