@@ -51,7 +51,7 @@ class _DownloadMapPageState extends State<DownloadMapPage> {
 
   Widget _mapWidget() {
     return MapWidget(
-        key: const ValueKey("downloadMapWidget"),
+        key: const ValueKey('downloadMapWidget'),
         styleUri: CustomMapboxStyles.outdoor,
         cameraOptions: CameraOptions(center: Point(coordinates: Position(9.8682, 53.5519)), zoom: 11.0),
         onMapCreated: (MapboxMap mapboxMap) {

@@ -60,13 +60,13 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                   alignment: MainAxisAlignment.center,
                   children: <Widget>[
                     ElevatedButton(
-                      onPressed: _onDownloadNewMap,
+                      onPressed: () => _onDownloadNewMap(locale),
                       child: Text(locale.downloadNewOfflineMapButton),
                     ),
                   ],
                 ),
                 const Divider(),
-                _downloadProgressWidget(),
+                _downloadProgressWidget(locale),
                 ListView.builder(
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
@@ -76,7 +76,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                     return OfflineMapCard(
                       region: region,
                       tileStore: _tileStore,
-                      onDelete: () => _onDeleteRegion(region.id, index),
+                      onDelete: () => _onDeleteRegion(locale, region.id, index),
                     );
                   },
                 ),
@@ -89,7 +89,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                     return OfflineMapStyleCard(
                         stylePack: pack,
                         canBeDeleted: _regions.isEmpty,
-                        onDelete: () => _onDeleteStylePack(pack.styleURI, index));
+                        onDelete: () => _onDeleteStylePack(locale, pack.styleURI, index));
                   },
                 ),
               ],
@@ -98,7 +98,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
     );
   }
 
-  Widget _downloadProgressWidget() {
+  Widget _downloadProgressWidget(AppLocalizations locale) {
     final progress = _downloadProgress;
     if (progress == null) {
       return Container();
@@ -108,8 +108,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
         initialData: 0.0,
         builder: (context, snapshot) {
           return Column(mainAxisSize: MainAxisSize.min, children: [
-            // TODO: Translate
-            Text("Progress: ${(snapshot.requireData * 100).toStringAsFixed(0)}%"),
+            Text(locale.offlineMapProgress((snapshot.requireData * 100).toStringAsFixed(0))),
             LinearProgressIndicator(
               value: snapshot.requireData,
             )
@@ -117,7 +116,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
         });
   }
 
-  Future<void> _onDownloadNewMap() async {
+  Future<void> _onDownloadNewMap(AppLocalizations locale) async {
     final regionLoadOptions = await Navigator.push<TileRegionLoadOptions>(
         context,
         MaterialPageRoute(
@@ -144,8 +143,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
       });
     } catch (e) {
       log('failed to download map: $e');
-      // TODO: Translate
-      _displaySnackBar("Failed to download map");
+      _displaySnackBar(locale.offlineMapDownloadFailed);
       setState(() => _downloadProgress = null);
     }
   }
@@ -184,31 +182,29 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
     return tileRegion;
   }
 
-  Future<void> _onDeleteStylePack(String styleURI, int index) async {
+  Future<void> _onDeleteStylePack(AppLocalizations locale, String styleURI, int index) async {
     try {
       await _offlineManager.removeStylePack(styleURI);
       setState(() {
         _stylePacks.removeAt(index);
       });
-      // TODO: Add translation
-      _displaySnackBar("Deleted map style");
+      _displaySnackBar(locale.offlineMapDeleteStylePackSuccess);
     } catch (e) {
       log('failed to delete downloaded style pack: $e');
-      _displaySnackBar("Failed to delete map style");
+      _displaySnackBar(locale.offlineMapDeleteStylePackFailed);
     }
   }
 
-  Future<void> _onDeleteRegion(String regionId, int index) async {
+  Future<void> _onDeleteRegion(AppLocalizations locale, String regionId, int index) async {
     try {
       await _tileStore.removeRegion(regionId);
       setState(() {
         _regions.removeAt(index);
       });
-      // TODO: Add translation
-      _displaySnackBar("Deleted map");
+      _displaySnackBar(locale.offlineMapDeleteRegionSuccess);
     } catch (e) {
       log('failed to remove downloaded region: $e');
-      _displaySnackBar("Failed to delete map");
+      _displaySnackBar(locale.offlineMapDeleteRegionFailed);
     }
   }
 
