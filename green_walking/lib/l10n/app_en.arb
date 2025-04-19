@@ -399,6 +399,36 @@
   "@offlineMapStyleCardSubtitle": {
     "description": "Subtitle of a offline map style card."
   },
+  "offlineMapProgress": "Progress: {percentage}%",
+  "@offlineMapProgress": {
+    "description": "Progress of downlading a map.",
+    "placeholders": {
+      "percentage": {
+        "type": "String",
+        "example": "25"
+      }
+    }
+  },
+  "offlineMapDownloadFailed": "Failed to download the map",
+  "@offlineMapDownloadFailed": {
+    "description": "Snack bar error text."
+  },
+  "offlineMapDeleteStylePackSuccess": "Deleted map style",
+  "@offlineMapDeleteStylePackSuccess": {
+    "description": "Snack bar info text."
+  },
+  "offlineMapDeleteStylePackFailed": "Failed to delete map style",
+  "@offlineMapDeleteStylePackFailed": {
+    "description": "Snack bar error text."
+  },
+  "offlineMapDeleteRegionSuccess": "Deleted map",
+  "@offlineMapDeleteRegionSuccess": {
+    "description": "Snack bar info text."
+  },
+  "offlineMapDeleteRegionFailed": "Failed to delete the map",
+  "@offlineMapDeleteRegionFailed": {
+    "description": "Snack bar error text."
+  },
   "downloadMapDialogTitle": "Download area?",
   "@downloadMapDialogTitle": {
     "description": "Title of the download map dialog."
