@@ -24,7 +24,7 @@ class AppPrefsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  _loadFromPrefs() async {
+  void _loadFromPrefs() async {
     themeMode = await AppPrefs.getThemeMode();
     locale = await AppPrefs.getLocale();
     notifyListeners();
