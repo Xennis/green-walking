@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:green_walking/services/app_prefs.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -8,6 +7,7 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import '../config.dart';
 import '../library/offline.dart';
 import '../widgets/offline/download_map_dialog.dart';
+import '../l10n/app_localizations.dart';
 
 class DownloadMapPage extends StatefulWidget {
   const DownloadMapPage({super.key, required this.tileStore});

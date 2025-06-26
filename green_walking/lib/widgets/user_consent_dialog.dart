@@ -1,11 +1,11 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../config.dart';
 import '../services/app_prefs.dart';
+import '../l10n/app_localizations.dart';
 
 void enableCrashReportingOrConsent(BuildContext context) {
   AppPrefs.getBool(AppPrefs.crashReportingEnabled).then((bool? enabled) {

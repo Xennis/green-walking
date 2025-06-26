@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/prefs_provider.dart';
 import '../widgets/settings/crash_reporting_list_tile.dart';
 import '../widgets/settings/language_list_tile.dart';
 import '../widgets/settings/theme_list_tile.dart';
+import '../l10n/app_localizations.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
