@@ -13,5 +13,9 @@ GeneratedPluginRegistrant.java
 # Bundle vendor dir
 .bundle/vendor
 
+# Local fles
+build/
+.kotlin/
+
 # Custom
 /app/.cxx
