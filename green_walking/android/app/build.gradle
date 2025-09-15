@@ -40,7 +40,7 @@ android {
         jvmTarget = '1.8'
     }
 
-    compileSdkVersion 35
+    compileSdkVersion 36
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -50,8 +50,8 @@ android {
     defaultConfig {
         // Unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "org.xennis.apps.green_walking"
-        minSdkVersion 21
-        targetSdkVersion 35
+        minSdkVersion flutter.minSdkVersion
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
