@@ -23,27 +23,23 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
-}
-
 
 android {
-    kotlinOptions {
-        // Added due to https://github.com/flutter/flutter/issues/147185
-        jvmTarget = '1.8'
-    }
-
+    namespace 'org.xennis.apps.green_walking'
     compileSdkVersion 36
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+    }
+
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
 
@@ -52,8 +48,8 @@ android {
         applicationId "org.xennis.apps.green_walking"
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion 36
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
     }
 
     signingConfigs {
@@ -69,23 +65,8 @@ android {
             signingConfig signingConfigs.release
         }
     }
-    lint {
-        disable 'InvalidPackage'
-    }
-    namespace 'org.xennis.apps.green_walking'
 }
 
 flutter {
     source '../..'
-}
-
-dependencies {
-    // firesbase stack leads to > 65K methods. Hence https://developer.android.com/studio/build/multidex is needed.
-    // That's default for minSdkVersion >= 21.
-    implementation 'androidx.multidex:multidex:2.0.1'
-
-    // https://firebase.google.com/docs/android/learn-more#bom
-    // When using the BoM, you don't specify versions in Firebase library dependencies.
-    //implementation platform('com.google.firebase:firebase-bom:29.0.0')
-    //implementation 'com.google.firebase:firebase-crashlytics'
 }
