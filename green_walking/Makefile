@@ -21,12 +21,6 @@ test:
 	@echo ">>> Flutter test"
 	flutter test $(TEST_DIR)
 
-release-android:
-	@echo ">>> [Android] Flutter build release"
-	flutter build appbundle
-	@echo ">>> [Android] Fastlane upload to Play Store"
-	cd android && bundle exec fastlane alpha
-
 upgrade:
 	@echo ">>> Upgrade Flutter dependencies"
 	flutter pub upgrade --major-versions
