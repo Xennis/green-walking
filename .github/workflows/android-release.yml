@@ -11,9 +11,6 @@ jobs:
       with:
         flutter-version: '3.35.x'
         channel: 'stable'
-    - name: Install dependencies
-      run: flutter pub get
-      working-directory: green_walking
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
