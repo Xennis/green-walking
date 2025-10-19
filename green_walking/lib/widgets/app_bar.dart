@@ -14,34 +14,32 @@ class MapAppBar extends StatelessWidget {
     final AppLocalizations locale = AppLocalizations.of(context)!;
     final ThemeData theme = Theme.of(context);
 
-    return SafeArea(
-        top: true,
-        child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 11, 16, 0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
-                border: Border.all(color: Colors.grey[200]!),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 6, right: 6),
-                child: Row(
-                  children: <Widget>[
-                    leading,
-                    Expanded(
-                      child: title,
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.layers,
-                        semanticLabel: locale.mapSwitchLayerSemanticLabel,
-                      ),
-                      onPressed: onLayerToogle,
-                    ),
-                  ],
+    return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 11, 16, 0),
+        child: Container(
+          decoration: BoxDecoration(
+            color: theme.scaffoldBackgroundColor,
+            border: Border.all(color: Colors.grey[200]!),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 6, right: 6),
+            child: Row(
+              children: <Widget>[
+                leading,
+                Expanded(
+                  child: title,
                 ),
-              ),
-            )));
+                IconButton(
+                  icon: Icon(
+                    Icons.layers,
+                    semanticLabel: locale.mapSwitchLayerSemanticLabel,
+                  ),
+                  onPressed: onLayerToogle,
+                ),
+              ],
+            ),
+          ),
+        ));
   }
 }
