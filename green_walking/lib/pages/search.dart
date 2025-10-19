@@ -46,30 +46,34 @@ class _SearchPageState extends State<SearchPage> {
         // If the search in the search bar is clicked the keyboard appears. The keyboard
         // should be over the map and by that avoid resizing of the whole app / map.
         resizeToAvoidBottomInset: false,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              MapAppBar(
-                leading: IconButton(
-                    icon: Icon(Icons.arrow_back, semanticLabel: MaterialLocalizations.of(context).backButtonTooltip),
-                    onPressed: () => Navigator.pop(context)),
-                title: TextField(
-                  controller: _queryFieldController,
-                  autofocus: true,
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.go,
-                  decoration: InputDecoration(
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-                      hintText: locale.searchBoxHintLabel('...')),
-                  onSubmitted: _onSearchSubmitted,
-                ),
+        body: SafeArea(
+            top: true,
+            bottom: true,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  MapAppBar(
+                    leading: IconButton(
+                        icon:
+                            Icon(Icons.arrow_back, semanticLabel: MaterialLocalizations.of(context).backButtonTooltip),
+                        onPressed: () => Navigator.pop(context)),
+                    title: TextField(
+                      controller: _queryFieldController,
+                      autofocus: true,
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.go,
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 15),
+                          hintText: locale.searchBoxHintLabel('...')),
+                      onSubmitted: _onSearchSubmitted,
+                    ),
+                  ),
+                  Padding(padding: const EdgeInsets.symmetric(horizontal: 10), child: _resultList(context)),
+                ],
               ),
-              Padding(padding: const EdgeInsets.symmetric(horizontal: 10), child: _resultList(context)),
-            ],
-          ),
-        ));
+            )));
   }
 
   Future<void> _onSearchSubmitted(String query) async {
