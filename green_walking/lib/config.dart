@@ -1,7 +1,7 @@
-String androidAppID = 'org.xennis.apps.green_walking';
-String appVersion = '3.6.0';
-String appAuthor = 'Xennis';
-String supportMail = 'code@xennis.org';
+const androidAppID = 'org.xennis.apps.green_walking';
+const appVersion = '3.6.0';
+const appAuthor = 'Xennis';
+const supportMail = 'code@xennis.org';
 Uri privacyPolicyUrl =
     Uri.https('raw.githubusercontent.com', '/Xennis/green-walking/main/web/privacy/privacy-policy.md');
 Uri appPlayStoreUrl = Uri.https('play.google.com', '/store/apps/details', {'id': androidAppID});

@@ -11,7 +11,6 @@ class Routes {
   static const String legalNotice = 'legal-notice';
   static const String map = 'map';
   static const String offlineMaps = 'offline-maps';
-  static const String privacy = 'privacy';
   static const String settings = 'settings';
 }
 

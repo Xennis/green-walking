@@ -1,4 +1,4 @@
-.PHONY: check format format-check lint test release-android release-web
+.PHONY: check format format-check lint test upgrade
 
 LIB_DIR = lib/
 TEST_DIR = test/

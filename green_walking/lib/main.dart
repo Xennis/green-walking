@@ -51,8 +51,7 @@ class GreenWalkingApp extends StatelessWidget {
             themeMode: prefsProvider.themeMode,
             initialRoute: Routes.map,
             routes: () {
-              final Map<String, WidgetBuilder> routes = getRoutes(context);
-              return routes;
+              return getRoutes(context);
             }(),
             locale: prefsProvider.locale,
             localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
