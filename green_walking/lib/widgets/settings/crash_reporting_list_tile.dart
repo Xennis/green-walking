@@ -41,7 +41,6 @@ class _CrashReportingListTileState extends State<CrashReportingListTile> {
                   });
                 });
           }),
-      onTap: () => {},
     );
   }
 }
