@@ -1,5 +1,5 @@
 const androidAppID = 'org.xennis.apps.green_walking';
-const appVersion = '3.6.0';
+const appVersion = '3.6.1';
 const appAuthor = 'Xennis';
 const supportMail = 'code@xennis.org';
 Uri privacyPolicyUrl =

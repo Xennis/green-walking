@@ -1,0 +1,1 @@
+* Fixed spacing of bottom map elements for certain screen
