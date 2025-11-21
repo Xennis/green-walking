@@ -3,7 +3,7 @@ const appVersion = '3.6.1';
 const appAuthor = 'Xennis';
 const supportMail = 'code@xennis.org';
 Uri privacyPolicyUrl =
-    Uri.https('raw.githubusercontent.com', '/Xennis/green-walking/main/web/privacy/privacy-policy.md');
+    Uri.https('fabian-rosenthal.notion.site', '/2b25e9c9e03380608b6febeb39636d21');
 Uri appPlayStoreUrl = Uri.https('play.google.com', '/store/apps/details', {'id': androidAppID});
 
 class CustomMapboxStyles {
