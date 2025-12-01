@@ -18,14 +18,14 @@ environment:
   sdk: ">=3.1.0 <4.0.0"
 
 dependencies:
-  firebase_core: ^4.2.0
-  firebase_crashlytics: ^5.0.3
+  firebase_core: ^4.2.1
+  firebase_crashlytics: ^5.0.5
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
   geolocator: ^14.0.2
-  http: ^1.5.0
+  http: ^1.6.0
   intl: ^0.20.2
   mapbox_maps_flutter: ^2.12.0
   path_provider: ^2.1.5
