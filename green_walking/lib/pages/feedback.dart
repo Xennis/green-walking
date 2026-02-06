@@ -46,7 +46,7 @@ class FeedbackPage extends StatelessWidget {
     );
   }
 
-  void _onPressed(AppLocalizations locale) {
+  Future<void> _onPressed(AppLocalizations locale) async {
     final Uri mailTo = Uri(
       scheme: 'mailto',
       path: supportMail,
@@ -55,6 +55,6 @@ class FeedbackPage extends StatelessWidget {
         //'body': 'App Version xx',
       },
     );
-    launchUrl(mailTo);
+    await launchUrl(mailTo);
   }
 }

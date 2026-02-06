@@ -7,16 +7,15 @@ import '../config.dart';
 import '../l10n/app_localizations.dart';
 import '../services/app_prefs.dart';
 
-void enableCrashReportingOrConsent(BuildContext context) {
-  AppPrefs.getBool(AppPrefs.crashReportingEnabled).then((bool? enabled) {
-    if (enabled == true) {
-      // Privacy: Only enable if it is set to enabled.
-      FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-    } else if (enabled == null) {
-      if (!context.mounted) return;
-      showDialog<dynamic>(context: context, builder: (BuildContext context) => const UserConsentDialog());
-    }
-  });
+Future<void> enableCrashReportingOrConsent(BuildContext context) async {
+  final bool? enabled = await AppPrefs.getBool(AppPrefs.crashReportingEnabled);
+  if (enabled == true) {
+    // Privacy: Only enable if it is set to enabled.
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+  } else if (enabled == null) {
+    if (!context.mounted) return;
+    await showDialog<dynamic>(context: context, builder: (BuildContext context) => const UserConsentDialog());
+  }
 }
 
 class UserConsentDialog extends StatelessWidget {
@@ -40,8 +39,8 @@ class UserConsentDialog extends StatelessWidget {
                   text: locale.gdprPrivacyPolicy,
                   style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
                   recognizer: TapGestureRecognizer()
-                    ..onTap = () {
-                      launchUrl(privacyPolicyUrl);
+                    ..onTap = () async {
+                      await launchUrl(privacyPolicyUrl);
                     },
                 ),
                 TextSpan(
@@ -56,17 +55,21 @@ class UserConsentDialog extends StatelessWidget {
       actions: <Widget>[
         TextButton(
             child: Text(locale.gdprDisagree.toUpperCase()),
-            onPressed: () {
-              AppPrefs.setBool(AppPrefs.crashReportingEnabled, false);
-              FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
-              Navigator.of(context).pop();
+            onPressed: () async {
+              await AppPrefs.setBool(AppPrefs.crashReportingEnabled, false);
+              await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
             }),
         TextButton(
             child: Text(locale.gdprAgree.toUpperCase()),
-            onPressed: () {
-              AppPrefs.setBool(AppPrefs.crashReportingEnabled, true);
-              FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-              Navigator.of(context).pop();
+            onPressed: () async {
+              await AppPrefs.setBool(AppPrefs.crashReportingEnabled, true);
+              await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
             }),
       ],
     );

@@ -85,26 +85,24 @@ class _MapViewState extends State<MapView> {
 
     return MapWidget(
       key: const ValueKey('mapWidget'),
-      onMapCreated: (MapboxMap mapboxMap) {
+      onMapCreated: (MapboxMap mapboxMap) async {
         _mapboxMap = mapboxMap;
-        _mapboxMap.style.setProjection(StyleProjection(name: StyleProjectionName.globe));
+        unawaited(_mapboxMap.style.setProjection(StyleProjection(name: StyleProjectionName.globe)));
         // _mapboxMap.style.localizeLabels('en', null);
         //_mapboxMap.setTelemetryEnabled(false);
-        _mapboxMap.compass.updateSettings(CompassSettings(marginTop: safeTop + 78, marginRight: 13.0));
+        unawaited(_mapboxMap.compass.updateSettings(CompassSettings(marginTop: safeTop + 78, marginRight: 13.0)));
         // By default the logo and attribution have little margin to the bottom
-        _mapboxMap.logo.updateSettings(LogoSettings(marginBottom: safeBottom + 13.0));
-        _mapboxMap.attribution.updateSettings(AttributionSettings(marginBottom: safeBottom + 13.0));
+        unawaited(_mapboxMap.logo.updateSettings(LogoSettings(marginBottom: safeBottom + 13.0)));
+        unawaited(_mapboxMap.attribution.updateSettings(AttributionSettings(marginBottom: safeBottom + 13.0)));
         // By default the scaleBar has a black primary colors which is pretty flashy.
-        _mapboxMap.scaleBar.updateSettings(ScaleBarSettings(
+        unawaited(_mapboxMap.scaleBar.updateSettings(ScaleBarSettings(
             enabled: false,
             position: OrnamentPosition.BOTTOM_LEFT,
             marginBottom: safeBottom + 48.0,
             marginLeft: 13.0,
             isMetricUnits: true,
-            primaryColor: Colors.blueGrey.toInt32));
-        _mapboxMap.annotations.createCircleAnnotationManager().then((value) {
-          _circleAnnotationManager = value;
-        });
+            primaryColor: Colors.blueGrey.toInt32)));
+        _circleAnnotationManager = await _mapboxMap.annotations.createCircleAnnotationManager();
       },
       cameraOptions:
           widget.lastCameraOption ?? CameraOptions(center: Point(coordinates: Position(9.8682, 53.5519)), zoom: 11.0),
@@ -112,7 +110,7 @@ class _MapViewState extends State<MapView> {
       onMapIdleListener: _onCameraIdle,
       onLongTapListener: _onLongTapListener,
       onCameraChangeListener: (CameraChangedEventData cameraChangedEventData) {
-        _mapboxMap.scaleBar.updateSettings(ScaleBarSettings(enabled: true));
+        unawaited(_mapboxMap.scaleBar.updateSettings(ScaleBarSettings(enabled: true)));
       },
       onScrollListener: (MapContentGestureContext context) {
         if (_userLocationTracking.value != UserLocationTracking.no) {
@@ -129,10 +127,9 @@ class _MapViewState extends State<MapView> {
       final Position tapPosition = context.point.coordinates;
       final Position? userPosition = (await _mapboxMap.getPuckLocation())?.position;
 
-      return _displaySearchResult(await widget.onSearchPage(userPosition: userPosition, reversePosition: tapPosition));
+      await _displaySearchResult(await widget.onSearchPage(userPosition: userPosition, reversePosition: tapPosition));
     } catch (e) {
       log('failed to get tap position: $e');
-      return;
     }
   }
 
@@ -142,15 +139,15 @@ class _MapViewState extends State<MapView> {
       return;
     }
     final Position? userPosition = (await _mapboxMap.getPuckLocation())?.position;
-    return _displaySearchResult(await widget.onSearchPage(userPosition: userPosition, proximity: cameraPosition));
+    await _displaySearchResult(await widget.onSearchPage(userPosition: userPosition, proximity: cameraPosition));
   }
 
   void _onLayerToggle() async {
     String currentStyle = await _mapboxMap.style.getStyleURI();
     if (currentStyle == CustomMapboxStyles.satellite) {
-      _mapboxMap.loadStyleURI(CustomMapboxStyles.outdoor);
+      unawaited(_mapboxMap.loadStyleURI(CustomMapboxStyles.outdoor));
     } else {
-      _mapboxMap.loadStyleURI(CustomMapboxStyles.satellite);
+      unawaited(_mapboxMap.loadStyleURI(CustomMapboxStyles.satellite));
     }
   }
 
@@ -166,7 +163,7 @@ class _MapViewState extends State<MapView> {
     }
     await _mapboxMap.location.updateSettings(LocationComponentSettings(
         enabled: true, pulsingEnabled: false, showAccuracyRing: true, puckBearingEnabled: true));
-    _refreshTrackLocation();
+    await _refreshTrackLocation();
   }
 
   Future<void> _onCameraIdle(MapIdleEventData mapIdleEventData) async {
@@ -177,11 +174,11 @@ class _MapViewState extends State<MapView> {
 
     // TODO: Maybe use a Timer instead of writing data that often?
     final CameraState cameraState = await _mapboxMap.getCameraState();
-    AppPrefs.setCameraState(AppPrefs.keyLastPosition, cameraState);
+    unawaited(AppPrefs.setCameraState(AppPrefs.keyLastPosition, cameraState));
   }
 
   Future<void> _setCameraPosition(Position position, double? bearing, double? pitch) async {
-    return _mapboxMap.flyTo(
+    await _mapboxMap.flyTo(
         CameraOptions(
           center: Point(coordinates: position),
           bearing: bearing,
@@ -191,12 +188,12 @@ class _MapViewState extends State<MapView> {
         MapAnimationOptions(duration: 900 + 100));
   }
 
-  void _refreshTrackLocation() async {
+  Future<void> _refreshTrackLocation() async {
     _updateUserLocation?.cancel();
-    WakelockPlus.enable();
+    unawaited(WakelockPlus.enable());
     _updateUserLocation = Timer.periodic(const Duration(milliseconds: 900), (timer) async {
       if (_userLocationTracking.value == UserLocationTracking.no) {
-        WakelockPlus.disable();
+        unawaited(WakelockPlus.disable());
         _updateUserLocation?.cancel();
         return;
       }
@@ -212,9 +209,9 @@ class _MapViewState extends State<MapView> {
 
       switch (_userLocationTracking.value) {
         case UserLocationTracking.positionBearing:
-          _setCameraPosition(puckLocation.position, puckLocation.bearing, 50.0);
+          unawaited(_setCameraPosition(puckLocation.position, puckLocation.bearing, 50.0));
         case UserLocationTracking.position:
-          _setCameraPosition(puckLocation.position, 0.0, 0.0);
+          unawaited(_setCameraPosition(puckLocation.position, 0.0, 0.0));
         case UserLocationTracking.no:
         // Handled above already. In case there is no location returned we would not cancel
         // the timer otherwise.
@@ -222,17 +219,17 @@ class _MapViewState extends State<MapView> {
     });
   }
 
-  void _displaySearchResult(Position? position) async {
+  Future<void> _displaySearchResult(Position? position) async {
     if (position == null) {
       return;
     }
     // If we keep the tracking on the map would move back to the user location.
     _userLocationTracking.value = UserLocationTracking.no;
-    _setCameraPosition(position, 0, 0);
+    unawaited(_setCameraPosition(position, 0, 0));
 
     // Draw circle
     await _circleAnnotationManager?.deleteAll();
-    _circleAnnotationManager?.create(CircleAnnotationOptions(
+    await _circleAnnotationManager?.create(CircleAnnotationOptions(
         geometry: Point(coordinates: position),
         circleRadius: 12,
         circleColor: const Color.fromRGBO(255, 192, 203, 1).toInt32,

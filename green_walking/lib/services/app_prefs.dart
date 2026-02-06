@@ -29,10 +29,11 @@ class AppPrefs {
     }
   }
 
-  static Future<bool> setCameraState(String key, CameraState val) {
+  static Future<bool> setCameraState(String key, CameraState val) async {
     try {
       final String raw = jsonEncode(val.toJson());
-      SharedPreferences.getInstance().then((SharedPreferences prefs) => prefs.setString(key, raw));
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(key, raw);
       return Future.value(true);
     } catch (e) {
       log('failed to store location: $e');
@@ -45,8 +46,9 @@ class AppPrefs {
     return prefs.getBool(key);
   }
 
-  static void setBool(String key, bool val) {
-    SharedPreferences.getInstance().then((SharedPreferences prefs) => prefs.setBool(key, val));
+  static Future<void> setBool(String key, bool val) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(key, val);
   }
 
   static Future<ThemeMode?> getThemeMode() async {

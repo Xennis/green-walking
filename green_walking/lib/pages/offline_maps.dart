@@ -163,7 +163,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
       }
     });
     downloadProgress.sink.add(1);
-    downloadProgress.sink.close();
+    await downloadProgress.sink.close();
     return stylePack;
   }
 
@@ -178,7 +178,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
       }
     });
     downloadProgress.sink.add(1);
-    downloadProgress.sink.close();
+    await downloadProgress.sink.close();
     return tileRegion;
   }
 
