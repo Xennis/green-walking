@@ -1,4 +1,4 @@
-.PHONY: check format format-check lint test upgrade
+.PHONY: check format format-check lint fix test upgrade generate
 
 LIB_DIR = lib/
 TEST_DIR = test/
@@ -17,6 +17,10 @@ lint:
 	@echo ">>> Flutter analyze"
 	flutter analyze $(LIB_DIR) $(TEST_DIR)
 
+fix:
+	@echo ">>> Dart fix"
+	dart fix --apply
+
 test:
 	@echo ">>> Flutter test"
 	flutter test $(TEST_DIR)
@@ -26,3 +30,7 @@ upgrade:
 	flutter pub upgrade --major-versions
 	@echo ">>> Upgrade Fastlane dependencies"
 	cd android/ && bundle update
+
+generate:
+	@echo ">>> Generate l10n"
+	flutter gen-l10n
