@@ -67,11 +67,11 @@ class _DownloadMapPageState extends State<DownloadMapPage> {
         onMapCreated: (MapboxMap mapboxMap) {
           _mapboxMap = mapboxMap;
           // Disable
-          _mapboxMap.scaleBar.updateSettings(ScaleBarSettings(enabled: false));
-          _mapboxMap.compass.updateSettings(CompassSettings(enabled: false));
-          _mapboxMap.gestures.updateSettings(GesturesSettings(rotateEnabled: false, pitchEnabled: false));
+          unawaited(_mapboxMap.scaleBar.updateSettings(ScaleBarSettings(enabled: false)));
+          unawaited(_mapboxMap.compass.updateSettings(CompassSettings(enabled: false)));
+          unawaited(_mapboxMap.gestures.updateSettings(GesturesSettings(rotateEnabled: false, pitchEnabled: false)));
           // Bounds (minZoom: zoomed out towards globe)
-          _mapboxMap.setBounds(CameraBoundsOptions(maxZoom: 14, minZoom: 10));
+          unawaited(_mapboxMap.setBounds(CameraBoundsOptions(maxZoom: 14, minZoom: 10)));
         });
   }
 

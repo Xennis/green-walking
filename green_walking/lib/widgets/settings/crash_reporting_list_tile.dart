@@ -30,12 +30,12 @@ class _CrashReportingListTileState extends State<CrashReportingListTile> {
           builder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
             return Switch(
                 value: snapshot.data ?? false,
-                onChanged: (bool? newValue) {
+                onChanged: (bool? newValue) async {
                   if (newValue == null) {
                     return;
                   }
-                  AppPrefs.setBool(AppPrefs.crashReportingEnabled, newValue);
-                  FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(newValue);
+                  await AppPrefs.setBool(AppPrefs.crashReportingEnabled, newValue);
+                  await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(newValue);
                   setState(() {
                     _enabled = newValue;
                   });
