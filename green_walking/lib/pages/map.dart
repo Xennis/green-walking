@@ -3,11 +3,11 @@ import 'dart:developer' show log;
 import 'package:flutter/material.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' show CameraOptions, CameraState, Position;
 
-import 'search.dart';
 import '../services/app_prefs.dart';
-import '../widgets/user_consent_dialog.dart';
 import '../widgets/map_view.dart';
 import '../widgets/navigation_drawer.dart';
+import '../widgets/user_consent_dialog.dart';
+import 'search.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});

@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../config.dart';
+import '../l10n/app_localizations.dart';
 import '../library/color_ex.dart';
 import '../library/map_utils.dart';
 import '../services/app_prefs.dart';
 import '../widgets/app_bar.dart';
 import '../widgets/location_button.dart';
-import '../config.dart';
-import '../l10n/app_localizations.dart';
 
 class MapView extends StatefulWidget {
   const MapView({super.key, required this.lastCameraOption, required this.onOpenDrawer, required this.onSearchPage});

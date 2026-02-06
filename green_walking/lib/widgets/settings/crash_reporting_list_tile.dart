@@ -1,8 +1,8 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 
-import '../../services/app_prefs.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/app_prefs.dart';
 
 class CrashReportingListTile extends StatefulWidget {
   const CrashReportingListTile({super.key});

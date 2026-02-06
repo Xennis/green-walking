@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../config.dart';
-import '../services/app_prefs.dart';
 import '../l10n/app_localizations.dart';
+import '../services/app_prefs.dart';
 
 void enableCrashReportingOrConsent(BuildContext context) {
   AppPrefs.getBool(AppPrefs.crashReportingEnabled).then((bool? enabled) {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../provider/prefs_provider.dart';
 import '../../l10n/app_localizations.dart';
+import '../../provider/prefs_provider.dart';
 
 class LanguageListTile extends StatefulWidget {
   const LanguageListTile(this.locale, {super.key});

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../config.dart';
-import '../routes.dart';
 import '../l10n/app_localizations.dart';
+import '../routes.dart';
 
 class AppNavigationDrawer extends StatelessWidget {
   const AppNavigationDrawer({super.key});
