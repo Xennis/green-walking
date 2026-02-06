@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
-import '../../library/util.dart';
 import '../../l10n/app_localizations.dart';
+import '../../library/util.dart';
 
 class DownloadMapDialog extends StatelessWidget {
   const DownloadMapDialog({super.key, required this.tileStore, required this.regionLoadOptions});

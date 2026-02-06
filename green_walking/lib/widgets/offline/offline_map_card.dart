@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
-import '../../library/offline.dart';
 import '../../l10n/app_localizations.dart';
+import '../../library/offline.dart';
 
 class OfflineMapCard extends StatelessWidget {
   const OfflineMapCard({super.key, required this.region, required this.tileStore, required this.onDelete});

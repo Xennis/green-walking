@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:green_walking/l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:green_walking/l10n/app_localizations.dart';
 import 'package:green_walking/pages/map.dart';
 
 void main() {

@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../l10n/app_localizations.dart';
 import '../widgets/offline/offline_map_card.dart';
 import 'download_map.dart';
-import '../l10n/app_localizations.dart';
 
 class OfflineMapsPage extends StatefulWidget {
   const OfflineMapsPage({super.key});

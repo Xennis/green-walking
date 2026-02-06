@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:turf/turf.dart';
 
+import '../l10n/app_localizations.dart';
 import '../services/geocoding.dart';
 import '../widgets/app_bar.dart';
 import '../widgets/search_result_card.dart';
-import '../l10n/app_localizations.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key, this.userPosition, this.reversePosition, this.proximity});

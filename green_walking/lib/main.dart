@@ -7,9 +7,9 @@ import 'package:provider/provider.dart';
 
 import 'config.dart';
 import 'firebase_options.dart';
+import 'l10n/app_localizations.dart';
 import 'provider/prefs_provider.dart';
 import 'routes.dart';
-import 'l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
