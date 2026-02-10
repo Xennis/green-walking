@@ -143,7 +143,7 @@ class _MapViewState extends State<MapView> {
   }
 
   void _onLayerToggle() async {
-    String currentStyle = await _mapboxMap.style.getStyleURI();
+    final String currentStyle = await _mapboxMap.style.getStyleURI();
     if (currentStyle == CustomMapboxStyles.satellite) {
       unawaited(_mapboxMap.loadStyleURI(CustomMapboxStyles.outdoor));
     } else {

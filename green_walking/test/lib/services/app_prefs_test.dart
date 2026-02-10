@@ -7,8 +7,8 @@ void main() {
   test('cameraState set and get', () async {
     // given
     SharedPreferences.setMockInitialValues({});
-    Point center = Point(coordinates: Position(52.5200, 13.4050));
-    CameraState cameraState = CameraState(
+    final Point center = Point(coordinates: Position(52.5200, 13.4050));
+    final CameraState cameraState = CameraState(
         center: center,
         padding: MbxEdgeInsets(top: 0, left: 0, bottom: 0, right: 0),
         zoom: 10,
@@ -16,8 +16,8 @@ void main() {
         pitch: 2.0);
 
     // when
-    bool actualSet = await AppPrefs.setCameraState('key', cameraState);
-    CameraState? actualGet = await AppPrefs.getCameraState('key');
+    final bool actualSet = await AppPrefs.setCameraState('key', cameraState);
+    final CameraState? actualGet = await AppPrefs.getCameraState('key');
 
     // then
     expect(actualSet, true);
